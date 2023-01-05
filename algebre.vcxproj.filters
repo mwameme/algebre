@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\precision">
+      <UniqueIdentifier>{7c4c5422-409e-4af5-bfcb-cf3be2a4926d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\objets algebre">
+      <UniqueIdentifier>{c8a251e1-7c9b-426c-85f0-9226b0e0b9d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\ensemble">
+      <UniqueIdentifier>{91a6a502-6b3a-4ef3-ac2c-ba979658729e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\objet_n">
+      <UniqueIdentifier>{a49515c4-cdbd-4ec6-b8dd-678140d9368c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="algebre.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="TVD.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="precision\precisioncore.cpp">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClCompile>
+    <ClCompile Include="vote.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ordre.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TVD.hpp">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="interpolation.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="precision\fprecision.h">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="precision\iprecision.h">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="precision\fractionprecision.h">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="precision\intervalprecision.h">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="precision\complexprecision.h">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="anneau quotient.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="corps quotient.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="complexe.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="matrice.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="polynome.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="polynome_n.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="rationnel.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="InfInt.h">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="fonctions template.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="norme.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="types.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="erreur.hpp">
+      <Filter>Fichiers d%27en-tête\precision</Filter>
+    </ClInclude>
+    <ClInclude Include="diagonalisation.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="fact_for.hpp">
+      <Filter>Fichiers d%27en-tête\objet_n</Filter>
+    </ClInclude>
+    <ClInclude Include="n_for.hpp">
+      <Filter>Fichiers d%27en-tête\objet_n</Filter>
+    </ClInclude>
+    <ClInclude Include="vecteur_n.hpp">
+      <Filter>Fichiers d%27en-tête\objet_n</Filter>
+    </ClInclude>
+    <ClInclude Include="polynome_n_iter.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="vote.hpp">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="ordre.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="simplifier polynome_n.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="entete objets.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="vrai et faux.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
