@@ -3,6 +3,7 @@
 #include "InfInt.h"
 #include "precision/fprecision.h"
 #include "precision/iprecision.h"
+#include "erreur.hpp"
 
 #include "fonctions template.hpp" //abs
 #include "types.hpp" //pour rationnel

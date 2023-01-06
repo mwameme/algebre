@@ -17,7 +17,7 @@ public:
 
 	polynome_n_iter() {};
 
-	polynome_n_iter(int n_var, T element,std::string* noms_) {//polynome de degre 0.
+	polynome_n_iter(int n_var, T element,std::string* noms_) {//polynome de degre 0. utilisé pour vrai/faux
 		if (n_var <= 0)
 			throw std::domain_error("polynome_n_iter : n_var <= 0.");
 
@@ -34,21 +34,22 @@ public:
 		for(int i(0);i<degres.size();++i)
 			if (degres[i] < 0) {
 				degres = std::vector<int>(degres.size(), 0);
-				element = false;
+				element = faux(element);
 				break;
 			}
+
 		for (int i(0); i < degres.size(); ++i)
 			degres[i] += 1; //dimensions
 		coeffs = vecteur_n<T>(degres);
-		T faux = element;
-		faux = false;
+		T faux_ = faux(element);
+
 		for (int i(0); i < coeffs.data.size(); ++i)
-			coeffs.data[i] = faux;
+			coeffs.data[i] = faux_;
 		coeffs.data[coeffs.data.size() - 1] = element; //monome
 		noms = noms_;
 	};
 
-	polynome_n_iter(vecteur_n<T> tableau, std::string* noms_) {
+	polynome_n_iter(vecteur_n<T> tableau, std::string* noms_) { //au cas où ?
 		coeffs = tableau;
 		noms = noms_;
 	};
@@ -64,11 +65,15 @@ public:
 	};
 
 	polynome_n_iter<T>& operator=(bool test) {
-		T faux = coeffs.data[0];
-		faux = test;
+		T temp;
+		if (test)
+			temp = vrai(coeffs.data[0]);
+		else
+			temp = faux(coeffs.data[0]);
+
 		std::vector<int> dimensions(coeffs.puissance, 1);
 		coeffs = vecteur_n<T>(dimensions);
-		coeffs.data[0] = faux;
+		coeffs.data[0] = temp;
 		return *this;
 	};
 
@@ -76,12 +81,9 @@ public:
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
-		T faux = gauche_.coeffs.data[0];
-		faux = false;
-
 		polynome_n_iter<T> gauche = gauche_;
 		polynome_n_iter<T> droite = droite_;
-		int n = gauche.coeffs.dimensions.size();
+		int n = gauche.coeffs.puissance;
 		std::vector<int> dim(n, 0);
 		for (int i(0); i < n; ++i)
 			dim[i] = max(gauche.coeffs.dimensions[i], droite.coeffs.dimensions[i]);
@@ -96,12 +98,9 @@ public:
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, soustraction : le nombre de variables ne correspond pas.");
 
-		T faux = gauche_.coeffs.data[0];
-		faux = false;
-
 		polynome_n_iter<T> gauche = gauche_;
 		polynome_n_iter<T> droite = droite_;
-		int n = gauche.coeffs.dimensions.size();
+		int n = gauche.coeffs.puissance;
 		std::vector<int> dim(n, 0);
 		for (int i(0); i < n; ++i)
 			dim[i] = max(gauche.coeffs.dimensions[i], droite.coeffs.dimensions[i]);
@@ -123,22 +122,20 @@ public:
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, multiplication : le nombre de variables ne correspond pas.");
 
-
 		int n = gauche.coeffs.puissance;
-		std::vector<int> degres(n, 0);
-		for (int i(0); i < gauche.coeffs.puissance;++i) {
+		std::vector<int> degres(n);
+		for (int i(0); i < n;++i) 
 			degres[i] = gauche.coeffs.dimensions[i] + droite.coeffs.dimensions[i] - 2;
-		}
-		T faux = gauche.coeffs.data[0];
-		faux = false;
 
-		polynome_n_iter<T> result(degres , faux , gauche.noms); //ATTENTION degrés et non dimensions.
+		T faux_ = faux(gauche.coeffs.data[0]);
+
+		polynome_n_iter<T> result(degres , faux_ , gauche.noms); //ATTENTION degrés et non dimensions.
 
 		std::vector<int> dimensions_gauche = gauche.coeffs.dimensions;
 		std::vector<int> dimensions_droite = droite.coeffs.dimensions;
 
-		std::vector<int> positions_gauche(dimensions_gauche.size(), 0);
-		std::vector<int> positions_droite(dimensions_gauche.size(), 0);
+		std::vector<int> positions_gauche(n, 0);
+		std::vector<int> positions_droite(n, 0);
 		int position_gauche = 0;
 		int position_droite = 0;
 		int position_finale = 0;
@@ -147,22 +144,6 @@ public:
 		std::vector<int> puissances_gauche = gauche.coeffs.puissances;
 		std::vector<int> puissances_droite = droite.coeffs.puissances;
 
-		/*
-		std::vector<int> puissances_finale(n, 0);
-		puissances_finale[n - 1] = 1;
-		for (int i(n - 2); i >= 0; --i)
-			puissances_finale[i] = dimensions[i + 1] * puissances_finale[i + 1];
-
-		std::vector<int> puissances_gauche(n, 0);
-		puissances_gauche[n - 1] = 1;
-		for (int i(n - 2); i >= 0; --i)
-			puissances_gauche[i] = dimensions_gauche[i + 1] * puissances_gauche[i + 1];
-
-		std::vector<int> puissances_droite(n, 0);
-		puissances_droite[n - 1] = 1;
-		for (int i(n - 2); i >= 0; --i)
-			puissances_droite[i] = dimensions_droite[i + 1] * puissances_droite[i + 1];
-			*/
 
 		bool fin = true;
 		while (fin) {
@@ -236,12 +217,12 @@ public:
 			if ((bool)element.coeffs.data[iter.position]) {
 				std::string puissance="";
 				for (int i(0); i < coeffs.puissance; ++i)
-					puissance = puissance + "*" + element.noms[i] + "^" + std::to_string(i) + " ";
+					puissance = puissance + "*" + element.noms[i] + "^" + std::to_string(iter.positions[i]) + " ";
 				if (premier) 
-					os << "+" << coeffs.data[iter.position] << puissance;
+					os << "+" << coeffs.data[iter.position] << " " << puissance;
 				else{
 					premier = true;
-					os << element.coeffs.data[iter.position] << puissance;
+					os << element.coeffs.data[iter.position] << " " << puissance;
 				}
 
 			}
@@ -261,7 +242,7 @@ template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, in
 
 	std::vector<polynome_n<T>*> tab(0);
 	for (int i(0); i < *dimensions; ++i)
-		tab.push_back(poly_n_convert_rec(data + (i * *puissances), dimensions + 1, puissances + 1, n - 1, noms + 1));
+		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1, noms + 1));
 
 	int i = 0;
 	for (i(*dimensions - 1); i >= 1; ++i)
@@ -276,9 +257,9 @@ template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, in
 	bool nul = true;
 	if ((i == 0) && !(tab[i]->nul))
 		nul = false;
-	T faux = *data;
-	faux = false;
-	return new polynome_n<T>(n, noms, faux, nul, tab);
+
+	T faux_ = faux(*data);
+	return new polynome_n<T>(n, noms, faux_, nul, tab);
 };
 
 

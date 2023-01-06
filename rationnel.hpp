@@ -11,6 +11,11 @@
 #include "norme.hpp"
 #include "vrai et faux.hpp"
 
+
+template<class T> T vrai(T const& element);
+
+
+
 template<class T, class enable = void> class rationnel;
 
 
@@ -31,6 +36,7 @@ public:
     explicit rationnel(T const& a, T const& b) {
         numerateur = a;
         denominateur = b;
+        simplifier();
     };
 
     explicit rationnel(T const& a) {
@@ -58,11 +64,12 @@ public:
         return (*this);
     };
 
+    /*
     friend rationnel<T> operator%(const rationnel<T>& temp1, const rationnel<T>& temp2) {
         rationnel<T> result = temp1;
         result = false;
         return result;
-    };
+    };*/
 
     /*
     T PGCD() const {
@@ -111,10 +118,10 @@ public:
         }
         if (!(bool)numerateur)
             if ((bool)denominateur)
-                denominateur = true;
+                denominateur = vrai(denominateur);
         if (!(bool)denominateur)
             if ((bool)numerateur)
-                numerateur = true;
+                numerateur = vrai(numerateur);
 
         return;
     };
@@ -149,7 +156,7 @@ public:
         U result = denominateur(element);
         if (!(bool)result) {
 //            std:cerr << "erreur : division par zero lors d'une évaluation de polynome" << std::endl;
-            throw std::domain_error("division par zero lors d'une évaluation de polynome");
+            throw std::domain_error("division par zero lors d'une évaluation de fraction polynome");
         }
         return (numerateur(element) / result);
     };
@@ -214,9 +221,7 @@ public:
 
 
     template<class U> explicit operator rationnel<U>()const {
-        rationnel<U> result;
-        result.numerateur = (U)numerateur;
-        result.denominateur = (U)denominateur;
+        rationnel<U> result( (U) numerateur, (U) denominateur);
         return result;
     };
 
@@ -250,7 +255,13 @@ public:
     explicit rationnel(T const& a, T const& b) {
         numerateur = a;
         denominateur = b;
+        simplifier();
     };
+
+    explicit rationnel(T const& a) {
+        numerateur = a;
+        denominateur = vrai(a);
+    }
 
 
     rationnel(const rationnel<T>& copie) {
@@ -272,11 +283,12 @@ public:
         return (*this);
     };
 
+    /*
     friend rationnel<T> operator%(const rationnel<T>& temp1, const rationnel<T>& temp2) {
         rationnel<T> result = temp1;
         result = false;
         return result;
-    };
+    };*/
 
     /*
     T PGCD() const {
@@ -316,7 +328,7 @@ public:
     };
     */
 
-    void simplifier() {
+    inline void simplifier() {
         /*
         T pgcd = PGCD(numerateur, denominateur);
 
@@ -364,7 +376,7 @@ public:
         U result = denominateur(element);
         if (!(bool)result) {
             //            std:cerr << "erreur : division par zero lors d'une évaluation de polynome" << std::endl;
-            throw std::domain_error("division par zero lors d'une évaluation de polynome");
+            throw std::domain_error("division par zero lors d'une évaluation de fraction de polynome");
         }
         return (numerateur(element) / result);
     };
@@ -411,7 +423,7 @@ public:
 
 
     explicit operator bool() const {
-        return ((bool)numerateur);
+        return ((bool) numerateur);
     };
 
     //    explicit operator double() const;

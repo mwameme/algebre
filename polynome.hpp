@@ -8,6 +8,7 @@
 #include <exception>
 #include "entete objets.hpp"
 #include "types.hpp"
+#include "vrai et faux.hpp"
 
 template<class T> class type_algebre;
 
@@ -298,10 +299,8 @@ public:
     };
 
     template<class U> U operator()(const U& element) const{
-        U result(element);
-        result = false;
-        U puissance(result);
-        puissance = true;
+        U result = faux(element);
+        U puissance = vrai(result);
 
         if (degre == -1)
             return result;
@@ -394,11 +393,12 @@ public:
     };
 
     friend T resultant(const polynome<T>& poly1, const polynome<T>& poly2) {
-        T faux = poly1.coeffs[0];
-        faux = false;
-        matrice<T> m_matrice(poly1.degre + poly2.degre, poly1.degre + poly2.degre, faux);
+        T faux_ = faux(poly1.coeffs[0]);
+
         if ((poly1.degre < 0) || (poly2.degre < 0))
-            return faux;
+            return faux_;
+
+        matrice<T> m_matrice(poly1.degre + poly2.degre, poly1.degre + poly2.degre, faux_);
 
         for (int i(0); i < poly2.degre; ++i)
             for (int j(0); j < poly1.coeffs.size(); ++j)
@@ -425,7 +425,7 @@ public:
         }//P à racines simples
         */
 
-        polynome<T> P = P / PGCD(P, derivee(P));
+        polynome<T> P = *this / PGCD(*this, derivee(*this));
 
         polynome<T> P_n(P);
         int multiplicite = 1;
@@ -434,26 +434,6 @@ public:
             ++multiplicite;
         }
         return multiplicite;
-
-        /*
-        int multiplicite = 1;
-        polynome<T> test = *this;
-        do {
-            test = derivee(test);
-            if (test.degre == 0)
-                break;
-            if ( PGCD(test,*this).degre >= 1)
-                ++multiplicite;
-            else break;
-
-        } while (true);
-
-        return multiplicite;
-        */
-    };
-
-    explicit operator T() {
-        return coeffs[0];
     };
 
     //protected:

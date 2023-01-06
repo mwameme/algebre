@@ -1,4 +1,8 @@
 #pragma once
+#include "vrai et faux.hpp"
+
+template<class T> T vrai(T const& element);
+
 
 template<class T> T derivee(T const& element) {
     T result=element;
@@ -51,8 +55,7 @@ template<class T> T PPCM(T const& a, T const& b) {
 };
 
 template<class T> T puissance(T element, int n) {
-    T resultat = element;
-    resultat = true;
+    T resultat = vrai( element);
 
     T puissance_m = element;
     while (n > 0) {
@@ -72,8 +75,8 @@ template<class T> T  inverse(T b,T quotient) { // inverse de b dans T*q
     a = quotient;
 //    b = x;
     //        ua = b; ua = true;
-    vb = b; vb = true;
-    ub = vb; ub = false;
+    vb = vrai(b);
+    ub = faux(b);
     //        va = ub;
     c = vb;
     while ((bool)c)
