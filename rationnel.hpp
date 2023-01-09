@@ -9,10 +9,10 @@
 
 #include "entete objets.hpp"
 #include "norme.hpp"
-#include "vrai et faux.hpp"
+#include "unite.hpp"
 
 
-template<class T> T vrai(T const& element);
+template<class T> T unite(T const& element,bool test);
 
 
 
@@ -41,7 +41,7 @@ public:
 
     explicit rationnel(T const& a) {
         numerateur = a;
-        denominateur = vrai(a);
+        denominateur = unite(a,true);
     }
 
 
@@ -118,10 +118,10 @@ public:
         }
         if (!(bool)numerateur)
             if ((bool)denominateur)
-                denominateur = vrai(denominateur);
+                denominateur = unite(denominateur,true);
         if (!(bool)denominateur)
             if ((bool)numerateur)
-                numerateur = vrai(numerateur);
+                numerateur = unite(numerateur,true);
 
         return;
     };
@@ -260,7 +260,7 @@ public:
 
     explicit rationnel(T const& a) {
         numerateur = a;
-        denominateur = vrai(a);
+        denominateur = unite(a);
     }
 
 

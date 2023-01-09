@@ -116,7 +116,7 @@ public:
 	};
 
 	inline void modifier_dimension(std::vector<int> const& nouvelles_dimensions) {
-		T element = faux(data[0]);
+		T element = unite(data[0],false);
 		modifier_dimension(nouvelles_dimensions, element);
 	};
 

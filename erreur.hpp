@@ -30,8 +30,6 @@ inline float precision_relative(float_precision const& x) {
 };
 
 
-
-
 template<class T> class erreur {
 public :
 	static_assert((type_algebre<T>::type == 0) && (type_algebre<T>::approx == 1), "erreur<T> : T doit être approché, avec division exacte");
@@ -55,7 +53,7 @@ public :
 	*/
 
 
-	erreur(T const& valeur_, float const& precision_) {
+	erreur(T const& valeur_, float const& precision_) { //faire attention au carré
 		valeur = valeur_;
 		precision = precision_;
 		//		maj();
@@ -223,7 +221,7 @@ public :
 
 	operator T() {
 		return valeur;
-	}
+	};
 
 
 	T valeur;

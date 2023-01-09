@@ -4,8 +4,7 @@
 #include "types.hpp"
 
 #include "entete objets.hpp"
-#include "vrai et faux.hpp"
-
+#include "unite.hpp"
 
 template<class T> class corps_quotient {
 public:
@@ -77,8 +76,8 @@ public:
         a = p;
         b = temp2.element;
 //        ua = b; ua = true;
-        vb = vrai(b);
-        ub = faux(b);
+        vb = unite(b,true);
+        ub = unite(b,false);
 //        va = ub;
         c = vb;
         while ( (bool) c)

@@ -5,7 +5,7 @@
 #include "polynome_n_iter.hpp"
 
 #include "entete objets.hpp"
-#include "vrai et faux.hpp"
+#include "unite.hpp"
 
 //polynome à n variables
 
@@ -19,7 +19,7 @@ public:
 		nul = (bool) temp;
 		if (n > 0) {
 			noms_variables = noms;
-			element = faux(temp);
+			element = unite(temp,false);
 			coeffs = { new polynome_n<T>(n - 1, temp, noms+1) };
 		}
 		else {
@@ -124,7 +124,7 @@ public:
 		}
 
 		if (!test) { //constructeur de polynome "vide".
-			element = faux(element_);
+			element = unite(element_,false);
 			nul = false;
 			n_var = liste.size();
 			if (n_var > 0) {
@@ -137,7 +137,7 @@ public:
 		}
 
 		
-		element = faux(element_);
+		element = unite(element_,false);
 		nul = true;
 		n_var = liste.size();
 		noms_variables = noms;
@@ -154,7 +154,7 @@ public:
 		if (n_var > 0) {
 			noms_variables = noms;
 			nul = true; //vérifié précédemment
-			element = faux(element_);
+			element = unite(element_,false);
 
 			coeffs.resize(liste[0] + 1);
 			for (int i(0); i < liste[0]; ++i) {
@@ -222,9 +222,9 @@ public:
 		}
 		else {
 			if (test)
-				element = vrai(element);
+				element = unite(element,true);
 			else
-				element = faux(element);
+				element = unite(element,true);
 			nul = test;
 		}
 
@@ -259,7 +259,7 @@ public:
 	friend polynome_n<T> operator*(polynome_n<T> const& temp1, polynome_n<T> const& temp2) {
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
-		T faux_ = faux(temp1.element);
+		T faux_ = unite(temp1.element,false);
 
 		polynome_n<T> faux_p(temp1.n_var, faux_, temp1.noms_variables); //polynome vide
 
@@ -463,7 +463,7 @@ public:
 
 		} 
 		else { //retourne le polynome nul.
-			T faux_ = faux( temp.element);
+			T faux_ = unite( temp.element,false);
 			return polynome_n<T>(temp.n_var, faux_, temp.noms_variables);
 		}
 	};
@@ -525,12 +525,12 @@ public:
 
 	operator polynome_n_iter<T>() const {
 		std::vector<int> degres = getDegre_tab();
-		T faux_ = faux(element);
+		T faux_ = unite(element,false);
 
 		polynome_n_iter<T> result(degres, faux_, noms_variables); //degrés ... se transforme en dimensions (+1).
 		if (result.coeffs.data.size() == 1) {
 			if (nul)
-				result.coeffs.data[0] = vrai(result.coeffs.data[0]);
+				result.coeffs.data[0] = unite(result.coeffs.data[0],true);
 		}
 		else
 			parcourir_convert(this, result.coeffs.data.data(), result.coeffs.puissances.data());

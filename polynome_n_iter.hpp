@@ -34,14 +34,14 @@ public:
 		for(int i(0);i<degres.size();++i)
 			if (degres[i] < 0) {
 				degres = std::vector<int>(degres.size(), 0);
-				element = faux(element);
+				element = unite(element,false);
 				break;
 			}
 
 		for (int i(0); i < degres.size(); ++i)
 			degres[i] += 1; //dimensions
 		coeffs = vecteur_n<T>(degres);
-		T faux_ = faux(element);
+		T faux_ = unite(element,false);
 
 		for (int i(0); i < coeffs.data.size(); ++i)
 			coeffs.data[i] = faux_;
@@ -67,9 +67,9 @@ public:
 	polynome_n_iter<T>& operator=(bool test) {
 		T temp;
 		if (test)
-			temp = vrai(coeffs.data[0]);
+			temp = unite(coeffs.data[0],true);
 		else
-			temp = faux(coeffs.data[0]);
+			temp = unite(coeffs.data[0],false);
 
 		std::vector<int> dimensions(coeffs.puissance, 1);
 		coeffs = vecteur_n<T>(dimensions);
@@ -127,7 +127,7 @@ public:
 		for (int i(0); i < n;++i) 
 			degres[i] = gauche.coeffs.dimensions[i] + droite.coeffs.dimensions[i] - 2;
 
-		T faux_ = faux(gauche.coeffs.data[0]);
+		T faux_ = unite(gauche.coeffs.data[0],false);
 
 		polynome_n_iter<T> result(degres , faux_ , gauche.noms); //ATTENTION degrés et non dimensions.
 
@@ -258,7 +258,7 @@ template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, in
 	if ((i == 0) && !(tab[i]->nul))
 		nul = false;
 
-	T faux_ = faux(*data);
+	T faux_ = unite(*data,false);
 	return new polynome_n<T>(n, noms, faux_, nul, tab);
 };
 

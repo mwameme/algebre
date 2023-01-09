@@ -8,7 +8,7 @@
 #include <exception>
 #include "entete objets.hpp"
 #include "types.hpp"
-#include "vrai et faux.hpp"
+#include "unite.hpp"
 
 template<class T> class type_algebre;
 
@@ -299,8 +299,8 @@ public:
     };
 
     template<class U> U operator()(const U& element) const{
-        U result = faux(element);
-        U puissance = vrai(result);
+        U result = unite(element,false);
+        U puissance = unite(result,true);
 
         if (degre == -1)
             return result;
@@ -393,7 +393,7 @@ public:
     };
 
     friend T resultant(const polynome<T>& poly1, const polynome<T>& poly2) {
-        T faux_ = faux(poly1.coeffs[0]);
+        T faux_ = unite(poly1.coeffs[0],false);
 
         if ((poly1.degre < 0) || (poly2.degre < 0))
             return faux_;

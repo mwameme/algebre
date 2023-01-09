@@ -128,7 +128,7 @@
     <ClInclude Include="entete objets.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
-    <ClInclude Include="vrai et faux.hpp">
+    <ClInclude Include="unite.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
   </ItemGroup>

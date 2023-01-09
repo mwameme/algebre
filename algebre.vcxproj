@@ -174,7 +174,7 @@
     <ClInclude Include="TVD.hpp" />
     <ClInclude Include="vecteur_n.hpp" />
     <ClInclude Include="vote.hpp" />
-    <ClInclude Include="vrai et faux.hpp" />
+    <ClInclude Include="unite.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

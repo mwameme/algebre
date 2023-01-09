@@ -5,8 +5,7 @@
 #include <exception>
 
 #include "entete objets.hpp"
-#include "vrai et faux.hpp"
-
+#include "unite.hpp"
 
 //#include <typeinfo> 
 
@@ -111,7 +110,7 @@ public:
 		matrice<T> result(taille_l,autre.taille_c);
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < autre.taille_c; ++j) {
-				T somme = faux(coeffs[0][0]);
+				T somme = unite(coeffs[0][0],false);
 				for (int k(0); k < taille_c; ++k)
 					somme = somme + (coeffs[i][k] * autre.coeffs[k][j]);
 				result.coeffs[i][j] = somme;
@@ -150,8 +149,8 @@ public:
 	};
 	
 	T determinant_anneau() const {
-		T resultat = faux(coeffs[0][0]);
-		T vrai_ = vrai(resultat);
+		T resultat = unite(coeffs[0][0],false);
+		T vrai_ = unite(resultat,true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("determinant : les dimensions ne coïncident pas");
@@ -204,7 +203,7 @@ public:
 	};
 
 	polynome<T> polynomeCaracteristique() const {
-		T mvrai = - vrai(coeffs[0][0]);
+		T mvrai = - unite(coeffs[0][0],true);
 
 		if(taille_l != taille_c)
 			throw std::domain_error("polynome caracteristique : les dimensions ne correspondent pas");
@@ -250,7 +249,7 @@ public:
 		if ( vec_ligne.size() != m_matrice.taille_l)
 			throw std::domain_error("multiplication vecteur*matrice : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
 		std::vector<T> resultat(m_matrice.taille_c);
 		for (int i(0); i < m_matrice.taille_c; ++i) {
@@ -267,9 +266,9 @@ public:
 		if (vec_colonne.size() != m_matrice.taille_c)
 			throw std::domain_error("multiplication matrice*vecteur : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
-		std::vector<T> resultat(m_matrice.taille_l, faux);
+		std::vector<T> resultat(m_matrice.taille_l, faux_);
 		for (int i(0); i < m_matrice.taille_l; ++i) {
 			T somme = faux_;
 			for (int j(0); j < m_matrice.taille_c; ++j)
@@ -370,7 +369,7 @@ public:
 	};
 
 	matrice<T> operator*(const matrice<T>& autre) const {
-		T faux_ = faux(coeffs[0][0]);
+		T faux_ = unite(coeffs[0][0],false);
 
 		if (taille_c != autre.taille_l)
 			throw std::domain_error("multiplication de matrices : les dimensions ne coïncident pas");
@@ -417,8 +416,8 @@ public:
 	};
 
 	T determinant_anneau() const {
-		T resultat = faux(coeffs[0][0]);
-		T vrai_ = vrai(resultat);
+		T resultat = unite(coeffs[0][0],false);
+		T vrai_ = unite(resultat,true);
 		if(taille_l != taille_c)
 			throw std::domain_error("determinant matrice : les dimensions ne coïncident pas");
 		int taille = taille_l;
@@ -437,7 +436,7 @@ public:
 	
 	T determinant() const {
 		matrice<rationnel<T>> m_matrice(taille_l,taille_l);
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("determinant matrice : les dimensions ne coïncident pas");
@@ -484,7 +483,7 @@ public:
 	};
 
 	polynome<T> polynomeCaracteristique() const {
-		T mvrai = -vrai(coeffs[0][0]);
+		T mvrai = -unite(coeffs[0][0],true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("determinant matrice : les dimensions ne coïncident pas");
@@ -526,7 +525,7 @@ public:
 		if (vec_ligne.size() != m_matrice.taille_l)
 			throw std::domain_error("multiplication vecteur*matrice : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
 		std::vector<T> resultat(m_matrice.taille_c);
 		for (int i(0); i < m_matrice.taille_c; ++i) {
@@ -543,9 +542,9 @@ public:
 		if (vec_colonne.size() != m_matrice.taille_c)
 			throw std::domain_error("multiplication matrice*vecteur : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
-		std::vector<T> resultat(m_matrice.taille_l, faux);
+		std::vector<T> resultat(m_matrice.taille_l, faux_);
 		for (int i(0); i < m_matrice.taille_l; ++i) {
 			T somme = faux_;
 			for (int j(0); j < m_matrice.taille_c; ++j)
@@ -646,7 +645,7 @@ public:
 	};
 
 	matrice<T> operator*(const matrice<T>& autre) const {
-		T faux_ = faux(coeffs[0][0]);
+		T faux_ = unite(coeffs[0][0],false);
 
 		if (taille_c != autre.taille_l)
 			throw std::domain_error("multiplication de matrices : les dimensions ne coïncident pas");
@@ -693,8 +692,8 @@ public:
 	};
 
 	T determinant_anneau() {
-		T resultat = faux( coeffs[0][0]);
-		T vrai_ = vrai(resultat);
+		T resultat = unite( coeffs[0][0],false);
+		T vrai_ = unite(resultat,true);
 
 		if(taille_l != taille_c)
 			throw std::domain_error("determinant de matrice : les dimensions ne coincident pas");
@@ -713,7 +712,7 @@ public:
 
 	T determinant() const {
 		matrice<T> m_matrice(*this);
-		T det = vrai(coeffs[0][0]);
+		T det = unite(coeffs[0][0],true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("determinant de matrice : les dimensions ne coincident pas");
@@ -780,14 +779,14 @@ public:
 	};
 
 	matrice<T> inverse() const {
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		if( taille_l != taille_c)
 			throw std::domain_error("inverse de matrice : dimensons ne coincident pas");
 		int taille = taille_l;
 
 		matrice<T> m_matrice(*this);
-		matrice<T> resultat= vrai(m_matrice);
+		matrice<T> resultat= unite(m_matrice,true);
 
 
 		for (int i(0); i < taille; ++i) {
@@ -820,7 +819,7 @@ public:
 	};
 
 	polynome<T> polynomeCaracteristique() const {
-		T mvrai = -vrai(coeffs[0][0]);
+		T mvrai = -unite(coeffs[0][0],true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("polynome caracteristique : dimensons ne coincident pas");
@@ -844,7 +843,7 @@ public:
 		matrice<T> m_matrice(*this);
 		if (m_matrice.taille_l != Y.size())
 			throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
 		for (int i(0); i < taille_l; ++i) {
@@ -898,7 +897,7 @@ public:
 		sous_ev<T>* resultat = new sous_ev<T>();
 		matrice<T> m_matrice(*this);
 
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
 		for (int i(0); i < taille_l; ++i) {
@@ -948,10 +947,10 @@ public:
 
 		parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
 		for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
-			T temp = faux(m_matrice.coeffs[0][0]);
+			T temp = unite(m_matrice.coeffs[0][0],false);
 
 			std::vector<T> vec(taille_c, temp);
-			temp = vrai(temp);
+			temp = unite(temp,true);
 			vec[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
 
 			//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
@@ -995,7 +994,7 @@ public:
 		if (vec_ligne.size() != m_matrice.taille_l)
 			throw std::domain_error("multiplication vecteur*matrice : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
 		std::vector<T> resultat(m_matrice.taille_c);
 		for (int i(0); i < m_matrice.taille_c; ++i) {
@@ -1012,7 +1011,7 @@ public:
 		if (vec_colonne.size() != m_matrice.taille_c)
 			throw std::domain_error("multiplication matrice*vecteur : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
 		std::vector<T> resultat(m_matrice.taille_l);
 		for (int i(0); i < m_matrice.taille_l; ++i) {
@@ -1108,7 +1107,7 @@ public:
 	};
 
 	matrice<T> operator*(const matrice<T>& autre) const {
-		T faux_ = faux(coeffs[0][0]);
+		T faux_ = unite(coeffs[0][0],false);
 
 		if (taille_c != autre.taille_l)
 			throw std::domain_error("multiplication de matrices : les dimensions ne coïncident pas");
@@ -1155,8 +1154,8 @@ public:
 	};
 
 	T determinant_anneau() {
-		T resultat = faux(coeffs[0][0]);
-		T vrai_ = vrai(resultat);
+		T resultat = unite(coeffs[0][0],false);
+		T vrai_ = unite(resultat,true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("determinant de matrice : les dimensions ne coïncident pas");
@@ -1176,7 +1175,7 @@ public:
 
 	T determinant() const {
 		matrice<T> m_matrice(*this);
-		T det = vrai(coeffs[0][0]);
+		T det = unite(coeffs[0][0],true);
 		T vrai_ = det;
 
 		if (taille_l != taille_c)
@@ -1264,14 +1263,14 @@ public:
 	};
 
 	matrice<T> inverse() const {
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		if(taille_l != taille_c)
 			throw std::domain_error("inverse de matrice : les dimensions ne coïncident pas.");
 		int taille = taille_l;
 
 		matrice<T> m_matrice(*this);
-		matrice<T> resultat = vrai(*this); //identité
+		matrice<T> resultat = unite(*this,true); //identité
 
 		for (int i(0); i < taille; ++i) {
 			int j_max = -1;
@@ -1313,7 +1312,7 @@ public:
 	};
 
 	polynome<T> polynomeCaracteristique() const {
-		T mvrai = -vrai(coeffs[0][0]);
+		T mvrai = -unite(coeffs[0][0],true);
 
 		if (taille_l != taille_c)
 			throw std::domain_error("inverse de matrice : les dimensions ne coïncident pas.");
@@ -1338,7 +1337,7 @@ public:
 		matrice<T> m_matrice(*this);
 		if (m_matrice.taille_l != Y.size())
 			throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		std::vector<bool> ligne_faite(taille_l,true);
 
@@ -1402,7 +1401,7 @@ public:
 				return std::vector<T>(0); //alors on retourne le vide
 		}
 
-		T faux_ = faux(vrai_);
+		T faux_ = unite(vrai_,false);
 		std::vector<T> resultat(taille_c, faux_);
 
 		//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
@@ -1424,7 +1423,7 @@ public:
 		sous_ev<T>* resultat = new sous_ev<T>();
 		matrice<T> m_matrice(*this);
 
-		T vrai_ = vrai(coeffs[0][0]);
+		T vrai_ = unite(coeffs[0][0],true);
 
 		std::vector<bool> ligne_faite(taille_l, true);
 
@@ -1463,7 +1462,7 @@ public:
 			//on a trouve notre ligne. On enleve i_max de ligne_faite.
 			ligne_faite[i_max] = false;
 
-			T inv = vrai / m_matrice.coeffs[i_max][j];
+			T inv = vrai_ / m_matrice.coeffs[i_max][j];
 			for (int k(0); k < taille_l; ++k) {
 				if (k == i_max)
 					continue;
@@ -1504,9 +1503,9 @@ public:
 
 		parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
 		for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
-			T temp = faux(m_matrice.coeffs[0][0]);
+			T temp = unite(m_matrice.coeffs[0][0],false);
 			std::vector<T> vec(taille_c, temp);
-			temp = vrai(temp);
+			temp = unite(temp,true);
 			vec[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
 
 			//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
@@ -1551,7 +1550,7 @@ public:
 		if (vec_ligne.size() != m_matrice.taille_l)
 			throw std::domain_error("multiplication vecteur*matrice : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
 		std::vector<T> resultat(m_matrice.taille_c);
 		for (int i(0); i < m_matrice.taille_c; ++i) {
@@ -1568,7 +1567,7 @@ public:
 		if (vec_colonne.size() != m_matrice.taille_c)
 			throw std::domain_error("multiplication matrice*vecteur : les dimensions ne correspondent pas");
 
-		T faux_ = faux(m_matrice.coeffs[0][0]);
+		T faux_ = unite(m_matrice.coeffs[0][0],false);
 
 		std::vector<T> resultat(m_matrice.taille_l);
 		for (int i(0); i < m_matrice.taille_l; ++i) {

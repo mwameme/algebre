@@ -66,10 +66,9 @@ public:
 	};
 
 	friend complexe<T> operator/(const complexe<T>& z1, const complexe<T>& z2) {
-		T vrai(z1);
-		vrai = true;
+		T vrai_ = unite(z1,true);
 
-		T inv_module = vrai / ((z2.x * z2.x) + (z2.y * z2.y));
+		T inv_module = vrai_ / ((z2.x * z2.x) + (z2.y * z2.y));
 		return complexe<T>(inv_module * (z1.x * z2.x + z1.y * z2.y), inv_module * ((z1.y * z2.x) - (z1.x * z2.y)));
 	};
 

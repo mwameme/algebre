@@ -5,8 +5,7 @@
 #include <vector>
 #include "entete objets.hpp"
 #include "fonctions template.hpp"
-#include "vrai et faux.hpp"
-
+#include "unite.hpp"
 #include "types.hpp"
 #include "norme.hpp"
 

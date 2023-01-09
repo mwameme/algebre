@@ -21,89 +21,91 @@ template<class T, class enable = void> class rationnel;
 
 
 
-template<class T> T vrai(T const& element) {
+template<class T> T unite(T const& element,bool test) {
 	T vrai_ = element;
-	vrai_ = true;
+	vrai_ = test;
 	return vrai_;
 };
 
-int vrai(int const& element) {
-	return 1;
+int unite(int const& element,bool test) {
+	return test ? 1:0;
 }
 
-long vrai(long const& element) {
-	return 1;
+long unite(long const& element,bool test) {
+	return test ? 1 : 0;
 }
 
-long long vrai(long long const& element) {
-	return 1;
+long long unite(long long const& element,bool test) {
+	return test ? 1 : 0;
 }
 
-float vrai(float const& element) {
-	return 1.;
+float unite(float const& element,bool test) {
+	return test ? 1 : 0;
 }
 
-double vrai(double const& element) {
-	return 1;
+double unite(double const& element,bool test) {
+	return test ? 1 : 0;
 }
 
-InfInt vrai(InfInt const& element) {
-	return InfInt(1);
+InfInt unite(InfInt const& element, bool test) {
+	return test ? InfInt(1):InfInt(0);
 }
 
-int_precision vrai(int_precision const& element) {
-	return int_precision(1);
+int_precision unite(int_precision const& element, bool test) {
+	return test ? int_precision(1) : int_precision(0);
 }
 
-float_precision vrai(float_precision const& element) {
-	return float_precision(1, element.precision(), element.mode());
+float_precision unite(float_precision const& element, bool test) {
+	return float_precision(test ? 1 : 0, element.precision(), element.mode());
 }
 
-template<class T> erreur<T> vrai(erreur<T> const& temp) {
-	return erreur<T>(vrai(temp.valeur), precision_relative(temp.valeur));
+template<class T> erreur<T> unite(erreur<T> const& temp, bool test) {
+	return erreur<T>(unite(temp.valeur,test), precision_relative(temp.valeur));
 }
 
-template<class T> polynome<T> vrai(polynome<T> const& poly) {
-	polynome<T> vrai_(vrai(poly.coeffs[0]));
-	return vrai_;
+template<class T> polynome<T> unite(polynome<T> const& poly, bool test) {
+	polynome<T> temp(unite(poly.coeffs[0],test));
+	return temp;
 }
 
-template<class T> polynome_n<T> vrai(polynome_n<T> const& poly_n) {
-	T vrai_T = vrai(poly_n.element);
-	polynome_n<T> vrai_(poly_n.n_var, vrai_T, poly_n.noms_variables);
-	return vrai_;
+template<class T> polynome_n<T> unite(polynome_n<T> const& poly_n, bool test) {
+	T temp = unite(poly_n.element,test);
+	polynome_n<T> temp_(poly_n.n_var, temp, poly_n.noms_variables);
+	return temp_;
 }
 
-template<class T> polynome_n_iter<T> vrai(polynome_n_iter<T> const& poly_n) {
-	polynome_n_iter<T> vrai_(poly_n.coeffs.puissance, vrai(poly_n.coeffs.data[0]), poly_n.noms);
-	return vrai_;
+template<class T> polynome_n_iter<T> unite(polynome_n_iter<T> const& poly_n, bool test) {
+	polynome_n_iter<T> temp(poly_n.coeffs.puissance, unite(poly_n.coeffs.data[0],test), poly_n.noms);
+	return temp;
 }
 
-template<class T> anneau_quotient<T> vrai(anneau_quotient<T> const& temp) {
-	return anneau_quotient<T>(vrai(temp.element), temp.quotient);
+template<class T> anneau_quotient<T> unite(anneau_quotient<T> const& temp, bool test) {
+	return anneau_quotient<T>(unite(temp.element,test), temp.quotient);
 }
 
-template<class T> corps_quotient<T> vrai(corps_quotient<T> const& temp) {
-	return corps_quotient<T>(vrai(temp.element), temp.quotient);
+template<class T> corps_quotient<T> unite(corps_quotient<T> const& temp, bool test) {
+	return corps_quotient<T>(unite(temp.element,test), temp.quotient);
 }
 
-template<class T> complexe<T> vrai(complexe<T> const& c) {
-	return complexe<T>(vrai(c.x), faux(c.x));
+template<class T> complexe<T> unite(complexe<T> const& c, bool test) {
+	return complexe<T>(unite(c.x,test), unite(c.x,false));
 }
 
-template<class T> rationnel<T> vrai(rationnel<T> const& temp) {
-	return rationnel<T>(vrai(temp.numerateur), vrai(temp.numerateur));
+template<class T> rationnel<T> unite(rationnel<T> const& temp, bool test) {
+	return rationnel<T>(unite(temp.numerateur,test), unite(temp.numerateur,true));
 }
 
-template<class T> matrice<T> vrai(matrice<T> const& temp) {
-	matrice<T> result(temp.taille_l, temp.taille_c, faux(temp.coeffs[0][0]));
-	T vrai_ = vrai(temp.coeffs[0][0]);
-	for (int i(0); i < min(temp.taille_l, temp.taille_c); ++i)
-		result.coeffs[i][i] = vrai_;
-
+template<class T> matrice<T> unite(matrice<T> const& m, bool test) {
+	matrice<T> result(m.taille_l, m.taille_c, unite(m.coeffs[0][0],false));
+	if (test) {
+		T vrai_ = unite(m.coeffs[0][0], true);
+		for (int i(0); i < min(m.taille_l, m.taille_c); ++i)
+			result.coeffs[i][i] = vrai_;
+	}
 	return result;
 }
 
+/*
 // >>>>>>>>>>>>>>>>>>>>   FAUX   <<<<<<<<<<<<<<<<<<<<
 
 template<class T> T faux(T const& temp) {
@@ -185,3 +187,5 @@ template<class T> matrice<T> faux(matrice<T> const& temp) {
 	matrice<T> result(temp.taille_l, temp.taille_c, faux(temp.coeffs[0][0]));
 	return result;
 }
+
+*/
