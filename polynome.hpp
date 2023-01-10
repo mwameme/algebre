@@ -6,6 +6,8 @@
 #include <vector>
 #include <iostream>
 #include <exception>
+#include <initializer_list>
+
 #include "entete objets.hpp"
 #include "types.hpp"
 #include "unite.hpp"
@@ -66,6 +68,15 @@ public:
         coeffs[2] = element3;
         getDegre();
     };
+
+    template<class U> explicit polynome(std::initializer_list<U> liste) {
+        if (liste.size() == 0)
+            throw std::domain_error("initialisation de polynome : liste vide");
+        coeffs(liste.size());
+        for (int i(0); i < liste.size(); ++i)
+            coeffs[i](liste[i]);
+        getDegre();
+    }
 
 
     polynome<T>& operator=(const polynome<T>& temp) {

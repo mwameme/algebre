@@ -5,11 +5,13 @@
 #include <vector>
 #include <iostream>
 #include <exception>
-#include "types.hpp"
+#include <initializer_list>
 
 #include "entete objets.hpp"
 #include "norme.hpp"
 #include "unite.hpp"
+#include "types.hpp"
+
 
 
 template<class T> T unite(T const& element,bool test);
@@ -30,6 +32,19 @@ public:
         return result;
     };
 
+    template<class U> explicit rationnel(std::initializer_list<U> liste) {
+        if ((liste.size() == 0) || (liste.size() >2))
+            throw std::domain_error("initialisation de rationnel : liste vide ou >2");
+        if (liste.size() == 1) {
+            numerateur(liste[0]);
+            denominateur = unite(numerateur, true);
+        }
+        if (liste.size() == 2) {
+            numerateur(liste[0]);
+            denominateur(liste[1]);
+            simplifier();
+        }
+    }
 
     explicit rationnel() : numerateur(),denominateur(){};
 

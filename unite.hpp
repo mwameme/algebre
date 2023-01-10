@@ -60,7 +60,10 @@ float_precision unite(float_precision const& element, bool test) {
 }
 
 template<class T> erreur<T> unite(erreur<T> const& temp, bool test) {
-	return erreur<T>(unite(temp.valeur,test), precision_relative(temp.valeur));
+	if (test)
+		return erreur<T>(unite(temp.valeur, test), precision_relative(temp.valeur));
+	else
+		return erreur<T>(unite(temp.valeur, test), 0.);
 }
 
 template<class T> polynome<T> unite(polynome<T> const& poly, bool test) {

@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include "fact_for.hpp"
 #include <exception>
+#include <initializer_list>
 
 #include "entete objets.hpp"
 #include "unite.hpp"
+#include "fact_for.hpp"
 
 //#include <typeinfo> 
 
@@ -61,6 +62,25 @@ public:
 
 	explicit matrice() {};
 
+	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
+		int taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		int taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j](liste[i][j]);
+
+		return;
+	}
 
 	explicit operator bool() const {
 		for (int i(0); i < taille_l; ++i)

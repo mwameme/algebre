@@ -524,6 +524,9 @@ public:
 	};
 
 	operator polynome_n_iter<T>() const {
+		if (n_var == 0)
+			return polynome_n_iter<T>(0, element, NULL);
+
 		std::vector<int> degres = getDegre_tab();
 		T faux_ = unite(element,false);
 

@@ -233,6 +233,8 @@ public:
 	};
 
 	operator polynome_n<T>() const {
+		if (coeffs.puissance == 0)
+			return polynome_n<T>(0, coeffs.data[0], noms);
 		return *poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
 	};
 
@@ -331,6 +333,16 @@ public:
 			result.coeffs.data[i] = scalaire * result.coeffs.data[i];
 		return result;
 	};
+
+	void simplifier() {
+		if (coeffs.puissance != 0)
+			coeffs.simplifier();
+		return;
+	}
+
+	void simplifier_2() {
+		*this = (polynome_n_iter<T>) ((polynome_n<T>) * this); //deux conversions ... la premiere simplifie.
+	}
 	
 	std::string* noms;
 	vecteur_n<T> coeffs;
