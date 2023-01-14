@@ -74,7 +74,7 @@ public:
             throw std::domain_error("initialisation de polynome : liste vide");
         coeffs(liste.size());
         for (int i(0); i < liste.size(); ++i)
-            coeffs[i](liste[i]);
+            coeffs[i] = T(liste[i]);
         getDegre();
     }
 

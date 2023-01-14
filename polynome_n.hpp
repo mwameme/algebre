@@ -98,12 +98,29 @@ public:
 		}
 	};
 
-	polynome_n(int n_var_, std::string* nom_, T element_, bool nul_, std::vector<polynome_n<T>*> vec) { //à partir d'un vecteur de pointeurs. Utilisé pour construire (* et +)
+	polynome_n(int n_var_, std::string* nom_, T element_, std::vector<polynome_n<T>*> vec) { //à partir d'un vecteur de pointeurs. Utilisé pour construire (* et +)
 		n_var = n_var_;
 		noms_variables = nom_;
 		coeffs = vec;
 		element = element_; //false
-		nul = nul_;
+
+		bool trouve = false;
+		int trouve_int = 0;
+		for (int j(coeffs.size() - 1); j >= 0; --j)
+			if ((bool)*coeffs[j]) {
+				trouve = true;
+				trouve_int = j;
+				break;
+			}
+
+		for (int i(trouve_int + 1); i < coeffs.size(); ++i)
+			delete coeffs[i];
+
+		if (trouve_int + 1 < coeffs.size())
+			coeffs.erase(coeffs.begin() + trouve_int + 1, coeffs.end());
+
+		nul = trouve;
+
 	};
 
 	polynome_n(std::vector<int> liste, std::string* noms, const T element_) : coeffs(0){ //liste : degrés ... Monome.
@@ -298,10 +315,10 @@ public:
 				trouve_int = 0;
 			}
 
-			if (trouve_int + 1 < vec_solution.size())
-				vec_solution.erase(vec_solution.begin() + trouve_int + 1, vec_solution.end()); //faire attention
+//			if (trouve_int + 1 < vec_solution.size())
+//				vec_solution.erase(vec_solution.begin() + trouve_int + 1, vec_solution.end()); //faire attention
 
-			return polynome_n<T>(temp1.n_var, temp1.noms_variables, temp1.element, trouve, vec_solution);
+			return polynome_n<T>(temp1.n_var, temp1.noms_variables, temp1.element, vec_solution);
 		}
 
 		T result = temp1.element * temp2.element;
@@ -326,23 +343,7 @@ public:
 					result[i] = new polynome_n<T>(*temp2.coeffs[i]);
 			}
 
-			int trouve_int = 0;
-			bool trouve = false;
-			for (int i(result.size() - 1); i >= 0; --i) {
-				if ((bool) *result[i]) {
-					trouve_int = i;
-					trouve = true;
-					break;
-				}
-			}
-
-			for (int i(trouve_int + 1); i < result.size(); ++i)
-				delete result[i];
-
-			if (trouve_int + 1 < result.size())
-				result.erase(result.begin() + trouve_int + 1, result.end());
-
-			return polynome_n<T>(temp1.n_var, temp1.noms_variables, temp1.element, trouve, result);
+			return polynome_n<T>(temp1.n_var, temp1.noms_variables, temp1.element, result);
 		}
 
 		T element = temp1.element + temp2.element;
@@ -368,23 +369,7 @@ public:
 					result[i] = new polynome_n<T>( - *temp2.coeffs[i]);
 			}
 
-			int trouve_int = 0;
-			bool trouve = false;
-			for (int i(result.size() - 1); i >= 0; --i) {
-				if ((bool) *result[i]) {
-					trouve_int = i;
-					trouve = true;
-					break;
-				}
-			}
-
-			for (int i(trouve_int + 1); i < result.size(); ++i)
-				delete result[i];
-
-			if (trouve_int + 1 < result.size())
-				result.erase(result.begin() + trouve_int + 1, result.end());
-
-			return polynome_n<T>(temp1.n_var, temp1.noms_variables, temp1.element, trouve, result);
+			return polynome_n<T>(temp1.n_var, temp1.noms_variables, temp1.element, result);
 		}
 
 		T element = temp1.element - temp2.element;
@@ -397,7 +382,7 @@ public:
 			result.resize(temp.coeffs.size());
 			for (int i(0); i < temp.coeffs.size(); ++i)
 				result[i] = new polynome_n<T>(-(*temp.coeffs[i]));
-			return polynome_n<T>(temp.n_var, temp.noms_variables, temp.element, temp.nul, result);
+			return polynome_n<T>(temp.n_var, temp.noms_variables, temp.element, result);
 		}
 		else {
 			return polynome_n<T>(-temp.element);
@@ -438,24 +423,7 @@ public:
 				for (int i(0); i < temp.coeffs.size(); ++i)
 					result[i] = new polynome_n<T>(scalaire * (*temp.coeffs[i]));
 
-				//au cas où le scalaire annule ...
-				int trouve_int = 0;
-				bool trouve = false;
-				for (int i(result.size() - 1); i >= 0; --i) {
-					if ((bool) *result[i]) {
-						trouve_int = i;
-						trouve = true;
-						break;
-					}
-				}
-
-				for (int i(trouve_int + 1); i < result.size(); ++i)
-					delete result[i];
-
-				if (trouve_int + 1 < result.size())
-					result.erase(result.begin() + trouve_int + 1, result.end());
-
-				return polynome_n<T>(temp.n_var, temp.noms_variables, temp.element, temp.nul, result);
+				return polynome_n<T>(temp.n_var, temp.noms_variables, temp.element, result);
 			}
 			else {
 				return polynome_n<T>(scalaire * temp.element);
@@ -468,7 +436,7 @@ public:
 		}
 	};
 
-	operator bool() const {
+	inline operator bool() const {
 		return nul;
 	};
 
@@ -481,22 +449,7 @@ public:
 			result[i] = new polynome_n<U>((polynome_n<U>) * coeffs[i]);
 
 		//idem, on vérifie ... au pire pas long.
-		bool trouve = false;
-		int trouve_int = 0;
-		for (int j(coeffs.size()-1); j >= 0; --j)
-			if ((bool) *result[j]) {
-				trouve = true;
-				trouve_int = j;
-				break;
-			}
-
-		for (int i(trouve_int + 1); i < result.size(); ++i)
-			delete result[i];
-
-		if (trouve_int + 1 < result.size())
-			result.erase(result.begin() + trouve_int + 1, result.end());
-
-		return polynome_n<U>(n_var, noms_variables, (U)element, trouve, result);
+		return polynome_n<U>(n_var, noms_variables, (U)element, result);
 
 	};
 

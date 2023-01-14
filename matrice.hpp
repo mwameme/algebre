@@ -77,7 +77,7 @@ public:
 		coeffs(taille_l, std::vector<T>(taille_c));
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
-				coeffs[i][j](liste[i][j]);
+				coeffs[i][j] = T(liste[i][j]);
 
 		return;
 	}

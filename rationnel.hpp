@@ -36,12 +36,13 @@ public:
         if ((liste.size() == 0) || (liste.size() >2))
             throw std::domain_error("initialisation de rationnel : liste vide ou >2");
         if (liste.size() == 1) {
-            numerateur(liste[0]);
+            numerateur = T(liste[0]);
             denominateur = unite(numerateur, true);
+            simplifier();
         }
         if (liste.size() == 2) {
-            numerateur(liste[0]);
-            denominateur(liste[1]);
+            numerateur =T(liste[0]);
+            denominateur = T(liste[1]);
             simplifier();
         }
     }

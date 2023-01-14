@@ -225,7 +225,7 @@ public:
 
 	};
 
-	explicit operator bool() const {
+	explicit inline operator bool() const {
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i])
 				return true;
@@ -356,22 +356,8 @@ template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, in
 	for (int i(0); i < *dimensions; ++i)
 		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1, noms + 1));
 
-	int i = 0;
-	for (i(*dimensions - 1); i >= 1; ++i)
-		if (tab[i]->nul)
-			break;
-		else
-			delete tab[i];
-
-	if (i < *dimensions - 1)
-		tab.erase(tab.begin() + i + 1, tab.end());
-
-	bool nul = true;
-	if ((i == 0) && !(tab[i]->nul))
-		nul = false;
-
 	T faux_ = unite(*data,false);
-	return new polynome_n<T>(n, noms, faux_, nul, tab);
+	return new polynome_n<T>(n, noms, faux_, tab);
 };
 
 
