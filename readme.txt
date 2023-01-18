@@ -9,7 +9,7 @@ Les objets créés sont :
 - les polynomes.
 - les polynomes à n variables (en itératif et en récursif).
 - les matrices.
-- j'ai utilisé une class d'entiers infinis, et de réels à précision modifiable.
+- j'ai utilisé une class d'entiers infinis, et de réels à précision modifiable. Téléchargés sur internet.
 - une class erreur qui contient un réel et l'erreur accumulée sur les opérations faites sur les réels.
 - la diagonalisation de matrice, où on a les vecteurs propres en fonction de polynomes en lambda (les valeurs propres), sans connaitre les valeurs de lambda.
 - les anneaux quotients : contient un élément, calculé modulo le quotient. par exemple les entiers modulo un nombre premier, ou un polynome modulo un autre polynome. Nécessite la division avec reste.
