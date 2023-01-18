@@ -357,7 +357,7 @@ template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, in
 		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1, noms + 1));
 
 	T faux_ = unite(*data,false);
-	return new polynome_n<T>(n, noms, faux_, tab);
+	return new polynome_n<T>(n, noms, faux_, tab); //simplifie aussi.
 };
 
 
