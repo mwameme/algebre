@@ -1,35 +1,24 @@
-utilisation : (et tout en bas l'explication)
+En algebre on peut définir plusieurs types d'objets : les rationnels a/b, les polynomes P(X) = a + b*X +c*X^2 + ..., ou bien les matrices A ={ {a00,a01},{a10,a11}}. Chacun de ces objets obéit à des règles d'addition de muliplications, voire de division. Ces objets peuvent etre définis au-dessus d'autres objets, par exemple on peut faire des rationnels d'entier, mais aussi des rationnels de polynomes. Donc on a 3 types d'objets, qui se combinent différemment les uns avec les autres. Le but était d'aller le plus loin possible dans ces combinaisons.
 
-Pour utiliser la class des polynome<T> sur une autre classe (la classe des coefficients), il y a besoin :
--que les coefficients aient les opérations + - * / (que la division soit parfaite : un corps).
--toujours la taille du vecteur coefficient doit être >=1 (au moins égale à 1)
--qu'il y ait l'opération =(true / false) pour mettre un coefficient valant 0 (l'élément neutre de l'addition) ou valant 1 (l'élément neutre de la multiplication)
-les polynomes ont une multiplication, une addition, une soustraction, mais aussi une division (partielle) et son reste. On peut mettre polynome = true/false , auquel cas la taille des coefficients est 1, et le premier coefficient =true/false
+Il y a des règles dans les combinaisons. Par exemple pour les rationnels d'entier, comme il y a une division avec reste pour les entiers, il y a l'algorithme du PGCD, et donc on peut simplifier les entiers. Idem pour les rationnels de polynomes de type T, si le type T a une division exacte on peut simplifier ces rationnels de polynome. Donc quand on écrit une class rationnel<T>, en fonction du type de T il y a des choses qu'on peut ou qu'on ne peut pas faire. J'ai fait donc des algorithmes de rationnel<T>, qui varient en fonction des algorithmes disponibles pour T.
 
-Pour utiliser la class des matrice<T> sur une autre classe (la classe des coefficients), il y a besoin :
--les mêmes condition que pour les polynomes ...
-les matrices peuvent être additionnées, soustraites, multipliées, mais il y a aussi une division (si determinant non-nul) exacte. On peut mettre une matrice = true/false (et alors la diagonale vaut = true/false , le reste = false).
+Il y a donc une récurrence sur T lorsque j'écris une class rationnel<T>. J'ai géré cette récurrence. Pour exemple d'algorithme, on peut prendre a/b + c/d = (ad + bc)/cd. Donc quand on a deux objets (a,b) et (c,d), on obtient l'objet (ad+bc, cd). Ceci utilise l'addition et la multiplication pour le type de a. Ce genre d'algorithme utilise la multiplication et l'addition reliées au type de a (qui est le même que le type de b, de c, et de d). On écrit donc le même algorithhme, qui utilisera les algorithmes des oppérations du type a.
 
-Pour utiliser la class des rationnel sur une autre classe (la classe des coefficients), il y a besoin :
--de faire attention que le denominateur soit différent de 0
--qu'il y ait l'opération =(true / false) pour mettre un coefficient valant 0 (l'élément neutre de l'addition) ou valant 1 (l'élément neutre de la multiplication)
--qu'il y ait une division et un reste (de la division) partielle : utilisé pour réduire les fractions (diviser le numérateur et le dénominateur par le PGCD, calculé avec / et %)
-les rationnels ont les opérations + - * et / (exacte). Le reste (%) est mis à 0 (la division est exacte). L'opératin =true/false met le numerateur = true/false, et le denominateur = true;
+Les objets créés sont :
+- les rationnels.
+- les polynomes.
+- les polynomes à n variables (en itératif et en récursif).
+- les matrices.
+- j'ai utilisé une class d'entiers infinis, et de réels à précision modifiable.
+- une class erreur qui contient un réel et l'erreur accumulée sur les opérations faites sur les réels.
+- la diagonalisation de matrice, où on a les vecteurs propres en fonction de polynomes en lambda (les valeurs propres), sans connaitre les valeurs de lambda.
+- les anneaux quotients : contient un élément, calculé modulo le quotient. par exemple les entiers modulo un nombre premier, ou un polynome modulo un autre polynome. Nécessite la division avec reste.
+- les corps quotients : idem, mais avec une division exacte (calculée suivant le théorème de Bezout).
+- les fichiers de récurrences sur les types T : si T est de type exacte ou approché (par exemple rationnel d'entier, ou réel). Ou si T a une division exacte (par exemple un rationnel d'autre chose), ou une division approchée (comme les entiers, ou les polynome<T> où T a une division exacte), ou sans aucune division.
+- un fichier "unité" : donne l'élément nul ou l'élément 1, pour n'importe lequel des types au-dessus.
+- un fichier "norme", pour savoir si l'objet est proche de 0. Par exemple pour minimiser les erreurs faites lors de l'inverse ou de la diagonalisation d'une matrice.
+- des tests préparés dans le fichier "algebre.cpp", où se trouve le main.
 
-Quand on utilise les corps fini, attention que p soit un nombre premier, et le même des deux côtés (lors des opérations).
-C'est un corps, donc il y a + - * /, et le reste (de la divisio) est mis à 0 (utilisé lors du pgcd).
-le "= true/false" met x = 0 ou 1
+Une partie du code prépare les algebres possibles (pré-compilation), et une autre exécute le code et fait les calculs. Une partie donc s'exécute lors de la compilation. Regarder le fichier "types.hpp".
 
-Idem, le corps des nombres complexes est un corps ... vérifier avant division que le nombre est non-nul.
-
-Toujours il y a la transformation d'un élément en booléen : si tous les coefficients sont nuls (polynome matrice corps-fini et complexe), ou si le numerateur est nul (fraction). C'est utile pour savoir si l'objet est nul ou non (pour les divisions par exemple).
-Au lieu d'avoir un contructeur qui prend un booléen en parametre, j'utilise la copie d'un élément que je transforme avec = true/false. Ca permet de garder les caractéristiques lorsqu'il y a plusieurs éléments neutres (pour les matrices il faut aussi spécifier la taille ... le true/false ne donne pas cette information ... voilà pourquoi (et idem pour les corps finis)).
-
-Au final toutes les opérations sont définies, avec la subtilité : la division est exacte (pour les corps), ou approchée (anneaux : polynomes ou entiers). Quand on a un anneau, on le transforme en corps avec rationnel<>
-Il faut pouvoir mettre les éléments = true/false, et vérifier si un élément est nul (==? true/false)
-Attention aux dépassements de la taille des entiers (j'utilise long long).
-
-
-Explication :
-partant d'une classe générique (notée T), si il y a de définis certaines opérations sur cette classe (+ - * / %), on peut générer une sur-classe qui prend T en paramètre. Par exemple, on peut définir des rationnel<T>. Comme la programmation est effectuée de manière générale (définir et utiliser les opérations sur ma_classe<T> , étant définies certaines opérations sur T) on peut composer ces classes. Par exemple pour calculer le polynome caractéristique d'une matrice<rationnel<entier>>, on utilise la classe rationne<polynome<rationnel<entier>>>. Comme il faut utiliser des opérations prédéfinies sur T, il y a la contrainte que ces opérations vérifient certaines conditions, et comme j'ai voulu itérer ces compositions de classes, il faut que les opérations sur ma_classe<T> vérifient aussi ces conditions.
-Finalement il faut séparer en deux types de classes : les corps, avec une division exacte (b= (b/a) * a), et les anneaux (comme les polynomes ou les entiers) dont on peut faire des rationnels, qui eux sont des corps. Les polynomes et les matrices sont définies sur des corps (les coefficients doivent être des éléments de type corps). Normalement j'ai tout fait de manière composable, ce qui était le but de l'exercice. Vous pouvez créer vos propres anneaux (commutatifs je crois) et corps (idem), et vérifier que ça marche.
+Bonne lecture !
