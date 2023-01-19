@@ -15,7 +15,7 @@ Les objets créés et fonctions implémentées sont :
 - les anneaux quotients : contient un élément, calculé modulo le quotient. par exemple les entiers modulo un nombre premier, ou un polynome modulo un autre polynome. Nécessite la division avec reste.
 - les corps quotients : idem, mais avec une division exacte (calculée suivant le théorème de Bezout).
 - les fichiers de récurrences sur les types T : si T est de type exacte ou approché (par exemple rationnel d'entier, ou réel). Ou si T a une division exacte (par exemple un rationnel d'autre chose), ou une division approchée (comme les entiers, ou les polynome<T> où T a une division exacte), ou sans aucune division. Par exemple polynome<T> a une division approchée si T a une division exacte.
-- un fichier "unité" : donne l'élément nul ou l'élément 1, pour n'importe lequel des types au-dessus.
+- un fichier "unité" : donne l'élément nul ou l'élément 1, pour n'importe lequel des types au-dessus. Prend un élément en parametre, car par exemple pour les polynomes à n variables il faut garder l'information du nombre de variables.
 - un fichier "norme", pour savoir si l'objet est proche de 0. Par exemple pour minimiser les erreurs faites lors de l'inverse ou de la diagonalisation d'une matrice.
 - des tests préparés dans le fichier "algebre.cpp", où se trouve le main.
 
