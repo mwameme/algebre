@@ -25,4 +25,6 @@ Le but était que chaque objet peut être réutilisé dans la définition d'un n
 
 C'était un exercice pour découvrir la notion de template, en essayant d'aller le plus loin possible dans ce projet.
 
+Les matrices de rationnels de polynômes à coefficients des rationnels de polynômes à n variables à coefficient rationnel d'entier (ou d'erreur de float_precision, pour le dernier). Le niveau maximal d'utilisation ! Ici pour calculer le polynôme caractéristique d'une matrice de type {{a,b},{c,d}}, ou du même genre la diagonalisation. (7 imbrications)
+
 Bonne lecture !
