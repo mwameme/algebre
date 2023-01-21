@@ -129,12 +129,6 @@ public:
 		if (test)
 			return;
 
-
-		int taille = 1;
-		for (int i(0); i < puissance; ++i)
-			taille = taille * nouvelles_dimensions[i];
-
-
 		//faire la boucle de dimension2, et recopier (si possible). boucle intelligente.
 		std::vector<int> pos(puissance, 0);
 		int pos_int = 0;

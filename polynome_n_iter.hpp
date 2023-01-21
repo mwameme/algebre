@@ -4,8 +4,10 @@
 #include <string>
 #include "polynome_n.hpp"
 #include <exception>
+#include <initializer_list>
 
 #include "entete objets.hpp"
+#include <iostream>
 
 template<class T> class vecteur_n;
 
@@ -24,7 +26,7 @@ public:
 
 		if (n_var == 0) {
 			std::vector<int> dimensions(1, 1);
-			coeffs (dimensions);
+			coeffs =vecteur_n<T>(dimensions);
 			coeffs.data[0] = element;
 			noms = NULL;
 			coeffs.puissance = 0;
@@ -40,7 +42,7 @@ public:
 	polynome_n_iter(std::vector<int> degres, T element, std::string* noms_){ //monome. degres >0. Transforme degres en dimensions ...  ATTENTION créé avec degrés
 		if (degres.size() == 0) {
 			degres = { 1 };
-			coeffs(degres);
+			coeffs=vecteur_n<T>(degres);
 			coeffs.data[0] = element;
 			coeffs.puissance = 0;
 			noms = NULL;
@@ -72,6 +74,36 @@ public:
 
 	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs) , noms(temp.noms){
 
+	};
+
+	polynome_n_iter(std::initializer_list<int> degres_, T element,std::string* noms_) {
+		std::vector<int> degres(degres_);
+
+		if (degres.size() == 0) {
+			degres = { 1 };
+			coeffs = vecteur_n<T>(degres);
+			coeffs.data[0] = element;
+			coeffs.puissance = 0;
+			noms = NULL;
+		}
+		else {
+			for (int i(0); i < degres.size(); ++i)
+				if (degres[i] < 0) {
+					degres = std::vector<int>(degres.size(), 0);
+					element = unite(element, false);
+					break;
+				}
+
+			for (int i(0); i < degres.size(); ++i)
+				degres[i] += 1; //dimensions
+			coeffs = vecteur_n<T>(degres);
+			T faux_ = unite(element, false);
+
+			for (int i(0); i < coeffs.data.size(); ++i)
+				coeffs.data[i] = faux_;
+			coeffs.data[coeffs.data.size() - 1] = element; //monome
+			noms = noms_;
+		}
 	};
 
 	polynome_n_iter<T>& operator=(polynome_n_iter<T> temp) {
@@ -169,6 +201,15 @@ public:
 		std::vector<int> puissances_gauche = gauche.coeffs.puissances;
 		std::vector<int> puissances_droite = droite.coeffs.puissances;
 
+		/*
+		std::cout << "result " << std::endl << result << std::endl;
+		long question;
+		std::cout << "gauche " << std::endl << gauche << std::endl;
+		std::cout << "droite " << std::endl << droite << std::endl;
+
+		std::cin >> question;
+		*/
+
 
 		bool fin = true;
 		while (fin) {
@@ -188,6 +229,7 @@ public:
 				positions_gauche[i] = 0;
 				if (i == 0) {
 					fin_gauche = false;
+					position_gauche = 0;
 					break;
 				}
 				++positions_gauche[i - 1];
@@ -205,7 +247,8 @@ public:
 
 				while (positions_droite[i] >= dimensions_droite[i]) {
 //					position_finale = position_finale - puissances_finale[i] * positions_droite[i];
-					position_droite = position_droite - puissances_droite[i] * positions_droite[i];
+//					position_droite = position_droite - puissances_droite[i] * positions_droite[i];
+					position_finale = position_finale - puissances_finale[i] * positions_droite[i];
 
 					positions_droite[i] = 0;
 					if (i == 0) {
@@ -246,10 +289,10 @@ public:
 		for (n_for iter(element.coeffs.dimensions); (bool)iter; ++iter)
 			if ((bool)element.coeffs.data[iter.position]) {
 				std::string puissance = "";
-				for (int i(0); i < coeffs.puissance; ++i)
+				for (int i(0); i < element.coeffs.puissance; ++i)
 					puissance = puissance + "*" + element.noms[i] + "^" + std::to_string(iter.positions[i]) + " ";
 				if (premier)
-					os << "+" << coeffs.data[iter.position] << " " << puissance;
+					os << "+" << element.coeffs.data[iter.position] << " " << puissance;
 				else {
 					premier = true;
 					os << element.coeffs.data[iter.position] << " " << puissance;

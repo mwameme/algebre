@@ -285,6 +285,21 @@ public:
         denominateur = copie.denominateur;
     };
 
+    template<class U> explicit rationnel(std::initializer_list<U> liste) {
+        if ((liste.size() == 0) || (liste.size() > 2))
+            throw std::domain_error("initialisation de rationnel : liste vide ou >2");
+        if (liste.size() == 1) {
+            numerateur = T(liste[0]);
+            denominateur = unite(numerateur, true);
+            simplifier();
+        }
+        if (liste.size() == 2) {
+            numerateur = T(liste[0]);
+            denominateur = T(liste[1]);
+            simplifier();
+        }
+    }
+
     rationnel<T>& operator=(bool test) {
         numerateur = test;
         denominateur = true;

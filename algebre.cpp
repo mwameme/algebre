@@ -68,6 +68,38 @@ int main()
     long question;
 //    auto x = 4.5 % 4.1;
 
+    //matrice
+    
+    if (true) {
+        matrice<int> mat{ {1,2,3},{4,5,6},{7,8,9} };
+
+        cout << "matrice \n" << 2 * mat << endl;
+
+        cout << endl << "======FIN======" << endl;
+
+        cin >> question;
+    };
+
+    //test polynome_n_iter
+    if (false) {
+        std::string noms[3] = { "X","Y","Z" };
+        polynome_n_iter<int> poly1({ 3,1,1 }, 1, noms);
+
+        polynome_n_iter<int> poly2({ 1,3,1 }, 2, noms);
+        polynome_n_iter<int> poly3({ 1,1,3 }, 3, noms);
+
+        polynome_n_iter<int> poly = poly1 + poly2 + poly3;
+
+        cout << "poly :\n" << poly << std::endl;
+        polynome_n_iter<int> poly4 = poly * poly1;
+
+        cout << "poly4 :\n" << poly4 << std::endl;
+
+        cout << endl << "======FIN======" << endl;
+        cin >> question;
+    }
+
+
     //test antoine
     if (false) {
         polynome<rationnel<int>> poly1(vector<rationnel<int>>{rationnel<int>(-1, 1), rationnel<int>(1, 1)});

@@ -2,13 +2,87 @@
 #include <vector>
 #include <functional>
 
+
 #include "vote.hpp"
 #include "TVD.hpp"
-#include "ordre.hpp"
 
 using namespace std;
 
-vector<double> vote(vector<vector<int>> const& votes, double epsilon_){
+
+vector<int> ordre_alea(int n) {
+	vector<double> liste(n, 0);
+	for (int i(0); i < n; ++i)
+		liste[i] = ((double)(rand()) / ((double)(RAND_MAX)));
+	return ordre_double(liste);
+}
+
+/*
+vector<double> multiplication(vector<double> const& X, vector<vector<double>> const& A) {
+	int n = X.size();
+	vector<double> Y(n, 0);
+	for (int i(0); i < n; ++i) {
+		double somme = 0;
+		for (int j(0); j < n; ++j)
+			somme += X[j] * A[j][i];
+		Y[i] = somme;
+	}
+
+	return Y;
+};
+
+vector<vector<double>> multiplication(vector<vector<double>> const& A, vector<vector<double>> const& B) {
+	int n = A.size();
+	vector<vector<double>> C(n, vector<double>(n, 0.));
+	for (int i(0); i < n; ++i)
+		for (int j(0); j < n; ++j) {
+			double somme = 0;
+			for (int k(0); k < n; ++k)
+				somme += A[i][k] * B[k][j];
+			C[i][j] = somme;
+		}
+	return C;
+};
+
+vector<vector<double>> puissance(vector<vector<double>> matrice, int puissance_n) {
+	vector<vector<double>> resultat(matrice.size(), vector<double>(matrice.size(), 0));
+	for (int i(0); i < matrice.size(); ++i)
+		resultat[i][i] = 1;
+
+	vector<vector<double>> puissance_m = matrice;
+	while (puissance_n > 0) {
+		if ((puissance_n % 2) == 1)
+			resultat = multiplication(resultat, puissance_m);
+		puissance_m = multiplication(puissance_m, puissance_m);
+		puissance_n = puissance_n / 2;
+	}
+	return resultat;
+};
+*/
+
+
+int compter_ordonne(vector<vector<int>> const& votes, vector<int> ordre) {
+	//renvoit le nombre de fois que ce n'est pas dans l'ordre ... vis-à-vis des préférences.
+
+	int taille = votes.size();//taille : le nombre de votants
+	int n = votes[0].size(); //n : le nombre d'élus / de votés
+	vector<vector<int>> preferences(n, vector<int>(n, 0));
+
+	for (int i(0); i < taille; ++i) //on parcourt la liste de votes
+		for (int j(0); j < n - 1; ++j)
+			for (int k(j + 1); k < n; ++k) //on regarde j préféré à k
+				preferences[votes[i][j]][votes[i][k]] += 1;
+
+	int ordonne = 0;
+
+	for (int i(0); i < n - 1; ++i)
+		for (int j(i + 1); j < n; ++j)
+			if (preferences[ordre[i]][ordre[j]] < preferences[ordre[j]][ordre[i]])
+				++ordonne;
+
+	return ordonne;
+};
+
+vector<double> vote(vector<vector<int>> const& votes, double epsilon_) {
 	int taille = votes.size();//taille : le nombre de votants
 	int n = votes[0].size(); //n : le nombre d'élus / de votés
 	vector<vector<int>> preferences(n, vector<int>(n, 0));
@@ -25,9 +99,9 @@ vector<double> vote(vector<vector<int>> const& votes, double epsilon_){
 
 	for (int i(0); i < n; ++i) // on parcourt la matrice de transitions
 		for (int j(0); j < n; ++j)
-				P[i][j] = inv_n * (1. + epsilon * ((double)preferences[j][i] - n_2));
-	
-	for(int i(0);i<n;++i)
+			P[i][j] = inv_n * (1. + epsilon * ((double)preferences[j][i] - n_2));
+
+	for (int i(0); i < n; ++i)
 		P[i][i] = inv_n;
 
 	double somme = 0; //calculer la stochasticité
@@ -60,124 +134,76 @@ vector<double> vote(vector<vector<int>> const& votes, double epsilon_){
 	X = multiplication(X, puissance(P, 1024));
 
 	somme = 0; //au cas où X n'est pas strictement de masse 1.
-	for (int i(0); i < n; +i)
+	for (int i(0); i < n; ++i)
 		somme += X[i];
 	somme_inv = 1. / somme;
 	for (int i(0); i < n; ++i)
 		X[i] *= somme_inv;
 
-	/*
-	//renvoyer le résultat ...
-	vector<double> resultat(n, 0);
-	double epsilon_inv = 1. / epsilon;
-	for (int i(0); i < n; ++i)
-		resultat[i] = (X[i] - inv_n) *epsilon_inv;
-		*/
 	return X;
 }
 
-vector<double> vote_iter(vector<vector<int>> const& votes, double epsilon,vector<double> const& poids) {
-	//on oublie les votants, on ne garde que les votés :
-	//on a donc n==taille
-	int n = votes.size(); //nombre de votés 
-							//NB : nombre de votés non-fixé (variable) ... tout parcourir !
-	vector<vector<double>> preferences(n, vector<double>( n, 0.));
+int get_min(std::vector<std::vector<int>> votes, double epsilon, int d, bool asymetrique) {
+	int n = votes[0].size();
+	if (n == 1)
+		return 0;
 
-	for (int i(0); i < n; ++i) //on parcourt la liste de votes
-		for (int j(0); j < n - 1; ++j)
-			for (int k(j + 1); k < n; ++k) //on regarde j préféré à k
-				preferences[votes[i][j]][votes[i][k]] += poids[i]; //j préféré à k : de poids i.
-
-	vector<vector<double>> P(n, vector<double>(n, 0)); // matrice de transition
-	double inv_n = 1. / ((double)n);
-//	double epsilon = epsilon_ * inv_n;
-
-	for (int i(0); i < n; ++i) // on parcourt la matrice de transitions
-		for (int j(0); j < n; ++j)
-			P[i][j] = inv_n * (1 + epsilon * (preferences[j][i] - .5));
-	
-	for(int i(0);i<n;++i)
-		P[i][i] = inv_n;
-
-	double somme = 0; //calculer la stochasticité
-	for (int i(0); i < n; ++i) {
-		double somme_temp = 0;
-		for (int j(0); j < n; ++j)
-			somme_temp += P[i][j];
-		if (somme_temp > somme)
-			somme = somme_temp;
-	}
-
-	double somme_inv = 1 / somme;
-	for (int i(0); i < n; ++i)
-		for (int j(0); j < n; ++j)
-			P[i][j] = P[i][j] * somme_inv;
-
-	//modifier les P_ii, toujours pour la stochasticité
-	for (int i(0); i < n; ++i) {
-		somme = 0.;
-		for (int j(0); j < n; ++j) {
-			if (j == i)
-				continue;
-			somme += P[i][j];
+	std::vector<int> ordre;
+	if (d == 0) {
+		if (asymetrique == false)
+			ordre = ordre_double(vote(votes, epsilon));
+		else {
+			ordre = ordre_double(vote(votes, epsilon));
+			return ordre[n - 1];
 		}
-		P[i][i] = 1. - somme;
 	}
+	else
+		ordre = get_max_min(votes, epsilon, d - 1, asymetrique);
 
+	int i_max = ordre[0];
 
-	vector<double> X(n, inv_n); //calculer la proba stationnaire ...
-	X = multiplication(X, puissance(P, 1024));
+	for (int i(0); i < votes.size(); ++i)
+		for (int j(0); j < n; ++j)
+			if (votes[i][j] == i_max)
+				votes[i].erase(votes[i].begin() + j);
 
-	somme = 0; //au cas où X n'est pas strictement de masse 1. réduit l'aléa (lors des itérations)
-	for (int i(0); i < n; +i)
-		somme += X[i];
-	somme_inv = 1. / somme;
-	for (int i(0); i < n; ++i)
-		X[i] *= somme_inv;
+	for (int i(0); i < votes.size(); ++i)
+		for (int j(0); j < n; ++j)
+			votes[i][j] = votes[i][j] > i_max ? votes[i][j] - 1 : votes[i][j];
 
-	//renvoyer le résultat ...
+	int i_min = get_min(votes, epsilon, d, asymetrique);
+	i_min = i_min < i_max ? i_min : i_min + 1;
 
-	return X;
+	return i_min;
 }
 
-vector<double> vote_n_iter(vector<vector<int>> const& votes, double epsilon, int iter) {
-	//rajouter un tableau de vote interne aux votés ...
-	//comme ça deux étapes : premier vote, puis vote_iter n fois ...
+std::vector<int> get_max_min(std::vector<std::vector<int>>  votes, double epsilon, int d, bool asymetrique) { //appeler asymétrique=false, d=0, epsilon=2. Renvoit une liste
+	int n = votes[0].size();
+	if (n == 1)
+		return vector<int>(1, 0);
 
-	int n = votes.size();
-	vector<double> X(n, 1 / ((double)n));
-	for (int i(0); i < iter; ++i)
-		X = vote_iter(votes, epsilon, X);
+	int i_min = get_min(votes, epsilon, d, asymetrique);
 
-	return X;
-};
+	for (int i(0); i < votes.size(); ++i)
+		for (int j(0); j < n; ++j)
+			if (votes[i][j] == i_min)
+				votes[i].erase(votes[i].begin() + j);
 
-vector<double> vote_experience(vector<vector<int>> votes_total, vector<vector<int>> votes_elus, double epsilon, int iter) {
-	vector<double> X = vote(votes_total, epsilon);
+	for (int i(0); i < votes.size(); ++i)
+		for (int j(0); j < n; ++j)
+			votes[i][j] = votes[i][j] > i_min ? votes[i][j] - 1 : votes[i][j];
 
-	for (int i(0); i < iter; ++i) 
-		X = vote_iter(votes_elus, epsilon, X);
-	
-	return X;
-}
+	vector<int> resultat = get_max_min(votes, epsilon, d, asymetrique);
+	for (int i(0); i < resultat.size(); ++i)
+		resultat[i] = resultat[i] < i_min ? resultat[i] : resultat[i] + 1;
 
-/*
-vector<int> ordre(vector<double> X) {
-	int n = X.size();
-	vector<couple> liste(n);
-	for (int i(0); i < n; ++i) {
-		liste[i].nombre = X[i];
-		liste[i].index = i;
-	}
-
-	sort(liste.begin(), liste.end(), [](couple& x, couple& y) {return x.nombre > y.nombre; });
-
-	vector<int> resultat(n, 0);
-	for (int i(0); i < n; ++i)
-		resultat[i] = liste[i].index;
+	resultat.push_back(i_min);
 
 	return resultat;
-}*/
+}
+
+
+
 
 
 //ajouter un vote en deux étapes : 

@@ -343,6 +343,28 @@ public:
 
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
 
+	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
+		int taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+
+		int taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(0); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	}
+
+
 	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
@@ -529,9 +551,9 @@ public:
 			for (int j(0); j < element.taille_c - 1; ++j)
 				os << element.coeffs[i][j] << " , ";
 			if (i < element.taille_l - 1)
-				os << element.coeffs[i][element.taille - 1] << " } ,";
+				os << element.coeffs[i][element.taille_c - 1] << " } ,";
 			else
-				os << element.coeffs[i][element.taille - 1] << " }";
+				os << element.coeffs[i][element.taille_c - 1] << " }";
 
 			if (i < element.taille_l - 1)
 				os << std::endl;
@@ -618,6 +640,28 @@ public:
 	};
 
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {}; //toujours remplire les matrices ...
+
+
+	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
+		int taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		int taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector < std::vector<T>> (taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	}
+
 
 	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
@@ -1086,6 +1130,27 @@ public:
 	};
 
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
+
+	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
+		int taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		int taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	}
+
 
 	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
