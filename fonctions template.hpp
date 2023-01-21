@@ -5,9 +5,7 @@ template<class T> T unite(T const& element,bool test);
 
 
 template<class T> T derivee(T const& element) {
-    T result=element;
-    result = false;
-    return result;
+    return unite(element,false);
 };
 
 

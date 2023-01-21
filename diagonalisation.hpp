@@ -42,8 +42,7 @@ public:
 			n = 1;
 
 		int taille = m_matrice.taille_l;
-		T e = m_matrice.coeffs[0][0];
-		e = true;
+		T e = unite(m_matrice.coeffs[0][0],true);
 		anneau_quotient<polynome<T>> poly_true(polynome<T>(e), chi_);
 		e = -e;
 		matrice<anneau_quotient<polynome<T>>> matrice_poly(taille, taille,poly_true);
@@ -201,11 +200,10 @@ public:
 		parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
 
 		for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre c'est dans le sous-espace sans diagonale.
-			anneau_quotient<polynome<T>> temp = matrices[i].coeffs[0][0];
-			temp = false;
+			anneau_quotient<polynome<T>> temp = unite(matrices[i].coeffs[0][0],false);
 
 			std::vector<anneau_quotient<polynome<T>>> vec_non_diagonale(non_diagonale.size(),temp);
-			temp = true;
+			temp = unite(temp, true);
 			vec_non_diagonale[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
 
 			//on regarde, pour chaque premier élément non-nul, sa valeur ... un seul parametre libre non-nul.
@@ -216,7 +214,7 @@ public:
 						break; // l'inverse existe : l'élément est testé et/donc toujours non-nul.
 					}//dans les faits, ne compte que si l'élément parametre libre est à droite du premier élément non-nul.
 
-			temp = false;
+			temp = unite(temp, false);
 			//le vecteur entier ... on commence par recopier la partie déjà calculée.
 			std::vector<anneau_quotient<polynome<T>>> vec(taille, temp);
 			for (int j(0); j < non_diagonale.size(); ++j)
@@ -224,8 +222,7 @@ public:
 
 			for(int j(0);j<taille;++j)
 				if ((bool)matrices[i].coeffs[j][j]) {// les éléments de diagonale non-nulle : on calcule leur valeur.
-					anneau_quotient<polynome<T>> somme = matrices[i].coeffs[0][0];
-					somme = false;
+					anneau_quotient<polynome<T>> somme = unite(matrices[i].coeffs[0][0],false);
 					for (int k(0); k < non_diagonale.size(); ++k) {
 						somme = somme + (matrices[i].coeffs[j][non_diagonale[k]] * vec_non_diagonale[k]);
 					}
@@ -301,8 +298,7 @@ public:
 			n = 1;
 
 		int taille = m_matrice.taille_l;
-		T e = m_matrice.coeffs[0][0];
-		e = true;
+		T e = unite(m_matrice.coeffs[0][0],true);
 		anneau_quotient<polynome<T>> poly_true(polynome<T>(e), chi_);
 		e = -e;
 		matrice<anneau_quotient<polynome<T>>> matrice_poly(taille, taille, poly_true);
@@ -371,8 +367,7 @@ public:
 		polynome<T>& poly = conditions[i];
 		int taille = matrices[i].taille_l;
 		long question;
-		auto vrai = matrices[i].coeffs[0][0];
-		vrai = true;
+		auto vrai = unite(matrices[i].coeffs[0][0],true);
 
 		for (int j = iterateurs[i]; j < taille; ++j) { //colonne j ...
 			iterateurs[i] = j;
@@ -522,11 +517,10 @@ public:
 		parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
 
 		for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre c'est dans le sous-espace sans diagonale.
-			anneau_quotient<polynome<T>> temp = matrices[i].coeffs[0][0];
-			temp = false;
+			anneau_quotient<polynome<T>> temp = unite(matrices[i].coeffs[0][0],false);
 
 			std::vector<anneau_quotient<polynome<T>>> vec_non_diagonale(non_diagonale.size(), temp);
-			temp = true;
+			temp = unite(temp,true);
 			vec_non_diagonale[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
 
 			//on regarde, pour chaque premier élément non-nul, sa valeur ... un seul parametre libre non-nul.
@@ -537,7 +531,7 @@ public:
 						break; // l'inverse existe : l'élément est testé et/donc toujours non-nul.
 					}//dans les faits, ne compte que si l'élément parametre libre est à droite du premier élément non-nul.
 
-			temp = false;
+			temp = unite(temp,false);
 			//le vecteur entier ... on commence par recopier la partie déjà calculée.
 			std::vector<anneau_quotient<polynome<T>>> vec(taille, temp);
 			for (int j(0); j < non_diagonale.size(); ++j)
@@ -545,8 +539,7 @@ public:
 
 			for (int j(0); j < taille; ++j)
 				if ((bool)matrices[i].coeffs[j][j]) {// les éléments de diagonale non-nulle : on calcule leur valeur.
-					anneau_quotient<polynome<T>> somme = matrices[i].coeffs[0][0];
-					somme = false;
+					anneau_quotient<polynome<T>> somme = unite(matrices[i].coeffs[0][0],false);
 					for (int k(0); k < non_diagonale.size(); ++k) {
 						somme = somme + (matrices[i].coeffs[j][non_diagonale[k]] * vec_non_diagonale[k]);
 					}

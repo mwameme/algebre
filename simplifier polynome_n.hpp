@@ -14,16 +14,19 @@ public:
 	};
 
 	scalaire_vecteur<T>& operator=(int i) { //i commence à 0.
+		T faux = unite(scalaire, false);
+		T vrai = unite(scalaire, true);
 		for (int j(0); j < vecteur.size(); ++j)
-			vecteur[j] = false;
-		vecteur[i] = true;
-		scalaire = false;
+			vecteur[j] = faux;
+		vecteur[i] = vrai;
+		scalaire = faux;
 		return *this;
 	};
 
 	scalaire_vecteur<T>& operator=(T element) {
+		T faux = unite(scalaire, false);
 		for (int i(0); i < vecteur.size(); ++i)
-			vecteur[i] = false;
+			vecteur[i] = faux;
 		scalaire = element;
 		return *this;
 	};
@@ -56,8 +59,8 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 	if (num.coeffs.puissance != denom.coeffs.puissance)
 		throw std::domain_error("simplification de polynomes : n_var ne correspond pas");
 
-	T faux = num.coeffs.data[0];
-	faux = false;
+	T faux = unite(num.coeffs.data[0], false);
+
 	polynome_n_iter<T> vide(n, faux, num.noms); //renvoit le polynome nul si le calcul n'aboutit pas.
 
 	std::vector<int> degres(n); //calcule les degres du polynome resultat
@@ -102,7 +105,7 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 
 	std::vector<T> X = m_matrice.resoudre(Y);
 	if (X.size() == 0) //non simplifiable
-		return vide;
+		return polynome_n_iter<T>(0,faux,NULL);
 
 	polynome_n_iter<T> resultat(degres, faux, denom.noms);
 	for (int i(0); i < resultat.coeffs.data.size(); ++i)

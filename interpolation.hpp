@@ -11,8 +11,7 @@ public :
 			largeur = largeur / 2;
 		}
 		if (largeur == 1) {
-			T temp = liste_coeffs[0];
-			temp = true;
+			T temp = unite(liste_coeffs[0],true);
 			poly(std::vector<T>{-liste_coeffs[debut_gauche], temp});
 			gauche = NULL;
 			droite = NULL;
@@ -44,8 +43,7 @@ public :
 	polynome<T> recherche(int n) { //n de 0 à ....
 		if (gauche == NULL) {
 			if (n == debut_droit) {
-				T temp = poly.coeffs[0];
-				temp = true;
+				T temp = unite(poly.coeffs[0],true);
 				return polynome<T>(temp);
 			}
 			else
@@ -72,8 +70,8 @@ public :
 };
 
 template<class T> polynome<T> interpolation(T* liste_x, T* liste_y, int taille) {
-	T faux = liste_x[0];
-	faux = false;
+	T faux = unite(liste_x[0],false);
+
 	polynome<T> resultat(faux);
 
 	int largeur = 1;
@@ -105,11 +103,11 @@ template<class T> polynome<T> interpolation_newton(T* liste_x, T* liste_y, int t
 
 
 //	polynome<T> resultat(liste_y[0]);
-	T vrai = liste_x[0];
-	vrai = true;
+	T vrai = unite( liste_x[0],true);
+
 	polynome<T> multiplication(vrai);
-	polynome<T> resultat = polynome<T>(vrai);
-	resultat = false;
+	polynome<T> resultat = unite(polynome<T>(vrai),false);
+
 	for (int i(taille - 1); i >= 0; --i) {
 		//		multiplication = multiplication * polynome<T>(-liste_x[i], vrai);
 		//		resultat = resultat + (alphas[i] * multiplication) ;

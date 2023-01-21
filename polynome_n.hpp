@@ -138,6 +138,7 @@ public:
 			nul = test;
 			noms_variables = NULL;
 			n_var = 0;
+			return;
 		}
 
 		if (!test) { //constructeur de polynome "vide".
@@ -436,7 +437,7 @@ public:
 		}
 	};
 
-	inline operator bool() const {
+	explicit inline operator bool() const {
 		return nul;
 	};
 

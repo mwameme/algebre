@@ -235,7 +235,10 @@ public:
 	operator polynome_n<T>() const {
 		if (coeffs.puissance == 0)
 			return polynome_n<T>(0, coeffs.data[0], noms);
-		return *poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
+		polynome_n<T>* adresse = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
+		polynome_n<T> copie(*adresse);
+		delete adresse;
+		return copie;
 	};
 
 	friend std::ostream& operator<<(std::ostream& os, polynome_n_iter<T> const& element) {

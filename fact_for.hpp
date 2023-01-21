@@ -118,7 +118,7 @@ public:
 		return os;
 	};
 
-	operator bool() const {// si OK=false, la boucle s'arrête.
+	explicit inline operator bool() const {// si OK=false, la boucle s'arrête.
 		return OK;
 	};
 

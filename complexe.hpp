@@ -26,7 +26,7 @@ public:
 		y = temp.imag();
 	};
 
-	explicit operator bool() {
+	explicit inline operator bool() {
 		return (((bool)x) || ((bool)y));
 	};
 

@@ -26,7 +26,7 @@ public:
         for (long i(0); i < result.coeffs.size() - 1; ++i) {
             result.coeffs[i] = ((i + 1)) * result.coeffs[i + 1];
         }
-        result.coeffs[result.coeffs.size() - 1] = false;
+        result.coeffs[result.coeffs.size() - 1] = unite(result.coeffs[0],false);
         result.getDegre();
         return result;
     };
@@ -96,12 +96,11 @@ public:
 
     friend polynome<T> operator*(const polynome<T>& temp1, const polynome<T>& temp2) {
 
-        polynome<T> result(temp1.coeffs[0]);
-        result = false;
-        T faux = result.coeffs[0];
+        polynome<T> result;
+        T faux = unite(temp1.coeffs[0], false);
 
         if ((temp1.degre < 0) || (temp2.degre < 0))
-            return result;
+            return unite(temp1,false);
 
         result.coeffs = std::vector<T>(temp1.degre + temp2.degre + 1,faux);
         /*
@@ -146,8 +145,7 @@ public:
         if (type_algebre<T>::type != 0)
             throw std::domain_error("modulo de polynomes : nécessite une division exacte sur T");
 
-        T faux = temp1.coeffs[0];
-        faux = false;
+        T faux = unite( temp1.coeffs[0],false);
 
         if (temp2.degre > temp1.degre)
             return temp1;
@@ -163,7 +161,7 @@ public:
             for (int i(0); i <= temp2.degre; ++i)
                 A.coeffs[i + degre] = A.coeffs[i + degre] - temp * temp2.coeffs[i];
             
-            A.coeffs[A.degre] = false; // au cas où ...
+            A.coeffs[A.degre] = faux; // au cas où ...
             A.getDegre();
         }
 
@@ -189,15 +187,11 @@ public:
 
 
         if (temp1.degre < 0) {
-            polynome<T> result(temp1);
-            result = false;
-            return result;
+            return unite(temp1, false);
         }
 
         if (temp2.degre > temp1.degre) {
-            polynome<T> result(temp1.coeffs[0]);
-            result = false;
-            return result;
+            return unite(temp1, false);
         }
 
 
@@ -206,8 +200,7 @@ public:
         A.getDegre();
         B.getDegre();
 
-        T faux = temp1.coeffs[0];
-        faux = false;
+        T faux = unite(temp1.coeffs[0],false);
 
         polynome<T> result;
         result.coeffs = std::vector<T>(A.degre - B.degre + 1,faux);
@@ -220,7 +213,7 @@ public:
             for (int i(0); i < B.degre; ++i) 
                 A.coeffs[i + degre] = A.coeffs[i + degre] -  ( temp * B.coeffs[i]);
 
-            A.coeffs[A.degre] = false;
+            A.coeffs[A.degre] = faux;
             A.getDegre();
         }
 
@@ -340,7 +333,7 @@ public:
 
 
 
-    explicit operator bool() const {
+    explicit inline operator bool() const {
         if (degre < 0)
             return false;
         for (int i(coeffs.size() -1); i >= 0; --i) {

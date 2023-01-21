@@ -102,8 +102,7 @@ public:
 	inline T operator[](std::vector<int> position) const { //
 		if (accesseur_possible(position))
 			return data[accesseur(position)];
-		T element = data[0];
-		element = false;
+		T element = unite(data[0],false);
 		return element;
 	};
 

@@ -117,8 +117,8 @@ template<class T> class norme_T< polynome_n<T> > {
 public:
 	static decltype(norme_T<T>::norme(T())) norme(polynome_n<T> poly) {
 		if (poly.n_var >= 1) {
-			decltype(norme_T<T>::norme(T())) x = norme_T<T>::norme(poly.element);
-			x = false;
+			decltype(norme_T<T>::norme(T())) x = unite(norme_T<T>::norme(poly.element),false);
+//			x = unite(x,false);
 			for (int i(0); i < poly.coeffs.size(); ++i) {
 				x = x + norme_T<polynome_n<T>>::norme(* poly.coeffs[i]);
 			}
@@ -166,8 +166,7 @@ public:
 	static decltype(norme_T<T>::norme(T())) norme(anneau_quotient<polynome<T>> x) {
 		polynome<T> pgcd = PGCD(x.element, x.quotient); //dans cet ordre ... résultant proportionnel au coeff dominant de x.element.
 		if (pgcd.degre >= 1) {
-			T temp = pgcd.coeffs[0];
-			temp = false;
+			T temp = unite(pgcd.coeffs[0],false);
 			return norme_T<T>::norme(temp);
 		}
 		return norme_T<polynome<T>>::norme(pgcd);

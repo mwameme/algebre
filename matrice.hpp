@@ -82,7 +82,7 @@ public:
 		return;
 	}
 
-	explicit operator bool() const {
+	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
 				if ((bool)coeffs[i][j])
@@ -343,7 +343,7 @@ public:
 
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
 
-	explicit operator bool() const {
+	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
 				if ((bool)coeffs[i][j])
@@ -619,7 +619,7 @@ public:
 
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {}; //toujours remplire les matrices ...
 
-	explicit operator bool() const {
+	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
 				if ((bool)coeffs[i][j])
@@ -745,7 +745,7 @@ public:
 					break;
 			}
 			if (j == taille)
-				return (det = false);
+				return unite(det,false);
 
 			if (i != j) {
 				m_matrice.echangerLigne(i, j);
@@ -818,7 +818,7 @@ public:
 				throw std::domain_error("matrice non-inversible");
 
 			if (!((bool)coeffs[i][j])) {
-				return (resultat = false);
+				return unite(resultat,false);
 			}
 			if (i != j) {
 				m_matrice.echangerLigne(i, j);
@@ -1087,7 +1087,7 @@ public:
 
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
 
-	explicit operator bool() const {
+	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
 				if ((bool)coeffs[i][j])
@@ -1224,7 +1224,7 @@ public:
 				}
 			}
 			if (j_max==-1) //0 sur une colonne
-				return (det = false);
+				return unite(det,false);
 
 			if (i != j_max) {
 				m_matrice.echangerLigne(i, j_max);

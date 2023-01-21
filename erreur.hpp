@@ -35,7 +35,7 @@ public :
 	static_assert((type_algebre<T>::type == 0) && (type_algebre<T>::approx == 1), "erreur<T> : T doit être approché, avec division exacte");
 
 	erreur() :precision(0) {
-		valeur = false;
+		valeur = 0;
 		precision = precision_relative(T(1.));
 	};
 
@@ -64,7 +64,7 @@ public :
 		precision = temp.precision;
 	};
 
-	operator bool() const {
+	explicit inline operator bool() const {
 		if (carre((float)valeur) <= (50. * precision))
 			return false;
 		else
@@ -91,7 +91,7 @@ public :
 		result.precision = temp1.precision/abs(temp2.valeur) + ( temp2.precision *abs(temp1.valeur/(temp2.valeur*temp2.valeur)) ) + ( abs(result.valeur)* precision_relative(result.valeur));
 		*/
 		erreur<T> result(temp1.valeur / temp2.valeur, 0.);
-		result.precision = temp1.precision / (carre((float)temp2.valeur))  +(temp2.precision * carre((float)temp1.valeur / ((float)temp2.valeur * (float)temp2.valeur)));
+		result.precision = temp1.precision / (carre((float)temp2.valeur))  +(temp2.precision * carre((float)temp1.valeur / carre((float)temp2.valeur)));
 	//		result.maj();
 		return result;
 	};

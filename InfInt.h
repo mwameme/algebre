@@ -181,7 +181,7 @@ public:
         return InfInt(gauche) * droit;
     };
 
-    explicit operator bool() const {
+    explicit inline operator bool() const {
         if (val.size() == 0)
             return false;
         for (int i = (int)val.size() - 1; i >= 0; --i)

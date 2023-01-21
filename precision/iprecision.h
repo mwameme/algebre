@@ -183,7 +183,7 @@ class int_precision
 
 	// ============================================================================
 	//Mes ajouts
-	explicit operator bool() const {
+	explicit inline operator bool() const {
 		for (int i(0); i < mNumber.size(); ++i)
 			if (mNumber[i] != 0)
 				return true;

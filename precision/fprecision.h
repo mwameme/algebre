@@ -347,7 +347,7 @@ class float_precision {
 
 	  // ============================================================================
 	  //Mes ajouts
-	  explicit operator bool() const{
+	  explicit inline operator bool() const{
 		  float_precision x(0.,mPrec,mRmode);
 		 return (*this ==  x);
 	  };

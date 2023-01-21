@@ -77,7 +77,7 @@ public:
         return result;
     };
 
-    explicit operator bool() const {
+    explicit inline operator bool() const {
         return (bool) element;
     };
 
