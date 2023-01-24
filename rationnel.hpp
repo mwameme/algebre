@@ -32,6 +32,7 @@ public:
         return result;
     };
 
+    /*
     template<class U> explicit rationnel(std::initializer_list<U> liste) {
         if ((liste.size() == 0) || (liste.size() >2))
             throw std::domain_error("initialisation de rationnel : liste vide ou >2");
@@ -46,6 +47,7 @@ public:
             simplifier();
         }
     }
+    */
 
     explicit rationnel() : numerateur(),denominateur(){};
 
@@ -285,6 +287,7 @@ public:
         denominateur = copie.denominateur;
     };
 
+    /*
     template<class U> explicit rationnel(std::initializer_list<U> liste) {
         if ((liste.size() == 0) || (liste.size() > 2))
             throw std::domain_error("initialisation de rationnel : liste vide ou >2");
@@ -299,6 +302,7 @@ public:
             simplifier();
         }
     }
+    */
 
     rationnel<T>& operator=(bool test) {
         numerateur = test;

@@ -63,10 +63,10 @@ public:
 	explicit matrice() {};
 
 	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
-		int taille_l = liste.size();
+		taille_l = liste.size();
 		if (taille_l == 0)
 			throw std::domain_error("initialisation de matrice : liste vide");
-		int taille_c = liste[0].size();
+		taille_c = liste[0].size();
 		if (taille_c == 0)
 			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
 
@@ -344,11 +344,11 @@ public:
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
 
 	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
-		int taille_l = liste.size();
+		taille_l = liste.size();
 		if (taille_l == 0)
 			throw std::domain_error("initialisation de matrice : liste vide");
 
-		int taille_c = liste[0].size();
+		taille_c = liste[0].size();
 		if (taille_c == 0)
 			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
 
@@ -643,10 +643,10 @@ public:
 
 
 	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
-		int taille_l = liste.size();
+		taille_l = liste.size();
 		if (taille_l == 0)
 			throw std::domain_error("initialisation de matrice : liste vide");
-		int taille_c = liste[0].size();
+		taille_c = liste[0].size();
 		if (taille_c == 0)
 			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
 
@@ -1132,10 +1132,10 @@ public:
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
 
 	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
-		int taille_l = liste.size();
+		taille_l = liste.size();
 		if (taille_l == 0)
 			throw std::domain_error("initialisation de matrice : liste vide");
-		int taille_c = liste[0].size();
+		taille_c = liste[0].size();
 		if (taille_c == 0)
 			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
 

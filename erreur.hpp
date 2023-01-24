@@ -10,7 +10,7 @@
 
 
 inline float precision_relative(double x) {
-	return carre(1.0e-12);
+	return carre(1.0e-15);
 };
 
 inline float precision_relative(float x) {
