@@ -71,6 +71,7 @@ int main()
     //matrice
     
     if (true) {
+        /*
         matrice<int> mat{ {1,2,3},{4,5,6},{7,8,9} };
 
         cout << "matrice \n" << 2 * mat << endl;
@@ -78,6 +79,7 @@ int main()
         cout << endl << "======FIN======" << endl;
 
         cin >> question;
+        */
     };
 
     //test polynome_n_iter

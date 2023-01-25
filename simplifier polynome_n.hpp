@@ -50,6 +50,10 @@ public:
 		return resultat;
 	};
 
+	inline operator bool() {
+		return true;
+	}
+
 	T scalaire;
 	std::vector<T> vecteur;
 };

@@ -172,12 +172,26 @@ public:
 		return result;
 	};
 
-	friend polynome_n_iter<T> operator*(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) {
+	friend polynome_n_iter<T> operator*(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) { // mettre le polynome le plus sparse à droite ! optimisé.
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, multiplication : le nombre de variables ne correspond pas.");
 
 		if (gauche.coeffs.puissance == 0)
 			return polynome_n_iter(0, gauche.coeffs.data[0] * droite.coeffs.data[0], NULL);
+
+		/*
+		int n_sparse = 0;
+		for (int i(0); i < gauche.coeffs.data.size(); ++i)
+			n_sparse += (bool)gauche.coeffs.data[i];
+
+		int m_sparse = 0;
+		for (int i(0); i < droite.coeffs.data.size(); ++i)
+			m_sparse += (bool)droite.coeffs.data[i];
+
+		if (n_sparse * droite.coeffs.data.size() < m_sparse * gauche.coeffs.data.size())
+			return droite * gauche;
+		//mettre la plus sparse à droite
+		*/
 
 		int n = gauche.coeffs.puissance;
 		std::vector<int> degres(n);
@@ -212,6 +226,12 @@ public:
 
 
 		bool fin = true;
+		bool fin_gauche = true;
+		int i;
+
+		if (!(bool)droite.coeffs.data[0])
+			goto increment_droite;
+
 		while (fin) {
 			//on opère la multiplication ... chaque couple (gauche , droite) apparait une et une seule fois.
 			if (((bool)gauche.coeffs.data[position_gauche]) && ((bool)droite.coeffs.data[position_droite])) 
@@ -219,8 +239,8 @@ public:
 			++position_gauche;
 			++positions_gauche[n - 1];
 			++position_finale;
-			int i = n - 1;
-			bool fin_gauche = true;
+			i = n - 1;
+			fin_gauche = true;
 
 			while (positions_gauche[i] >= dimensions_gauche[i]) { //On réajuste gauche, et donc finale aussi.
 				position_finale = position_finale - puissances_finale[i] * positions_gauche[i];
@@ -240,6 +260,7 @@ public:
 
 			fin = true;
 			if (!fin_gauche) { //gauche a dépassé, et vaut  0 partout ... on incrémente à droite.
+				increment_droite:
 				++position_droite;
 				++positions_droite[n - 1];
 				++position_finale;
@@ -260,6 +281,8 @@ public:
 					position_finale = position_finale + puissances_finale[i - 1];
 					--i;
 				}
+				if (! (bool) droite.coeffs.data[position_droite])
+					goto increment_droite;
 			}
 			//fin du while
 		}//Le calcule marche, car le vecteur finale est la sommme du vecteur gauche et droite, et cela se calcule avec les puissances (finales). 
@@ -357,7 +380,7 @@ public:
 
 			polynome_n_iter<T> pow = unite(Y, true);
 			for (int k(0); k < coeffs.dimensions[i]; ++k) {
-				result = result + (coeffs.data[position + k * coeffs.puissances[i]] * (poly_fixe * pow));
+				result = result + (coeffs.data[position + k * coeffs.puissances[i]] * (pow * poly_fixe));
 				pow = pow * Y;
 			}
 		};
