@@ -106,15 +106,19 @@ public:
 
 		bool trouve = false;
 		int trouve_int = 0;
-		for (int j(coeffs.size() - 1); j >= 0; --j)
+		for (int j(coeffs.size() - 1); j >= 0; --j) {
+			if (coeffs[j] == NULL)
+				continue;
 			if ((bool)*coeffs[j]) {
 				trouve = true;
 				trouve_int = j;
 				break;
 			}
+		}
 
 		for (int i(trouve_int + 1); i < coeffs.size(); ++i)
-			delete coeffs[i];
+			if (coeffs[i])
+				delete coeffs[i];
 
 		if (trouve_int + 1 < coeffs.size())
 			coeffs.erase(coeffs.begin() + trouve_int + 1, coeffs.end());

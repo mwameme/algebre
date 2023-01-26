@@ -32,6 +32,9 @@ public:
 	};
 
 	friend scalaire_vecteur<T> operator*(scalaire_vecteur<T> const& gauche, scalaire_vecteur<T> const& droit) {//gauche est scalaire, et droit est vecteur ou scalaire
+		if ((!(bool)gauche.scalaire) && ((bool)droit.scalaire)) //car on calcule scalaire * sous_ev ...
+			return droit * gauche;
+
 		scalaire_vecteur<T> resultat(droit.vecteur.size());
 		resultat.scalaire = gauche.scalaire * droit.scalaire;
 		for (int i(0); i < resultat.vecteur.size(); ++i)

@@ -179,7 +179,7 @@ public:
 		if (gauche.coeffs.puissance == 0)
 			return polynome_n_iter(0, gauche.coeffs.data[0] * droite.coeffs.data[0], NULL);
 
-		/*
+		//mettre la plus sparse à droite
 		int n_sparse = 0;
 		for (int i(0); i < gauche.coeffs.data.size(); ++i)
 			n_sparse += (bool)gauche.coeffs.data[i];
@@ -190,8 +190,6 @@ public:
 
 		if (n_sparse * droite.coeffs.data.size() < m_sparse * gauche.coeffs.data.size())
 			return droite * gauche;
-		//mettre la plus sparse à droite
-		*/
 
 		int n = gauche.coeffs.puissance;
 		std::vector<int> degres(n);
@@ -264,7 +262,7 @@ public:
 				++position_droite;
 				++positions_droite[n - 1];
 				++position_finale;
-				int i = n - 1;
+				i = n - 1;
 
 				while (positions_droite[i] >= dimensions_droite[i]) {
 //					position_finale = position_finale - puissances_finale[i] * positions_droite[i];
@@ -281,6 +279,9 @@ public:
 					position_finale = position_finale + puissances_finale[i - 1];
 					--i;
 				}
+				if (!fin)
+					break;
+
 				if (! (bool) droite.coeffs.data[position_droite])
 					goto increment_droite;
 			}
@@ -351,6 +352,12 @@ public:
 		bool fin = true;
 		std::vector<int> positions = std::vector<int>(n, 0);
 
+		//preparer les puissances de Y
+		std::vector<polynome_n_iter> pow_vector(coeffs.dimensions[i]);
+		pow_vector[0] = unite(Y, true);
+		for (int i(1); i < coeffs.dimensions[i]; ++i)
+			pow_vector[i] = Y * pow_vector[i - 1];
+
 		polynome_n_iter<T> result(n - 1, unite(coeffs.data[0], false), Y.noms); //polynome nul.
 		while (fin) {
 			int j = n - 1;
@@ -377,11 +384,11 @@ public:
 			std::vector<int> nouvelles_positions = positions;
 			nouvelles_positions.erase(nouvelles_positions.begin() + i); //Pour le polynome à n-1 variables.
 			polynome_n_iter<T> poly_fixe(nouvelles_positions, unite(coeffs.data[0], true), Y.noms); //degrés et nouvelles_positions correspondent ... OK.
-
-			polynome_n_iter<T> pow = unite(Y, true);
+			
+//			polynome_n_iter<T> pow = unite(Y, true);
 			for (int k(0); k < coeffs.dimensions[i]; ++k) {
-				result = result + (coeffs.data[position + k * coeffs.puissances[i]] * (pow * poly_fixe));
-				pow = pow * Y;
+				result = result + (coeffs.data[position + k * coeffs.puissances[i]] * (pow_vector[k] * poly_fixe));
+//				pow = pow * Y;
 			}
 		};
 
