@@ -18,7 +18,7 @@ template<typename T> class polynome;
 template<class T> class polynome_n;
 template<class T> class polynome_n_iter;
 template<class T, class enable = void> class rationnel;
-
+template<class T> class scalaire_vecteur;
 
 
 template<class T> inline T unite(T const& element,bool test) {
@@ -108,87 +108,9 @@ template<class T> inline matrice<T> unite(matrice<T> const& m, bool test) {
 	return result;
 }
 
-/*
-// >>>>>>>>>>>>>>>>>>>>   FAUX   <<<<<<<<<<<<<<<<<<<<
-
-template<class T> T faux(T const& temp) {
-	T faux_ = temp;
-	faux_ = false;
-	return faux_;
-};
-
-int faux(int const& element) {
-	return 0;
+template<class T> inline scalaire_vecteur<T> unite(scalaire_vecteur<T> const& temp, bool test) {
+	T element = unite( temp.scalaire,test);
+	scalaire_vecteur<T> retour(temp.vecteur.size());
+	retour = element;
+	return retour;
 }
-
-long faux(long const& element) {
-	return 0;
-}
-
-long long faux(long long const& element) {
-	return 0;
-}
-
-float faux(float const& element) {
-	return 0.;
-}
-
-double faux(double const& element) {
-	return 0;
-}
-
-InfInt faux(InfInt const& element) {
-	return InfInt(0);
-}
-
-int_precision faux(int_precision const& element) {
-	return int_precision(0);
-}
-
-float_precision faux(float_precision const& element) {
-	return float_precision(0, element.precision(), element.mode());
-}
-
-template<class T> erreur<T> faux(erreur<T> const& temp) {
-	return erreur<T>(faux(temp.valeur), precision_relative(temp.valeur));
-}
-
-
-template<class T> polynome<T> faux(polynome<T> const& poly) {
-	polynome<T> faux_(faux(poly.coeffs[0]));
-	return faux_;
-}
-
-template<class T> polynome_n<T> faux(polynome_n<T> const& poly_n) {
-	T faux_T = faux(poly_n.element);
-	polynome_n<T> faux_(poly_n.n_var, faux_T, poly_n.noms_variables);
-	return faux_;
-}
-
-template<class T> polynome_n_iter<T> faux(polynome_n_iter<T> const& poly_n) {
-	polynome_n_iter<T> faux_(poly_n.coeffs.puissance, faux(poly_n.coeffs.data[0]), poly_n.noms);
-	return faux_;
-}
-
-template<class T> anneau_quotient<T> faux(anneau_quotient<T> const& temp) {
-	return anneau_quotient<T>(faux(temp.element), temp.quotient);
-}
-
-template<class T> corps_quotient<T> faux(corps_quotient<T> const& temp) {
-	return corps_quotient<T>(faux(temp.element), temp.quotient);
-}
-
-template<class T> complexe<T> faux(complexe<T> const& c) {
-	return complexe<T>(faux(c.x), faux(c.x));
-}
-
-template<class T> rationnel<T> faux(rationnel<T> const& temp) {
-	return rationnel<T>(faux(temp.numerateur), vrai(temp.numerateur));
-}
-
-template<class T> matrice<T> faux(matrice<T> const& temp) {
-	matrice<T> result(temp.taille_l, temp.taille_c, faux(temp.coeffs[0][0]));
-	return result;
-}
-
-*/

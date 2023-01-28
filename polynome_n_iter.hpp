@@ -13,7 +13,7 @@ template<class T> class vecteur_n;
 
 template<class T> class polynome_n;
 
-template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, int* puissances, int n, std::string* noms);
+template<class T> polynome_n<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n,  std::string* noms);
 
 template<class T> class polynome_n_iter {
 public:
@@ -182,11 +182,11 @@ public:
 		//mettre la plus sparse à droite
 		int n_sparse = 0;
 		for (int i(0); i < gauche.coeffs.data.size(); ++i)
-			n_sparse += (bool)gauche.coeffs.data[i];
+			n_sparse += (bool) gauche.coeffs.data[i];
 
 		int m_sparse = 0;
 		for (int i(0); i < droite.coeffs.data.size(); ++i)
-			m_sparse += (bool)droite.coeffs.data[i];
+			m_sparse += (bool) droite.coeffs.data[i];
 
 		if (n_sparse * droite.coeffs.data.size() < m_sparse * gauche.coeffs.data.size())
 			return droite * gauche;
@@ -417,14 +417,14 @@ public:
 	}
 
 	void simplifier_2() {
-		*this = (polynome_n_iter<T>) ((polynome_n<T>) * this); //deux conversions ... la premiere simplifie.
+		*this = (polynome_n_iter<T>) ((polynome_n<T>) *this); //deux conversions ... la premiere simplifie.
 	}
 	
 	std::string* noms;
 	vecteur_n<T> coeffs;
 };
 
-template<class T> polynome_n<T>* poly_n_convert_rec(T* data, int* dimensions, int* puissances, int n, std::string* noms) {
+template<class T> polynome_n<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {
 	if (n == 0)
 		return new polynome_n<T>(*data);
 

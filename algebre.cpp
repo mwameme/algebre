@@ -68,18 +68,55 @@ int main()
     long question;
 //    auto x = 4.5 % 4.1;
 
-    //matrice
-    
+    //test simplifier et double conversion.
     if (true) {
-        /*
+        std::string noms[3] = { "X","Y","Z" };
+        polynome_n_iter<rationnel<int>> poly1({ 3,1,1 }, rationnel<int> {3, 4}, noms);
+
+        polynome_n_iter<rationnel<int>> poly2({ 1,3,1 }, rationnel<int> {5, 4}, noms);
+        polynome_n_iter<rationnel<int>> poly3({ 1,1,3 }, rationnel<int> {2, 3}, noms);
+
+        polynome_n_iter<rationnel<int>> poly = poly1 + poly2 + poly3;
+
+        cout << "poly :\n" << poly << std::endl;
+
+        polynome_n_iter<rationnel<int>> poly4 = poly * poly1;
+        cout << "poly4 :\n" << poly4 << std::endl;
+        poly4.simplifier_2();
+        cout << "poly4 simplifie :\n" << poly4 << std::endl;
+        polynome_n<rationnel<int>> poly5 = (polynome_n<rationnel<int>>) poly4;
+        cout << poly5 << endl;
+
+        cin >> question;
+        polynome_n_iter<rationnel<int>> poly_simp = simplifier(poly4, poly1);
+        cout << "\n polynome simplifie fraction : \n" << poly_simp << endl;
+
+
+
+        cout << endl << "======FIN======" << endl;
+        cin >> question;
+    }
+
+    //constructeur de liste
+    if (false) {
+        
         matrice<int> mat{ {1,2,3},{4,5,6},{7,8,9} };
 
         cout << "matrice \n" << 2 * mat << endl;
 
+        polynome<int> poly{ 1,2,3 };
+        cout << poly << endl;
+
+        rationnel<int> ratio{ 1,2 };
+        cout << ratio << endl;
+
+        polynome<rationnel<int>> poly_ratio{ rationnel<int>{1,2},rationnel<int>{3,4},rationnel<int>{5,6} };
+        cout << poly_ratio << endl;
+
         cout << endl << "======FIN======" << endl;
 
         cin >> question;
-        */
+        
     };
 
     //test polynome_n_iter

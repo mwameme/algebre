@@ -38,7 +38,7 @@ public:
 		scalaire_vecteur<T> resultat(droit.vecteur.size());
 		resultat.scalaire = gauche.scalaire * droit.scalaire;
 		for (int i(0); i < resultat.vecteur.size(); ++i)
-			resultat[i] = gauche.scalaire * droit.vecteur[i];
+			resultat.vecteur[i] = gauche.scalaire * droit.vecteur[i];
 		return resultat;
 	};
 
@@ -49,13 +49,13 @@ public:
 		scalaire_vecteur<T> resultat(droit.vecteur.size());
 		resultat.scalaire = gauche.scalaire + droit.scalaire;
 		for (int i(0); i < resultat.vecteur.size(); ++i)
-			resultat[i] = gauche.vecteur[i] + droit.vecteur[i];
+			resultat.vecteur[i] = gauche.vecteur[i] + droit.vecteur[i];
 		return resultat;
 	};
 
-	inline operator bool() {
+	operator bool() const {
 		return true;
-	}
+	};
 
 	T scalaire;
 	std::vector<T> vecteur;
@@ -85,7 +85,7 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 	faux_T = faux;
 
 	vecteur_n<scalaire_vecteur<T>> denom_vec_T(denom.coeffs.dimensions, faux_T); //même dimension que denom. Mais de type différent ...
-	polynome_n_iter<scalaire_vecteur<T>> denom_T();
+	polynome_n_iter<scalaire_vecteur<T>> denom_T;
 	denom_T.coeffs = denom_vec_T;
 	denom_T.noms = denom.noms;
 
@@ -107,7 +107,7 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 	for (int i(0); i < m_matrice.taille_l; ++i) {//pour chacune des lignes
 		Y[i] = num.coeffs.data[i];
 		for (int j(0); j < m_matrice.taille_c; ++j)
-			m_matrice[i][j] = num_T.coeffs.data[i].vecteur[j];
+			m_matrice.coeffs[i][j] = num_T.coeffs.data[i].vecteur[j];
 	}
 
 	std::vector<T> X = m_matrice.resoudre(Y);

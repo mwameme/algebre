@@ -70,11 +70,12 @@ public:
     };
 
     template<class U> explicit polynome(std::initializer_list<U> liste) {
-        if (liste.size() == 0)
+        std::vector<U> vec(liste);
+        if (vec.size() == 0)
             throw std::domain_error("initialisation de polynome : liste vide");
-        coeffs(liste.size());
-        for (int i(0); i < liste.size(); ++i)
-            coeffs[i] = T(liste[i]);
+        coeffs.resize(vec.size());
+        for (int i(0); i < vec.size(); ++i)
+            coeffs[i] = T(vec[i]);
         getDegre();
     }
 

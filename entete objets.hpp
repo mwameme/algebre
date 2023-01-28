@@ -10,7 +10,7 @@
 #include "norme.hpp"
 #include "types.hpp"
 #include "erreur.hpp"
-
+#include "simplifier polynome_n.hpp"
 
 #include "fonctions template.hpp"
 

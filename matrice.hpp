@@ -344,22 +344,27 @@ public:
 	explicit matrice() : taille_l(0), taille_c(0), coeffs(0, std::vector<T>(0)) {};
 
 	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
-		taille_l = liste.size();
+		std::vector<std::vector<U>> vec(0);
+		for (auto it =liste.begin();it != liste.end();++it)
+			vec.push_back(*it);
+
+
+		taille_l = vec.size();
 		if (taille_l == 0)
 			throw std::domain_error("initialisation de matrice : liste vide");
 
-		taille_c = liste[0].size();
+		taille_c = vec[0].size();
 		if (taille_c == 0)
 			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
 
 		for (int i(0); i < taille_l; ++i)
-			if (liste[i].size() != taille_c)
+			if (vec[i].size() != taille_c)
 				throw std::domain_error("initialisation de matrice : non-rectangulaire");
 
 		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
-				coeffs[i][j] = T(liste[i][j]);
+				coeffs[i][j] = T(vec[i][j]);
 
 		return;
 	}
@@ -913,7 +918,7 @@ public:
 		for (int i(0); i < taille_l; ++i) {
 			int j;
 			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice[i][j])
+				if ((bool)m_matrice.coeffs[i][j])
 					break;
 			if (j == taille_c)
 				continue;
@@ -930,7 +935,7 @@ public:
 		for (int i(0); i < taille_l; ++i) {
 			bool test = false;
 			for (int j(0); j < taille_c; ++j)
-				if ((bool)m_matrice[i][j]) {
+				if ((bool)m_matrice.coeffs[i][j]) {
 					test = true;
 					break;
 				}
@@ -947,7 +952,7 @@ public:
 		for (int i(0); i < taille_l; ++i) {
 			int j;
 			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice[i][j])
+				if ((bool)m_matrice.coeffs[i][j])
 					break;
 			if (j == taille_c) //ligne nulle. 
 				continue;
@@ -967,7 +972,7 @@ public:
 		for (int i(0); i < taille_l; ++i) {
 			int j;
 			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice[i][j])
+				if ((bool)m_matrice.coeffs[i][j])
 					break;
 			if (j == taille_c)
 				continue;
@@ -986,7 +991,7 @@ public:
 		for (int i(0); i < taille_l; ++i) {
 			int j;
 			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice[i][j])
+				if ((bool)m_matrice.coeffs[i][j])
 					break;
 			if (j == taille_c)
 				continue;
@@ -1000,7 +1005,7 @@ public:
 		for (int i(0); i < taille_c; ++i) {
 			bool test = false;
 			for(int j(0);j<taille_l;++j)
-				if ((bool)m_matrice[j][i]) {
+				if ((bool)m_matrice.coeffs[j][i]) {
 					test = true;
 					break;
 				}
@@ -1021,12 +1026,12 @@ public:
 			for (int i(0); i < taille_l; ++i) {
 				int j;
 				for (j = 0; j < taille_c; ++j)
-					if ((bool)m_matrice[i][j])
+					if ((bool)m_matrice.coeffs[i][j])
 						break;
 				if (j == taille_c)
 					continue;
 
-				vec[j] = -m_matrice[i][parametres_libres[vec_k]] / m_matrice[i][j];
+				vec[j] = -m_matrice.coeffs[i][parametres_libres[vec_k]] / m_matrice.coeffs[i][j];
 			}
 
 			resultat->ajouter_vecteur(vec);
