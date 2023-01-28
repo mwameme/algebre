@@ -81,6 +81,8 @@ public:
 
 
     polynome<T>& operator=(const polynome<T>& temp) {
+        if (this == &temp)
+            return *this;
         coeffs = temp.coeffs;
         degre = temp.degre;
         return (*this);

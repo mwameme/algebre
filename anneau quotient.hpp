@@ -31,6 +31,8 @@ public:
     };
 
     anneau_quotient<T>& operator=(anneau_quotient<T> const& temp) {
+        if (this == &temp)
+            return *this;
         element = temp.element;
         quotient = temp.quotient;
         return *this;

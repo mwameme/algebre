@@ -13,6 +13,11 @@ public:
 		vecteur = std::vector<T>(n);
 	};
 
+	scalaire_vecteur(scalaire_vecteur<T> const& temp) {
+		scalaire = temp.scalaire;
+		vecteur = temp.vecteur;
+	}
+
 	scalaire_vecteur<T>& operator=(int i) { //i commence à 0.
 		T faux = unite(scalaire, false);
 		T vrai = unite(scalaire, true);
@@ -23,13 +28,21 @@ public:
 		return *this;
 	};
 
-	scalaire_vecteur<T>& operator=(T element) {
+	scalaire_vecteur<T>& operator=(T const& element) {
 		T faux = unite(scalaire, false);
 		for (int i(0); i < vecteur.size(); ++i)
 			vecteur[i] = faux;
 		scalaire = element;
 		return *this;
 	};
+
+	scalaire_vecteur<T>& operator=(scalaire_vecteur<T>& temp) {
+		if (this == &temp)
+			return *this;
+		scalaire = temp.scalaire;
+		vecteur = temp.vecteur;
+		return *this;
+	}
 
 	friend scalaire_vecteur<T> operator*(scalaire_vecteur<T> const& gauche, scalaire_vecteur<T> const& droit) {//gauche est scalaire, et droit est vecteur ou scalaire
 		if ((!(bool)gauche.scalaire) && ((bool)droit.scalaire)) //car on calcule scalaire * sous_ev ...

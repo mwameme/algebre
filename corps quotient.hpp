@@ -28,6 +28,8 @@ public:
     };
 
     corps_quotient<T>& operator=(corps_quotient<T> const& temp) {
+        if (this == &temp)
+            return *this;
         element = temp.element;
         quotient = temp.quotient;
         return *this;

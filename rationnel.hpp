@@ -76,6 +76,8 @@ public:
     };
 
     rationnel<T>& operator=(const rationnel<T>& temp) {
+        if (this == &temp)
+            return *this;
         numerateur = temp.numerateur;
         denominateur = temp.denominateur;
 
@@ -312,6 +314,8 @@ public:
     };
 
     rationnel<T>& operator=(const rationnel<T>& temp) {
+        if (this == &temp)
+            return *this;
         numerateur = temp.numerateur;
         denominateur = temp.denominateur;
 

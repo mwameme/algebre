@@ -234,7 +234,7 @@ public:
 		return os;
 	};
 
-	polynome_n<T>& operator=(bool const& test) {
+	polynome_n<T>& operator=(bool test) {
 		if (n_var > 0) {
 			for (int i(1); i < coeffs.size(); ++i)
 				delete coeffs[i];

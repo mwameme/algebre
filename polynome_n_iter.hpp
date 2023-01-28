@@ -106,7 +106,9 @@ public:
 		}
 	};
 
-	polynome_n_iter<T>& operator=(polynome_n_iter<T> temp) {
+	polynome_n_iter<T>& operator=(polynome_n_iter<T>& temp) {
+		if (this == &temp)
+			return *this;
 		coeffs = temp.coeffs;
 		noms = temp.noms;
 		return *this;

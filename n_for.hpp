@@ -34,6 +34,8 @@ public:
 	};
 
 	n_for& operator=(n_for const& temp) {
+		if (this == &temp)
+			return *this;
 		croissant = temp.croissant;
 		OK = temp.OK;
 		positions = temp.positions;

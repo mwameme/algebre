@@ -187,12 +187,14 @@ public :
 
 
 	erreur<T>& operator=(erreur<T> const& temp) {
+		if (this == &temp)
+			return *this;
 		valeur = temp.valeur;
 		precision = temp.precision;
 		return *this;
 	};
 
-	erreur<T>& operator=(bool const& test) {
+	erreur<T>& operator=(bool test) {
 		precision = precision_relative(valeur);
 		valeur = test;
 		return *this;

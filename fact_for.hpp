@@ -56,6 +56,8 @@ public:
 	};
 
 	fact_for& operator=(fact_for const& temp) {
+		if (this == &temp)
+			return *this;
 		signature = temp.signature; //calculer la signature !
 		OK = temp.OK; //tant qu'on n'a pas tout parcouru
 		n = temp.n; //pour fact(n)
