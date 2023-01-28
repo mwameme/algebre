@@ -106,7 +106,7 @@ public:
 		}
 	};
 
-	polynome_n_iter<T>& operator=(polynome_n_iter<T>& temp) {
+	polynome_n_iter<T>& operator=(polynome_n_iter<T> const& temp) {
 		if (this == &temp)
 			return *this;
 		coeffs = temp.coeffs;
@@ -419,7 +419,7 @@ public:
 	}
 
 	void simplifier_2() {
-		*this = (polynome_n_iter<T>) ((polynome_n<T>) *this); //deux conversions ... la premiere simplifie.
+		*this = ((polynome_n_iter<T>) ((polynome_n<T>) *this)); //deux conversions ... la premiere simplifie.
 	}
 	
 	std::string* noms;

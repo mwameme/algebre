@@ -52,7 +52,7 @@ public:
 	};
 	
 	vecteur_n<T>& operator=(vecteur_n<T> const& temp) {
-		if (this == temp)
+		if (this == &temp)
 			return *this;
 		puissance = temp.puissance;
 		dimensions = temp.dimensions;
