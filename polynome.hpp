@@ -11,6 +11,7 @@
 #include "entete objets.hpp"
 #include "types.hpp"
 #include "unite.hpp"
+#include "convertir_liste.hpp"
 
 template<class T> class type_algebre;
 
@@ -69,6 +70,7 @@ public:
         getDegre();
     };
 
+    /*
     template<class U> explicit polynome(std::initializer_list<U> liste) {
         std::vector<U> vec(liste);
         if (vec.size() == 0)
@@ -77,7 +79,23 @@ public:
         for (int i(0); i < vec.size(); ++i)
             coeffs[i] = T(vec[i]);
         getDegre();
-    }
+    }*/
+
+    template<class U> explicit polynome(std::initializer_list<U> const & liste) {
+        auto vec = convertir_T<std::initializer_list<U>>::convertir(liste);
+        coeffs.resize(vec.size());
+        for (int i(0); i < vec.size(); ++i)
+            coeffs[i] = T(vec[i]);
+        getDegre();
+    };
+
+    template<class U> explicit polynome(std::vector<U> const& vec) {
+        coeffs.resize(vec.size());
+        for (int i(0); i < vec.size(); ++i)
+            coeffs[i] = T(vec[i]);
+        getDegre();
+    };
+
 
 
     polynome<T>& operator=(const polynome<T>& temp) {

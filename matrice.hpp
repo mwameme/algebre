@@ -82,6 +82,27 @@ public:
 		return;
 	}
 
+	template<class U> explicit matrice(std::vector< std::vector<U>> liste) {
+		taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	}
+
+
 	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
@@ -368,6 +389,27 @@ public:
 
 		return;
 	}
+
+	template<class U> explicit matrice(std::vector< std::vector<U>> liste) {
+		taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	}
+
 
 
 	explicit inline operator bool() const {
@@ -667,6 +709,26 @@ public:
 		return;
 	}
 
+	template<class U> explicit matrice(std::vector< std::vector<U>> liste) {
+		taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	}
+
 
 	explicit inline operator bool() const {
 		for (int i(0); i < taille_l; ++i)
@@ -912,7 +974,7 @@ public:
 		matrice<T> m_matrice(*this);
 		if (m_matrice.taille_l != Y.size())
 			throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
-		T vrai_ = unite(coeffs[0][0],true);
+		T vrai = unite(m_matrice.coeffs[0][0],true);
 
 		// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
 		for (int i(0); i < taille_l; ++i) {
@@ -922,12 +984,14 @@ public:
 					break;
 			if (j == taille_c)
 				continue;
-			T inv = vrai_ / m_matrice.coeffs[i][j]; //on est dans la ligne i, colonne j.
+			T inv = vrai / m_matrice.coeffs[i][j]; //on est dans la ligne i, colonne j.
 			for (int k(0); k < taille_l; ++k) { //ligne k != i.
 				if (k == i)
 					continue;
-				Y[k] = Y[k] - inv * m_matrice.coeffs[k][j] * Y[i];
-				m_matrice.ajouterLigne(i, k, -inv * m_matrice.coeffs[k][j]); //ajoute la ligne i à la ligne k. annnule [k][j]
+				if (m_matrice.coeffs[k][j]) {
+					Y[k] = Y[k] - inv * m_matrice.coeffs[k][j] * Y[i];
+					m_matrice.ajouterLigne(i, k, -inv * m_matrice.coeffs[k][j]); //ajoute la ligne i à la ligne k. annnule [k][j]
+				}
 			}
 		}
 
@@ -941,11 +1005,12 @@ public:
 				}
 			if (test)
 				continue;
-			if ((bool)Y[i]) //ligne nulle, et Y non-nul. Renvoyer vide.
+			if ((bool) Y[i]) //ligne nulle, et Y non-nul. Renvoyer vide.
 				return std::vector<T>(0);
 		}
 
-		std::vector<T> resultat(taille_c);
+		T faux = unite(vrai, false);
+		std::vector<T> resultat(taille_c,faux);
 
 		//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
 		//ensuite, pour chaque premier élément non-nul, = Y[k]
@@ -1154,7 +1219,28 @@ public:
 				coeffs[i][j] = T(liste[i][j]);
 
 		return;
-	}
+	};
+
+	template<class U> explicit matrice(std::vector< std::vector<U>> liste) {
+		taille_l = liste.size();
+		if (taille_l == 0)
+			throw std::domain_error("initialisation de matrice : liste vide");
+		taille_c = liste[0].size();
+		if (taille_c == 0)
+			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
+
+		for (int i(1); i < taille_l; ++i)
+			if (liste[i].size() != taille_c)
+				throw std::domain_error("initialisation de matrice : non-rectangulaire");
+
+		coeffs = std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] = T(liste[i][j]);
+
+		return;
+	};
+
 
 
 	explicit inline operator bool() const {

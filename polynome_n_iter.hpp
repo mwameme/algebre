@@ -29,13 +29,14 @@ public:
 			coeffs =vecteur_n<T>(dimensions);
 			coeffs.data[0] = element;
 			noms = NULL;
-			coeffs.puissance = 0;
+			scalaire = true;
 		}
 		else {
 			std::vector<int> dimensions(n_var, 1);
 			coeffs = vecteur_n<T>(dimensions);
 			coeffs.data[0] = element;
 			noms = noms_;
+			scalaire = false;
 		}
 	};
 
@@ -44,7 +45,7 @@ public:
 			degres = { 1 };
 			coeffs=vecteur_n<T>(degres);
 			coeffs.data[0] = element;
-			coeffs.puissance = 0;
+			scalaire = true;
 			noms = NULL;
 		}
 		else {
@@ -64,15 +65,17 @@ public:
 				coeffs.data[i] = faux_;
 			coeffs.data[coeffs.data.size() - 1] = element; //monome
 			noms = noms_;
+			scalaire = false;
 		}
 	};
 
 	polynome_n_iter(vecteur_n<T> tableau, std::string* noms_) { //au cas où ?
 		coeffs = tableau;
 		noms = noms_;
+		scalaire = false;
 	};
 
-	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs) , noms(temp.noms){
+	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs) , noms(temp.noms),scalaire(temp.scalaire){
 
 	};
 
@@ -83,7 +86,7 @@ public:
 			degres = { 1 };
 			coeffs = vecteur_n<T>(degres);
 			coeffs.data[0] = element;
-			coeffs.puissance = 0;
+			scalaire = true;
 			noms = NULL;
 		}
 		else {
@@ -103,6 +106,7 @@ public:
 				coeffs.data[i] = faux_;
 			coeffs.data[coeffs.data.size() - 1] = element; //monome
 			noms = noms_;
+			scalaire = false;
 		}
 	};
 
@@ -111,17 +115,19 @@ public:
 			return *this;
 		coeffs = temp.coeffs;
 		noms = temp.noms;
+		scalaire = temp.scalaire;
 		return *this;
 	};
 
 	polynome_n_iter<T>& operator=(bool test) {
 		T temp = unite(coeffs.data[0],test);
-		if (coeffs.puissance == 0)
+		if (scalaire)
 			coeffs.data[0] = temp;
 		else {
 			std::vector<int> dimensions(coeffs.puissance, 1);
 			coeffs = vecteur_n<T>(dimensions);
 			coeffs.data[0] = temp;
+			scalaire = false;
 		}
 
 		return *this;
@@ -131,8 +137,12 @@ public:
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
-		if (gauche_.coeffs.puissance == 0)
+		if(((gauche_.scalaire) && (! droite_.scalaire)) || ((droite_.scalaire) && (! gauche_.scalaire)))
+			throw std::domain_error("addition de polynome_n_iter : scalaire + polynome");
+
+		if (gauche_.scalaire) {
 			return polynome_n_iter(0, gauche_.coeffs.data[0] + droite_.coeffs.data[0], NULL);
+		}
 
 		polynome_n_iter<T> gauche = gauche_;
 		polynome_n_iter<T> droite = droite_;
@@ -144,6 +154,7 @@ public:
 		droite.coeffs.modifier_dimension(dim);
 		for (int i(0); i < gauche.coeffs.data.size(); ++i)
 			gauche.coeffs.data[i] = gauche.coeffs.data[i] + droite.coeffs.data[i];
+		gauche.scalaire = false;
 		return gauche;
 	};
 
@@ -151,7 +162,10 @@ public:
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, soustraction : le nombre de variables ne correspond pas.");
 
-		if (gauche_.coeffs.puissance == 0)
+		if (((gauche_.scalaire) && (!droite_.scalaire)) || ((droite_.scalaire) && (!gauche_.scalaire)))
+			throw std::domain_error("soustraction de polynome_n_iter : scalaire - polynome");
+
+		if (gauche_.scalaire)
 			return polynome_n_iter(0, gauche_.coeffs.data[0] - droite_.coeffs.data[0], NULL);
 
 		polynome_n_iter<T> gauche = gauche_;
@@ -164,6 +178,7 @@ public:
 		droite.coeffs.modifier_dimension(dim);
 		for (int i(0); i < gauche.coeffs.data.size(); ++i)
 			gauche.coeffs.data[i] = gauche.coeffs.data[i] - droite.coeffs.data[i];
+		gauche.scalaire = false;
 		return gauche;
 	};
 
@@ -177,8 +192,10 @@ public:
 	friend polynome_n_iter<T> operator*(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) { // mettre le polynome le plus sparse à droite ! optimisé.
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, multiplication : le nombre de variables ne correspond pas.");
+		if (((gauche.scalaire) && (!droite.scalaire)) || ((droite.scalaire) && (!gauche.scalaire)))
+			throw std::domain_error("multiplication de polynome_n_iter : scalaire * polynome");
 
-		if (gauche.coeffs.puissance == 0)
+		if (gauche.scalaire)
 			return polynome_n_iter(0, gauche.coeffs.data[0] * droite.coeffs.data[0], NULL);
 
 		//mettre la plus sparse à droite
@@ -295,6 +312,9 @@ public:
 	};
 
 	explicit inline operator bool() const {
+		if (scalaire) 
+			return (bool)coeffs.data[0];
+
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i])
 				return true;
@@ -302,7 +322,7 @@ public:
 	};
 
 	operator polynome_n<T>() const {
-		if (coeffs.puissance == 0)
+		if (scalaire)
 			return polynome_n<T>(0, coeffs.data[0], noms);
 		polynome_n<T>* adresse = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
 		polynome_n<T> copie(*adresse);
@@ -335,6 +355,8 @@ public:
 		if (Y.coeffs.puissance != coeffs.puissance - 1)
 			throw std::domain_error("evaluation de polynome : objet évalué non-conforme");
 
+		if (Y.scalaire)
+			throw std::domain_error("evaluation de polynome_n_iter : polynome=scalaire");
 
 		if (coeffs.puissance == 1) {
 			T result = unite(coeffs.data[0], false);
@@ -413,7 +435,7 @@ public:
 	};
 
 	void simplifier() {
-		if (coeffs.puissance != 0)
+		if (! scalaire)
 			coeffs.simplifier();
 		return;
 	}
@@ -422,6 +444,7 @@ public:
 		*this = ((polynome_n_iter<T>) ((polynome_n<T>) *this)); //deux conversions ... la premiere simplifie.
 	}
 	
+	bool scalaire;
 	std::string* noms;
 	vecteur_n<T> coeffs;
 };

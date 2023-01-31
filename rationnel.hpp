@@ -68,6 +68,15 @@ public:
         denominateur = copie.denominateur;
     };
 
+    template<class U> explicit rationnel(std::vector<U> const& liste) {
+        numerateur = T(liste[0]);
+        if (liste.size() > 1)
+            denominateur = T(liste[1]);
+        else
+            denominateur = unite(numerateur, true);
+        simplifier();
+    };
+
     rationnel<T>& operator=(bool test) {
         numerateur = test;
         denominateur = true;
@@ -281,7 +290,17 @@ public:
     explicit rationnel(T const& a) {
         numerateur = a;
         denominateur = unite(a);
-    }
+    };
+
+    template<class U> explicit rationnel(std::vector<U> const& liste) {
+        numerateur = T(liste[0]);
+        if (liste.size() > 1)
+            denominateur = T(liste[1]);
+        else
+            denominateur = unite(numerateur, true);
+        simplifier();
+    };
+
 
 
     rationnel(const rationnel<T>& copie) {

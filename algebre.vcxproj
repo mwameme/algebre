@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="complexe.hpp" />
+    <ClInclude Include="convertir_liste.hpp" />
     <ClInclude Include="corps quotient.hpp" />
     <ClInclude Include="diagonalisation.hpp" />
     <ClInclude Include="entete objets.hpp" />

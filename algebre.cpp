@@ -21,6 +21,7 @@
 #include "fact_for.hpp"
 #include "simplifier polynome_n.hpp"
 
+#include "convertir_liste.hpp"
 
 using namespace std;
 
@@ -68,6 +69,25 @@ int main()
     long question;
 //    auto x = 4.5 % 4.1;
 
+
+    if (false) {
+        auto x = convertir_T<std::initializer_list<std::initializer_list<int>>>::convertir({ {1,2},{3,4}, {5,6} });
+///        auto x = convertir({ {1,2},{3,4}, {5,6} });
+        for (int i(0); i < 3; ++i)
+            for (int j(0); j < 2; ++j)
+                cout << x[i][j];
+        cout << endl;
+
+        cin >> question;
+
+        polynome<rationnel<int>> poly(x);
+//        polynome<int> poly({ 1,2,3 });
+//        rationnel<int> ratio(std::vector<int>{1, 2});
+//        cout << ratio << endl;
+        cout << poly << endl;
+        cin >> question;
+    }
+
     //test simplifier et double conversion.
     if (true) {
         std::string noms[3] = { "X","Y","Z" };
@@ -90,8 +110,6 @@ int main()
         cin >> question;
         polynome_n_iter<rationnel<int>> poly_simp = simplifier(poly4, poly1);
         cout << "\n polynome simplifie fraction : \n" << poly_simp << endl;
-
-
 
         cout << endl << "======FIN======" << endl;
         cin >> question;

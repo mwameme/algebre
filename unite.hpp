@@ -109,8 +109,8 @@ template<class T> inline matrice<T> unite(matrice<T> const& m, bool test) {
 }
 
 template<class T> inline scalaire_vecteur<T> unite(scalaire_vecteur<T> const& temp, bool test) {
-	T element = unite( temp.scalaire,test);
+	T element = unite(temp.scalaire, test);
 	scalaire_vecteur<T> retour(temp.vecteur.size());
 	retour = element;
 	return retour;
-}
+};

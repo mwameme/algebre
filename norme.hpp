@@ -178,3 +178,4 @@ public:
 template<class T> inline decltype(norme_T<T>::norme(T())) norme(T x) {
 	return norme_T<T>::norme(x);
 };
+

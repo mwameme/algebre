@@ -2,21 +2,21 @@
 #include "polynome_n_iter.hpp"
 #include "matrice.hpp"
 #include <vector>
+#include <iostream>
+
 
 template<class T> class scalaire_vecteur {
 public:
 
-	scalaire_vecteur() {};
+	scalaire_vecteur() : vecteur(0) { };
 
 
-	scalaire_vecteur(int n) {
-		vecteur = std::vector<T>(n);
-	};
+	scalaire_vecteur(int n) : vecteur(n) { };
 
 	scalaire_vecteur(scalaire_vecteur<T> const& temp) {
 		scalaire = temp.scalaire;
 		vecteur = temp.vecteur;
-	}
+	};
 
 	scalaire_vecteur<T>& operator=(int i) { //i commence à 0.
 		T faux = unite(scalaire, false);
@@ -29,20 +29,20 @@ public:
 	};
 
 	scalaire_vecteur<T>& operator=(T const& element) {
-		T faux = unite(scalaire, false);
+		T faux = unite(element, false);
 		for (int i(0); i < vecteur.size(); ++i)
 			vecteur[i] = faux;
 		scalaire = element;
 		return *this;
 	};
 
-	scalaire_vecteur<T>& operator=(scalaire_vecteur<T>& temp) {
+	scalaire_vecteur<T>& operator=(scalaire_vecteur<T> const& temp) {
 		if (this == &temp)
 			return *this;
 		scalaire = temp.scalaire;
 		vecteur = temp.vecteur;
 		return *this;
-	}
+	};
 
 	friend scalaire_vecteur<T> operator*(scalaire_vecteur<T> const& gauche, scalaire_vecteur<T> const& droit) {//gauche est scalaire, et droit est vecteur ou scalaire
 		if ((!(bool)gauche.scalaire) && ((bool)droit.scalaire)) //car on calcule scalaire * sous_ev ...
@@ -56,6 +56,11 @@ public:
 	};
 
 	friend scalaire_vecteur<T> operator+(scalaire_vecteur<T> const& gauche, scalaire_vecteur<T> const& droit) {//additionne membre à membre
+		if (gauche.vecteur.size() == 0)
+			return droit;
+		if (droit.vecteur.size() == 0)
+			return gauche;
+
 		if (gauche.vecteur.size() != droit.vecteur.size())
 			throw std::domain_error("addition de scalaire_vecteur : les dimensions ne correspondent pas");
 
@@ -67,6 +72,8 @@ public:
 	};
 
 	operator bool() const {
+		if ((vecteur.size() == 0) && (!((bool)scalaire)))
+			return false;
 		return true;
 	};
 
@@ -78,21 +85,27 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 	int n = num.coeffs.puissance;
 	if (num.coeffs.puissance != denom.coeffs.puissance)
 		throw std::domain_error("simplification de polynomes : n_var ne correspond pas");
+	if (((num.scalaire) && (!denom.scalaire)) || ((denom.scalaire) && (!num.scalaire)))
+		throw std::domain_error("multiplication de polynome_n_iter : scalaire * polynome");
+
+	if (num.scalaire)
+		return polynome_n_iter<T>(0, num.coeffs.data[0] / denom.coeffs.data[0], NULL);
+
 
 	T faux = unite(num.coeffs.data[0], false);
 
-	polynome_n_iter<T> vide(n, faux, num.noms); //renvoit le polynome nul si le calcul n'aboutit pas.
+	//	polynome_n_iter<T> vide(n, faux, num.noms); //renvoit le polynome nul si le calcul n'aboutit pas.
 
 	std::vector<int> degres(n); //calcule les degres du polynome resultat
 	for (int i(0); i < n; ++i)
 		degres[i] = num.coeffs.dimensions[i] - denom.coeffs.dimensions[i];
 	for (int i(0); i < n; ++i)
 		if (degres[i] < 0)
-			return vide;
+			return polynome_n_iter<T>(0, faux, NULL);
 
 	int puissance = 1; //nombre d'éléments dans le polynome retourné ... sert à scalaire_vecteur<T>
 	for (int i(0); i < n; ++i)
-		puissance *= (degres[i]+1);
+		puissance *= (degres[i] + 1);
 
 	scalaire_vecteur<T> faux_T(0);
 	faux_T = faux;
@@ -101,10 +114,11 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 	polynome_n_iter<scalaire_vecteur<T>> denom_T;
 	denom_T.coeffs = denom_vec_T;
 	denom_T.noms = denom.noms;
+	denom_T.scalaire = false;
 
 	for (int i(0); i < denom.coeffs.data.size(); ++i)
 		denom_T.coeffs.data[i] = denom.coeffs.data[i]; //scalaire ... on recopie membre à membre. Type T. (modifie le scalaire)
-	
+
 	faux_T.vecteur.resize(puissance); //on met à jour la taille du vecteur ... taille(faux_T) = taille(resultat_T)
 	polynome_n_iter<scalaire_vecteur<T>> resultat_T(degres, faux_T, denom.noms); //on connait le degré du résultat à l'avance ...
 	for (int i(0); i < resultat_T.coeffs.data.size(); ++i)
@@ -112,6 +126,10 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 
 	//on a le resultat, et le denom ... on les multiplie et extrait les équations !
 	polynome_n_iter<scalaire_vecteur<T>> num_T = denom_T * resultat_T; //normalement les dimensions correspondent. Car pas de simplification (je parle de data ...)
+
+	//OK
+//	std::cout << "tailles : " << denom_T.coeffs.data.size() << " ; " << denom.coeffs.data.size() << std::endl;
+//	std::cout << faux_T.vecteur.size() << " ; " << resultat_T.coeffs.data.size() << " ; " << num_T.coeffs.data.size() << " ; " << num.coeffs.data.size() << std::endl;
 
 	//construire la matrice. Il y a autant d'équations que le nombre(num_T) = nombre(num) : taille_l
 	//le nombre de variables est nombre(resultat_T) : taille_c
@@ -123,13 +141,27 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 			m_matrice.coeffs[i][j] = num_T.coeffs.data[i].vecteur[j];
 	}
 
+	//	std::cout << m_matrice << std::endl;
+		/*
+		for (int i(0); i < m_matrice.taille_l; ++i)
+			if ((bool)Y[i]) {
+				for (int j(0); j < m_matrice.taille_c; ++j)
+					std::cout << m_matrice.coeffs[i][j];
+				std::cout << std::endl;
+			}
+		long question;
+		std::cin >> question;
+		*/
+
 	std::vector<T> X = m_matrice.resoudre(Y);
 	if (X.size() == 0) //non simplifiable
-		return polynome_n_iter<T>(0,faux,NULL);
+		return polynome_n_iter<T>(0, faux, NULL);
 
 	polynome_n_iter<T> resultat(degres, faux, denom.noms);
 	for (int i(0); i < resultat.coeffs.data.size(); ++i)
 		resultat.coeffs.data[i] = X[i]; //on sait que e_i = X_i ... c'était le but.
 
+	resultat.simplifier_2();
+
 	return resultat;
-}
+};
