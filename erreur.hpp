@@ -65,7 +65,7 @@ public :
 	};
 
 	explicit inline operator bool() const {
-		if (carre((float)valeur) <= (50. * precision))
+		if (carre((float)valeur) <= (20. * precision))
 			return false;
 		else
 			return true;

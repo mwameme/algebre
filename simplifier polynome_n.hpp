@@ -1,6 +1,8 @@
 #pragma once
 #include "polynome_n_iter.hpp"
 #include "matrice.hpp"
+#include "rationnel.hpp"
+#include "unite.hpp"
 #include <vector>
 #include <iostream>
 
@@ -81,7 +83,7 @@ public:
 	std::vector<T> vecteur;
 };
 
-template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, polynome_n_iter<T> const& denom) {
+template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& num, polynome_n_iter<T> const& denom) {
 	int n = num.coeffs.puissance;
 	if (num.coeffs.puissance != denom.coeffs.puissance)
 		throw std::domain_error("simplification de polynomes : n_var ne correspond pas");
@@ -164,4 +166,36 @@ template<class T> polynome_n_iter<T> simplifier(polynome_n_iter<T> const& num, p
 	resultat.simplifier_2();
 
 	return resultat;
+};
+
+
+template<class T> class Simplifier_T {
+public:
+	static void Simplifier(T & x) {
+		return;
+	};
+};
+
+template<class T> class Simplifier_T<rationnel<polynome_n_iter<T>>> {
+public:
+	static void Simplifier(rationnel<polynome_n_iter<T>> & x) {
+		polynome_n_iter<T> simple = simplifier_poly<T>(x.numerateur, x.denominateur);
+		if (simple.scalaire == true)
+			return ;
+		T vrai = unite(simple.coeffs.data[0], true);
+		polynome_n_iter<T> vrai_T(simple.coeffs.puissance, vrai, simple.noms);
+		x = rationnel<polynome_n_iter<T>>(simple, vrai_T);
+		return;
+	};
+};
+
+template<class T> inline void Simplifier_frac_poly(T & x) {
+	Simplifier_T<T>::Simplifier(x);
+};
+
+template<class T> inline void simplifier_poly(polynome<T> &poly) {
+	for (int i(0); i < poly.coeffs.size(); ++i)
+		Simplifier_frac_poly(poly.coeffs[i]);
+	poly.getDegre();
+	return;
 };

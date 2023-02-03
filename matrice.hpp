@@ -7,6 +7,7 @@
 #include "entete objets.hpp"
 #include "unite.hpp"
 #include "fact_for.hpp"
+#include "simplifier polynome_n.hpp"
 
 //#include <typeinfo> 
 
@@ -262,7 +263,7 @@ public:
 					m_matrice.coeffs[i][j] = polynome<T>(std::vector<T>{ coeffs[i][j], mvrai });
 
 		polynome<T> det = m_matrice.determinant();
-
+		simplifier_poly(det);
 		return det;
 	};
 
@@ -538,7 +539,9 @@ public:
 
 		rationnel<T> det = m_matrice.determinant();
 
-		return det.numerateur / det.denominateur; //simplifier : division avec reste 
+		T result = det.numerateur / det.denominateur; //simplifier : division avec reste 
+		Simplifier_frac_poly(result);
+		return result;
 	};
 
 	void echangerLigne(int i, int j) {
@@ -588,6 +591,7 @@ public:
 					m_matrice.coeffs[i][j] = polynome<T>(std::vector<T>{ coeffs[i][j], mvrai });
 
 		polynome<T> det = m_matrice.determinant(); //passe par le determinant_anneau : sans utiliser la division.
+		simplifier_poly(det);
 		return det;
 	};
 
@@ -870,7 +874,7 @@ public:
 
 		for (int i(0); i < taille; ++i)
 			det = (det * m_matrice.coeffs[i][i]);
-
+		Simplifier_frac_poly(det);
 		return det;
 	};
 
@@ -965,7 +969,7 @@ public:
 					m_matrice.coeffs[i][j] = polynome<T>(coeffs[i][j], mvrai);
 
 		auto det = m_matrice.determinant();
-
+		simplifier_poly(det);
 		return det;
 	};
 	//si T est un anneau, calculer pour matrice<rationnel<T>> et simplifier les fractions de polynome<rationnel<T>>
@@ -1402,7 +1406,7 @@ public:
 					m_matrice_fin.coeffs[i][j] = m_matrice.coeffs[taille_max + i][taille_max + j];
 			det = det * m_matrice_fin.determinant_anneau();
 		}
-
+		Simplifier_frac_poly(det);
 		return det;
 	};
 
@@ -1505,7 +1509,7 @@ public:
 					m_matrice.coeffs[i][j] = polynome<T>(coeffs[i][j], mvrai);
 
 		auto det = m_matrice.determinant();
-
+		simplifier_poly(det);
 		return det;
 	};
 

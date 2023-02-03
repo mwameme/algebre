@@ -108,7 +108,7 @@ int main()
         cout << poly5 << endl;
 
         cin >> question;
-        polynome_n_iter<rationnel<int>> poly_simp = simplifier(poly4, poly1);
+        polynome_n_iter<rationnel<int>> poly_simp = simplifier_poly(poly4, poly1);
         cout << "\n polynome simplifie fraction : \n" << poly_simp << endl;
 
         cout << endl << "======FIN======" << endl;

@@ -444,7 +444,7 @@ public:
 		*this = ((polynome_n_iter<T>) ((polynome_n<T>) *this)); //deux conversions ... la premiere simplifie.
 	}
 	
-	bool scalaire;
+	bool scalaire; //true si c'est juste un scalaire
 	std::string* noms;
 	vecteur_n<T> coeffs;
 };
