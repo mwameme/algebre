@@ -13,8 +13,10 @@
 #include "simplifier polynome_n.hpp"
 
 #include "fonctions template.hpp"
+#include <complex>
 
 
+template<class T> class complex;
 
 template<class T> class erreur;
 template<class T> class anneau_quotient;

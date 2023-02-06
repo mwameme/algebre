@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <complex>
 #include "polynome.hpp"
 #include "rationnel.hpp"
 #include "corps quotient.hpp"
@@ -15,7 +15,10 @@
 
 #include "entete objets.hpp"
 
+template<class T> class complex;
+
 template<class T> class erreur;
+template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<typename T> class complexe;
 template<class T> class corps_quotient;
@@ -139,6 +142,21 @@ public:
 	static constexpr int approx{ get_approx() };
 };
 
+template<class T> class type_algebre<erreur_l<T>> {
+public:
+	static constexpr int get_type() {
+		return 0;
+	};
+
+	static constexpr int get_approx() {
+		return type_algebre<T>::approx;
+	};
+
+	static constexpr int type{ get_type() };
+	static constexpr int approx{ get_approx() };
+};
+
+
 template<class T> class type_algebre<complexe<T>> {
 public:
 	static constexpr int get_type() {
@@ -156,6 +174,25 @@ public:
 	static constexpr int approx{ get_approx() };
 
 };
+
+template<class T> class type_algebre<complex<T>> {
+public:
+	static constexpr int get_type() {
+		if (type_algebre<T>::type == 0)
+			return 0;
+		else
+			return 2;
+	};
+
+	static constexpr int get_approx() {
+		return type_algebre<T>::approx;
+	};
+
+	static constexpr int type{ get_type() };
+	static constexpr int approx{ get_approx() };
+
+};
+
 
 // ==========================================================
 //types de base

@@ -377,7 +377,7 @@ public:
 		std::vector<int> positions = std::vector<int>(n, 0);
 
 		//preparer les puissances de Y
-		std::vector<polynome_n_iter> pow_vector(coeffs.dimensions[i]);
+		std::vector<polynome_n_iter<T>> pow_vector(coeffs.dimensions[i]);
 		pow_vector[0] = unite(Y, true);
 		for (int i(1); i < coeffs.dimensions[i]; ++i)
 			pow_vector[i] = Y * pow_vector[i - 1];
@@ -413,6 +413,76 @@ public:
 			for (int k(0); k < coeffs.dimensions[i]; ++k) {
 				result = result + (coeffs.data[position + k * coeffs.puissances[i]] * (pow_vector[k] * poly_fixe));
 //				pow = pow * Y;
+			}
+		};
+
+		return result;
+	};
+
+	template<class U> U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ...
+		if ((i >= coeffs.puissance) || (i < 0))
+			throw std::domain_error("evaluation de polynome_n : i non-conforme");
+
+		if (Y.coeffs.puissance != coeffs.puissance - 1)
+			throw std::domain_error("evaluation de polynome : objet évalué non-conforme");
+
+		if (Y.scalaire)
+			throw std::domain_error("evaluation de polynome_n_iter : polynome=scalaire");
+
+		if (coeffs.puissance == 1) {
+			U result = unite(Y, false);
+			T puissance = unite(Y, true);
+
+			for (int i(0); i < coeffs.data.size(); ++i) {
+				result = result + (coeffs.data[i] * puissance);
+				puissance = puissance * Y;
+			}
+
+			return result;
+		}
+
+		int n = coeffs.puissance;
+		int position = 0;
+		bool fin = true;
+		std::vector<int> positions = std::vector<int>(n, 0);
+
+		//preparer les puissances de Y
+		std::vector<U> pow_vector(coeffs.dimensions[i]);
+		pow_vector[0] = unite(Y, true);
+		for (int i(1); i < coeffs.dimensions[i]; ++i)
+			pow_vector[i] = Y * pow_vector[i - 1];
+
+		U result = unite(Y,false); //polynome nul.
+		while (fin) {
+			int j = n - 1;
+			if (j == i)
+				--j;
+			if (j < 0) //non-essentiel. Pour être sûr.
+				break;
+			do {
+				++positions[j];
+				position += coeffs.puissances[j];
+				if (positions[j] < coeffs.dimensions[j])
+					break;
+				positions -= positions[j] * coeffs.puissances[j];
+				--j;
+				if (j == i)
+					--j;
+				if (j < 0)
+					break;
+			} while (true);
+			if (j < 0)
+				break;
+			//on a la nouvelle position ... correcte avec 0 sur positions[i].
+
+			std::vector<int> nouvelles_positions = positions;
+			nouvelles_positions.erase(nouvelles_positions.begin() + i); //Pour le polynome à n-1 variables.
+			polynome_n_iter<T> poly_fixe(nouvelles_positions, unite(coeffs.data[0], true), NULL); //degrés et nouvelles_positions correspondent ... OK.
+
+//			polynome_n_iter<T> pow = unite(Y, true);
+			for (int k(0); k < coeffs.dimensions[i]; ++k) {
+				result = result + (coeffs.data[position + k * coeffs.puissances[i]] * (poly_fixe * pow_vector[k]));
+				//				pow = pow * Y;
 			}
 		};
 

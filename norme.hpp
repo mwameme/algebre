@@ -2,12 +2,15 @@
 
 
 #include "InfInt.h"
+#include <complex>
 #include "precision/fprecision.h"
 #include "precision/iprecision.h"
 
 #include "fonctions template.hpp" //abs
 #include "types.hpp" //pour rationnel
 #include "entete objets.hpp"
+
+template<class T> class complex;
 
 template<class T> class erreur;
 template<class T> class anneau_quotient;
@@ -99,6 +102,13 @@ template<class T> class norme_T<complexe<T>> {
 public:
 	static decltype(norme_T<T>::norme(T())) norme(complexe<T> temp) {
 		return norme_T<T>::norme(temp.x) + norme_T<T>::norme(temp.y);
+	};
+};
+
+template<class T> class norme_T<complex<T>> {
+public:
+	static decltype(norme_T<T>::norme(T())) norme(complex<T> temp) {
+		return norme_T<T>::norme(temp.real()) + norme_T<T>::norme(temp.imag());
 	};
 };
 

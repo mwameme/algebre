@@ -1,5 +1,6 @@
 #pragma once
 
+#include <complex>
 #include "InfInt.h"
 #include "precision/fprecision.h"
 #include "precision/iprecision.h"
@@ -9,7 +10,10 @@
 #include "types.hpp" //pour rationnel
 #include "entete objets.hpp"
 
+template<class T> class complex;
+
 template<class T> class erreur;
+template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<typename T> class complexe;
 template<class T> class corps_quotient;
@@ -66,6 +70,14 @@ template<class T> inline erreur<T> unite(erreur<T> const& temp, bool test) {
 		return erreur<T>(unite(temp.valeur, test), 0.);
 }
 
+template<class T> inline erreur_l<T> unite(erreur_l<T> const& temp, bool test) {
+	if (test)
+		return erreur_l<T>(unite(temp.valeur, test), precision_relative_l(temp.valeur));
+	else
+		return erreur_l<T>(unite(temp.valeur, test), 0.);
+}
+
+
 template<class T> inline polynome<T> unite(polynome<T> const& poly, bool test) {
 	polynome<T> temp(unite(poly.coeffs[0],test));
 	return temp;
@@ -93,6 +105,11 @@ template<class T> inline corps_quotient<T> unite(corps_quotient<T> const& temp, 
 template<class T> inline complexe<T> unite(complexe<T> const& c, bool test) {
 	return complexe<T>(unite(c.x,test), unite(c.x,false));
 }
+
+template<class T> inline complex<T> unite(complex<T> const& c, bool test) {
+	return complex<T>(unite(c.real(), test), unite(c.real(), false));
+}
+
 
 template<class T> inline rationnel<T> unite(rationnel<T> const& temp, bool test) {
 	return rationnel<T>(unite(temp.numerateur,test), unite(temp.numerateur,true));
