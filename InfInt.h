@@ -194,10 +194,12 @@ public:
         return false;
     };
 
+    /*
     const InfInt& operator=(bool test) {
         int test_ = test;
         return (*this = test_);
     };
+    */
 
 
     explicit operator double() const {

@@ -3,14 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
-
-/*
-std::vector<std::vector<double>> multiplication(std::vector<std::vector<double>> const&, std::vector<std::vector<double>> const&);
-std::vector<std::vector<double>> puissance(std::vector<std::vector<double>>, int);
-std::vector<double> multiplication(std::vector<double> const&, std::vector<std::vector<double>> const&);
-*/
-
-std::vector<int> ordre_alea(int n);
+#include "TVD.hpp"
 
 int compter_ordonne(std::vector<std::vector<int>> const& votes, std::vector<int> ordre);
 

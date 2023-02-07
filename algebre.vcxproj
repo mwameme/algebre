@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algebre.cpp" />
-    <ClCompile Include="ordre.cpp" />
     <ClCompile Include="precision\precisioncore.cpp" />
     <ClCompile Include="TVD.cpp" />
     <ClCompile Include="vote.cpp" />
@@ -160,7 +159,6 @@
     <ClInclude Include="matrice.hpp" />
     <ClInclude Include="anneau quotient.hpp" />
     <ClInclude Include="norme.hpp" />
-    <ClInclude Include="ordre.hpp" />
     <ClInclude Include="polynome_n_iter.hpp" />
     <ClInclude Include="precision\complexprecision.h" />
     <ClInclude Include="precision\fprecision.h" />

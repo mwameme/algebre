@@ -39,9 +39,6 @@
     <ClCompile Include="vote.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="ordre.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TVD.hpp">
@@ -118,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="vote.hpp">
       <Filter>Fichiers sources</Filter>
-    </ClInclude>
-    <ClInclude Include="ordre.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="simplifier polynome_n.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>

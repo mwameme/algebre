@@ -190,11 +190,13 @@ class int_precision
 		return false;
 	};
 
+	/*
 	int_precision& operator=(bool test) {
 		int i = test;
 		int_precision temp(i);
 		return *this = temp;
 	};
+	*/
 
 	
 	friend int_precision operator*(int const gauche, int_precision const droit) {

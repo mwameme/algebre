@@ -364,11 +364,13 @@ class float_precision {
 		  return float_precision(x,temp.mPrec,temp.mRmode) * temp;
 	  };
 	  
+	  /*
 	  float_precision& operator=(bool test){
 		  int x=test;
 		  float_precision temp(x,mPrec,mRmode);
 		  return *this=temp;
 	  };
+	  */
 
 	  /*
 	  explicit float_precision(bool test, size_t p = float_precision_ctrl.precision(), enum round_mode m = float_precision_ctrl.mode())
