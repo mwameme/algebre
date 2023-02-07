@@ -22,10 +22,12 @@ public:
         quotient = copie.quotient;
     };
 
+    /*
     corps_quotient<T>& operator=(bool test) {
         element = test;
         return *this;
     };
+    */
 
     corps_quotient<T>& operator=(corps_quotient<T> const& temp) {
         if (this == &temp)

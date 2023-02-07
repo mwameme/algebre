@@ -106,13 +106,14 @@ public:
         return (*this);
     };
 
+    /*
     polynome<T>& operator=(bool test) {
         coeffs.resize(1);
         coeffs[0] = test;
         getDegre();
         return (*this);
     };
-
+    */
 
 
     friend polynome<T> operator*(const polynome<T>& temp1, const polynome<T>& temp2) {

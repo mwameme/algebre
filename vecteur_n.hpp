@@ -61,11 +61,13 @@ public:
 		return *this;
 	};
 
+	/*
 	vecteur_n<T>& operator=(bool test) {
 		for (int i(0); i < data.size(); ++i)
 			data[i] = test;
 		return *this;
 	};
+	*/
 
 	int accesseur(std::vector<int> const& positions) const { //position doit être de la bonne taille (et du bon format)
 		int expo = 1;

@@ -122,7 +122,7 @@ public:
 		return result;
 	};
 
-
+	/*
 	matrice<T>& operator=(bool test) { //des 1 sur la diagonale, 0 partout ailleurs.
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
@@ -134,8 +134,8 @@ public:
 				coeffs[i][i] = true;
 
 		return *this;
-
 	};
+	*/
 
 	template<class U> friend matrice<T> operator*(U scalaire, const matrice<T>& m_matrice) {
 		matrice<T> result(m_matrice);
@@ -437,7 +437,7 @@ public:
 		return result;
 	};
 
-
+	/*
 	matrice<T>& operator=(bool test) {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
@@ -449,6 +449,7 @@ public:
 		return *this;
 
 	};
+	*/
 
 	template<class U> friend matrice<T> operator*(U scalaire, const matrice<T>& m_matrice) {
 		matrice<T> result(m_matrice);
@@ -758,7 +759,7 @@ public:
 		return result;
 	};
 
-
+	/*
 	matrice<T>& operator=(bool test) {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
@@ -770,6 +771,7 @@ public:
 		return *this;
 
 	};
+	*/
 
 	template<class U> friend matrice<T> operator*(U scalaire, const matrice<T>& m_matrice) {
 		matrice<T> result(m_matrice);
@@ -1265,7 +1267,7 @@ public:
 		return result;
 	};
 
-
+	/*
 	matrice<T>& operator=(bool test) {
 		for (int i(0); i < taille_l; ++i)
 			for (int j(0); j < taille_c; ++j)
@@ -1277,6 +1279,7 @@ public:
 				coeffs[i][i] = true;
 		return *this;
 	};
+	*/
 
 	template<class U> friend matrice<T> operator*(U scalaire, const matrice<T>& m_matrice) {
 		matrice<T> result(m_matrice);

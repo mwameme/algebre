@@ -72,12 +72,14 @@ public:
 		return complexe<T>(inv_module * (z1.x * z2.x + z1.y * z2.y), inv_module * ((z1.y * z2.x) - (z1.x * z2.y)));
 	};
 
+	/*
 	complexe<T>& operator=(bool test) {
 		x = test;
 		y = false;
 
 		return *this;
 	};
+	*/
 
 	friend bool operator==(const complexe<T>& temp1, const complexe<T>& temp2) {
 		return ((temp1.x == temp2.x) && (temp1.y == temp2.y));

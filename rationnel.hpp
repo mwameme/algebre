@@ -77,12 +77,14 @@ public:
         simplifier();
     };
 
+    /*
     rationnel<T>& operator=(bool test) {
         numerateur = test;
         denominateur = true;
         return *this;
 
     };
+    */
 
     rationnel<T>& operator=(const rationnel<T>& temp) {
         if (this == &temp)
@@ -325,12 +327,14 @@ public:
     }
     */
 
+    /*
     rationnel<T>& operator=(bool test) {
         numerateur = test;
         denominateur = true;
         return *this;
 
     };
+    */
 
     rationnel<T>& operator=(const rationnel<T>& temp) {
         if (this == &temp)

@@ -234,6 +234,7 @@ public:
 		return os;
 	};
 
+	/*
 	polynome_n<T>& operator=(bool test) {
 		if (n_var > 0) {
 			for (int i(1); i < coeffs.size(); ++i)
@@ -252,6 +253,7 @@ public:
 
 		return *this;
 	};
+	*/
 
 	polynome_n<T>& operator=(polynome_n<T> const& temp) {
 		if (&temp == this)

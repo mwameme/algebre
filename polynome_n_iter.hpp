@@ -119,6 +119,7 @@ public:
 		return *this;
 	};
 
+	/*
 	polynome_n_iter<T>& operator=(bool test) {
 		T temp = unite(coeffs.data[0],test);
 		if (scalaire)
@@ -132,6 +133,7 @@ public:
 
 		return *this;
 	};
+	*/
 
 	friend polynome_n_iter<T> operator+(polynome_n_iter<T> const& gauche_, polynome_n_iter<T> const& droite_) {
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
@@ -419,7 +421,9 @@ public:
 		return result;
 	};
 
-	template<class U> U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ...
+	template<class U> U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ... 
+																//Plus précisément polynome de taille n-1
+																// Est utile pour évaluer une fraction de polynome_n_iter ... On évalue le numerateur puis le denominateur ...
 		if ((i >= coeffs.puissance) || (i < 0))
 			throw std::domain_error("evaluation de polynome_n : i non-conforme");
 

@@ -25,10 +25,12 @@ public:
         quotient = copie.quotient;
     };
 
+    /*
     anneau_quotient<T>& operator=(bool test) {
         element = test;
         return *this;
     };
+    */
 
     anneau_quotient<T>& operator=(anneau_quotient<T> const& temp) {
         if (this == &temp)

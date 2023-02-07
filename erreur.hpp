@@ -168,11 +168,13 @@ public :
 		return *this;
 	};
 
+	/*
 	erreur<T>& operator=(bool test) {
 		precision = precision_relative(valeur);
 		valeur = test;
 		return *this;
 	};
+	*/
 
 
 	friend bool operator==(erreur<T> temp1, erreur<T> temp2) {
@@ -356,11 +358,13 @@ public:
 		return *this;
 	};
 
+	/*
 	erreur<T>& operator=(bool test) {
 		precision = precision_relative_l(valeur);
 		valeur = test;
 		return *this;
 	};
+	*/
 
 
 	friend bool operator==(erreur_l<T> temp1, erreur_l<T> temp2) {
