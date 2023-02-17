@@ -41,9 +41,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TVD.hpp">
-      <Filter>Fichiers sources</Filter>
-    </ClInclude>
     <ClInclude Include="interpolation.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -113,9 +110,6 @@
     <ClInclude Include="polynome_n_iter.hpp">
       <Filter>Fichiers d%27en-tête\objets algebre</Filter>
     </ClInclude>
-    <ClInclude Include="vote.hpp">
-      <Filter>Fichiers sources</Filter>
-    </ClInclude>
     <ClInclude Include="simplifier polynome_n.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
@@ -127,6 +121,12 @@
     </ClInclude>
     <ClInclude Include="convertir_liste.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="TVD.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="vote.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

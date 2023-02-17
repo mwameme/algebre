@@ -2,6 +2,8 @@
 #include <vector>
 #include <cmath>
 #include <functional>
+#include <exception>
+#include <stdexcept>
 
 //#include <iostream>
 
