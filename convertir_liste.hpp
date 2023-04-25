@@ -4,7 +4,7 @@
 
 template<class T> class convertir_T {
 public:
-	static T convertir(const T element) {
+	static T convertir(const T& element) {
 		return element;
 	};
 };

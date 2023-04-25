@@ -32,7 +32,7 @@ template<typename T> class complexe;
 template<class T> class corps_quotient;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
 template<typename T> class polynome;
-template<class T> class polynome_n;
+template<class T> class polynome_n_rec;
 template<class T> class polynome_n_iter;
 template<class T, class enable = void> class rationnel;
 
@@ -40,7 +40,7 @@ template<class T, class enable = void> class rationnel;
 template<class T, class Enable = void> class norme_T;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
 
-template polynome_n<float>;
+template polynome_n_rec<float>;
 */
 
 /*
@@ -51,7 +51,7 @@ template rationnel<polynome<rationnel<InfInt>>>;
 template matrice<double>;
 template anneau_quotient<polynome<rationnel<InfInt>>>;
 template corps_quotient<polynome<rationnel<InfInt>>>;
-template polynome_n<rationnel<InfInt>>;
+template polynome_n_rec<rationnel<InfInt>>;
 template erreur<float_precision>;
 */
 
@@ -104,7 +104,7 @@ int main()
         cout << "poly4 :\n" << poly4 << std::endl;
         poly4.simplifier_2();
         cout << "poly4 simplifie :\n" << poly4 << std::endl;
-        polynome_n<rationnel<int>> poly5 = (polynome_n<rationnel<int>>) poly4;
+        polynome_n_rec<rationnel<int>> poly5 = (polynome_n_rec<rationnel<int>>) poly4;
         cout << poly5 << endl;
 
         cin >> question;
@@ -118,7 +118,7 @@ int main()
     //constructeur de liste
     if (false) {
         
-        matrice<int> mat{ {1,2,3},{4,5,6},{7,8,9} };
+        matrice<int> mat (vector<vector<int>>{ {1,2,3},{4,5,6},{7,8,9} });
 
         cout << "matrice \n" << 2 * mat << endl;
 
@@ -201,19 +201,19 @@ int main()
         cin >> question;
     }
 
-    //tests polynome_n<float>
+    //tests polynome_n_rec<float>
     if (false) {
         float x = 4.3;
         string noms[3] = { "X","Y","Z" };
         vector<int> dim = { 1,2,3 };
-        polynome_n<float> poly1(dim,noms,x);
+        polynome_n_rec<float> poly1(dim,noms,x);
         cout << poly1 << endl;
 
         vector<int> dim2 = { 3,4,5 };
-        polynome_n<float> poly2(dim2, noms, 3.54);
+        polynome_n_rec<float> poly2(dim2, noms, 3.54);
         cout << poly2 << endl;
 
-        polynome_n<float> poly3 = poly1 + poly2;
+        polynome_n_rec<float> poly3 = poly1 + poly2;
         cout << poly3 << endl;
 
         cout << "n_var" << endl;
@@ -226,7 +226,7 @@ int main()
         cout << poly1.coeffs[0]->n_var << endl;
         cin >> question;
 
-        polynome_n<float> poly4 = poly3 * poly2;
+        polynome_n_rec<float> poly4 = poly3 * poly2;
         cout << poly4 << endl;
         cout << poly4 + poly2 << endl;
 //        auto f = norme(poly4);

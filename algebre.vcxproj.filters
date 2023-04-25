@@ -74,7 +74,7 @@
     <ClInclude Include="polynome.hpp">
       <Filter>Fichiers d%27en-tête\objets algebre</Filter>
     </ClInclude>
-    <ClInclude Include="polynome_n.hpp">
+    <ClInclude Include="polynome_n_rec.hpp">
       <Filter>Fichiers d%27en-tête\objets algebre</Filter>
     </ClInclude>
     <ClInclude Include="rationnel.hpp">
@@ -127,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="vote.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="polynome_n_fixe.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="swap_T.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

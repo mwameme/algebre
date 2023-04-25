@@ -159,6 +159,7 @@
     <ClInclude Include="matrice.hpp" />
     <ClInclude Include="anneau quotient.hpp" />
     <ClInclude Include="norme.hpp" />
+    <ClInclude Include="polynome_n_fixe.hpp" />
     <ClInclude Include="polynome_n_iter.hpp" />
     <ClInclude Include="precision\complexprecision.h" />
     <ClInclude Include="precision\fprecision.h" />
@@ -166,9 +167,10 @@
     <ClInclude Include="precision\intervalprecision.h" />
     <ClInclude Include="precision\iprecision.h" />
     <ClInclude Include="simplifier polynome_n.hpp" />
+    <ClInclude Include="swap_T.hpp" />
     <ClInclude Include="types.hpp" />
     <ClInclude Include="polynome.hpp" />
-    <ClInclude Include="polynome_n.hpp" />
+    <ClInclude Include="polynome_n_rec.hpp" />
     <ClInclude Include="rationnel.hpp" />
     <ClInclude Include="TVD.hpp" />
     <ClInclude Include="vecteur_n.hpp" />

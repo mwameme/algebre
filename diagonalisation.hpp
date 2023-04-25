@@ -27,7 +27,8 @@ public:
 
 		/*
 		polynome<T> R;
-		while ((R = PGCD(chi_, derivee(chi_))).degre >= 1) {
+		while ((R = PGCD(chi_, 
+		(chi_))).degre >= 1) {
 			chi_ = chi_ / R;
 		}//chi_ à racines simples */
 		chi_ = chi_ / PGCD(chi_, derivee(chi_));

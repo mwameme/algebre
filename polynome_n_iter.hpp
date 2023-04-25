@@ -2,7 +2,7 @@
 #include "vecteur_n.hpp"
 #include <vector>
 #include <string>
-#include "polynome_n.hpp"
+#include "polynome_n_rec.hpp"
 #include <exception>
 #include <initializer_list>
 
@@ -11,9 +11,9 @@
 
 template<class T> class vecteur_n;
 
-template<class T> class polynome_n;
+template<class T> class polynome_n_rec;
 
-template<class T> polynome_n<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n,  std::string* noms);
+template<class T> polynome_n_rec<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n,  std::string* noms);
 
 template<class T> class polynome_n_iter {
 public:
@@ -323,11 +323,11 @@ public:
 		return false;
 	};
 
-	operator polynome_n<T>() const {
+	operator polynome_n_rec<T>() const {
 		if (scalaire)
-			return polynome_n<T>(0, coeffs.data[0], noms);
-		polynome_n<T>* adresse = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
-		polynome_n<T> copie(*adresse);
+			return polynome_n_rec<T>(0, coeffs.data[0], noms);
+		polynome_n_rec<T>* adresse = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
+		polynome_n_rec<T> copie(*adresse);
 		delete adresse;
 		return copie;
 	};
@@ -352,7 +352,7 @@ public:
 
 	polynome_n_iter<T> operator() (int i, polynome_n_iter<T> const& Y) const {
 		if ((i >= coeffs.puissance) || (i < 0))
-			throw std::domain_error("evaluation de polynome_n : i non-conforme");
+			throw std::domain_error("evaluation de polynome_n_rec : i non-conforme");
 
 		if (Y.coeffs.puissance != coeffs.puissance - 1)
 			throw std::domain_error("evaluation de polynome : objet évalué non-conforme");
@@ -425,7 +425,7 @@ public:
 																//Plus précisément polynome de taille n-1
 																// Est utile pour évaluer une fraction de polynome_n_iter ... On évalue le numerateur puis le denominateur ...
 		if ((i >= coeffs.puissance) || (i < 0))
-			throw std::domain_error("evaluation de polynome_n : i non-conforme");
+			throw std::domain_error("evaluation de polynome_n_rec : i non-conforme");
 
 		if (Y.coeffs.puissance != coeffs.puissance - 1)
 			throw std::domain_error("evaluation de polynome : objet évalué non-conforme");
@@ -495,7 +495,7 @@ public:
 
 	polynome_n_iter<T> operator() (int i, T element, std::string* noms_) const {
 		if (coeffs.puissance <= 0)
-			throw std::domain_error("evaluation de polynome_n : puissance requise >0");
+			throw std::domain_error("evaluation de polynome_n_rec : puissance requise >0");
 		polynome_n_iter<T> Y(coeffs.puissance - 1, element, noms_);
 		return *this(i, Y);
 	};
@@ -515,7 +515,7 @@ public:
 	}
 
 	void simplifier_2() {
-		*this = ((polynome_n_iter<T>) ((polynome_n<T>) *this)); //deux conversions ... la premiere simplifie.
+		*this = ((polynome_n_iter<T>) ((polynome_n_rec<T>) *this)); //deux conversions ... la premiere simplifie.
 	}
 	
 	bool scalaire; //true si c'est juste un scalaire
@@ -523,23 +523,23 @@ public:
 	vecteur_n<T> coeffs;
 };
 
-template<class T> polynome_n<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {
+template<class T> polynome_n_rec<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {
 	if (n == 0)
-		return new polynome_n<T>(*data);
+		return new polynome_n_rec<T>(*data);
 
-	std::vector<polynome_n<T>*> tab(0);
+	std::vector<polynome_n_rec<T>*> tab(0);
 	for (int i(0); i < *dimensions; ++i)
 		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1, noms + 1));
 
 	T faux_ = unite(*data,false);
-	return new polynome_n<T>(n, noms, faux_, tab); //simplifie aussi.
+	return new polynome_n_rec<T>(n, noms, faux_, tab); //simplifie aussi.
 };
 
 
 
 
 // Verifier les dimensions : polynome nul. OK
-// convertir en polynome_n, et réciproquement. OK
+// convertir en polynome_n_rec, et réciproquement. OK
 // mettre a jour types et norme.
 // simplifier le vecteur_n OK
 // vérifier puissances OK

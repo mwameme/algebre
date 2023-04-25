@@ -7,11 +7,11 @@
 #include "anneau quotient.hpp"
 #include "InfInt.h"
 #include "erreur.hpp"
-#include "polynome_n.hpp"
+#include "polynome_n_rec.hpp"
 #include "complexe.hpp"
 #include "precision/fprecision.h"
-#include "polynome_n.hpp"
-#include "polynome_n.hpp"
+#include "polynome_n_rec.hpp"
+#include "polynome_n_rec.hpp"
 
 #include "entete objets.hpp"
 
@@ -24,9 +24,9 @@ template<typename T> class complexe;
 template<class T> class corps_quotient;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
 template<typename T> class polynome;
-template<class T> class polynome_n;
+template<class T> class polynome_n_rec;
 template<class T> class polynome_n_iter;
-template<class T, class enable = void> class rationnel;
+template<class T> class rationnel;
 
 /*
 template<typename, typename = void> constexpr int type_algebre{};
@@ -59,7 +59,7 @@ public:
 	static constexpr int approx{ get_approx() };
 };
 
-template<class T> class type_algebre<polynome_n<T>> {
+template<class T> class type_algebre<polynome_n_rec<T>> {
 public:
 	static constexpr int get_type() {
 		return 2;
@@ -329,7 +329,7 @@ template<class T> constexpr int type_algebre(matrice<T>& element) {
 		return 2;
 };
 
-template<class T> constexpr int type_algebre(polynome_n<T>& element) {
+template<class T> constexpr int type_algebre(polynome_n_rec<T>& element) {
 	return 2;
 };
 
@@ -408,7 +408,7 @@ template<class T> constexpr int type_approx(corps_quotient<T>& element) {
 };
 
 
-template<class T> constexpr int type_approx(polynome_n<T>& element) {
+template<class T> constexpr int type_approx(polynome_n_rec<T>& element) {
 	return type_approx(T());
 };
 

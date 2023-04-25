@@ -4,7 +4,7 @@
 #include "corps quotient.hpp"
 #include "matrice.hpp"
 #include "polynome.hpp"
-#include "polynome_n.hpp"
+#include "polynome_n_rec.hpp"
 #include "polynome_n_iter.hpp"
 #include "rationnel.hpp"
 #include "norme.hpp"
@@ -20,13 +20,15 @@ template<class T> class complex;
 
 template<class T> class erreur;
 template<class T> class anneau_quotient;
-template<typename T> class complexe;
+template<class T> class complexe;
 template<class T> class corps_quotient;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
-template<typename T> class polynome;
-template<class T> class polynome_n;
+template<class T> class polynome;
+template<class T> class polynome_n_rec;
 template<class T> class polynome_n_iter;
-template<class T, class enable = void> class rationnel;
+template<class T> class rationnel;
+template<class T, int n> class polynome_n_fixe;
+
 
 //template<class T> class type_algebre;
 

@@ -20,6 +20,9 @@ template<class T, class enable1 = void, class enable2 = void> class matrice;
 template<typename T> class polynome {
 public:
 
+    int degre;
+    std::vector<T> coeffs;
+
     
     friend polynome<T> derivee(polynome<T> const& element) { // T = rationnel<InfInt>
         polynome<T> result(element);
@@ -33,7 +36,7 @@ public:
     };
     
 
-    explicit polynome(std::vector<T> tab) {
+    explicit polynome(std::vector<T> const& tab) {
         coeffs = tab;
         if (coeffs.size() == 0) {
             throw std::domain_error("polynome : la taille du vecteur des coeffs doit être > 0");
@@ -41,18 +44,35 @@ public:
         getDegre();
     };
 
+
+    explicit polynome(std::vector<T>&& tab) {
+        std::swap(coeffs, tab);
+        if (coeffs.size() == 0) {
+            throw std::domain_error("polynome : la taille du vecteur des coeffs doit être > 0");
+        }
+        getDegre();
+    };
+
+
+
     explicit polynome() { // : degre(-1), coeffs(1) {
     }; //problème si utilisé ... est juste là pour les fonctions template.
+
+
+    polynome(const polynome<T>& copie) {
+        coeffs = copie.coeffs;
+        degre=copie.degre;
+    };
+
+    polynome(polynome<T>&& copie) {
+        swap(*this, copie);
+        return;
+    };
 
     explicit polynome(const T& element) {
         coeffs.resize(1);
         coeffs[0] = element;
         getDegre();
-    };
-
-    polynome(const polynome<T>& copie) {
-        coeffs = copie.coeffs;
-        degre=copie.degre;
     };
 
     explicit polynome(T const& element1, T const& element2) {
@@ -70,24 +90,6 @@ public:
         getDegre();
     };
 
-    /*
-    template<class U> explicit polynome(std::initializer_list<U> liste) {
-        std::vector<U> vec(liste);
-        if (vec.size() == 0)
-            throw std::domain_error("initialisation de polynome : liste vide");
-        coeffs.resize(vec.size());
-        for (int i(0); i < vec.size(); ++i)
-            coeffs[i] = T(vec[i]);
-        getDegre();
-    }*/
-
-    template<class U> explicit polynome(std::initializer_list<U> const & liste) {
-        auto vec = convertir_T<std::initializer_list<U>>::convertir(liste);
-        coeffs.resize(vec.size());
-        for (int i(0); i < vec.size(); ++i)
-            coeffs[i] = T(vec[i]);
-        getDegre();
-    };
 
     template<class U> explicit polynome(std::vector<U> const& vec) {
         coeffs.resize(vec.size());
@@ -106,14 +108,14 @@ public:
         return (*this);
     };
 
-    /*
-    polynome<T>& operator=(bool test) {
-        coeffs.resize(1);
-        coeffs[0] = test;
-        getDegre();
+    polynome<T>& operator=(polynome<T>&& temp) {
+        if (this == &temp)
+            return *this;
+        
+        swap(*this, temp);
         return (*this);
     };
-    */
+
 
 
     friend polynome<T> operator*(const polynome<T>& temp1, const polynome<T>& temp2) {
@@ -144,15 +146,6 @@ public:
         return result;
     };
 
-    friend polynome<T> operator*(const T& scalaire, const polynome<T>& temp) {
-        polynome<T> result(temp);
-
-        for (int i(0); i < temp.coeffs.size(); ++i)
-            result.coeffs[i] = scalaire * result.coeffs[i];
-        result.getDegre();
-        return result;
-    };
-
     template<class U> friend polynome<T> operator*(const U& scalaire, const polynome<T>& temp) { 
         //sert pour descendre les niveaux de construction. utilisé pour la dérivée : multiplier par un entier.
         polynome<T> result(temp);
@@ -164,8 +157,9 @@ public:
     };
 
     friend polynome<T> operator%(const polynome<T>& temp1, const polynome<T>& temp2) {
-        if (type_algebre<T>::type != 0)
-            throw std::domain_error("modulo de polynomes : nécessite une division exacte sur T");
+        static_assert(type_algebre<T>::type == 0);
+//        if (type_algebre<T>::type != 0)
+//            throw std::domain_error("modulo de polynomes : nécessite une division exacte sur T");
 
         T faux = unite( temp1.coeffs[0],false);
 
@@ -191,18 +185,19 @@ public:
     };
 
     polynome<T>& operator%=(polynome<T> Q) {
+        static_assert(type_algebre<T>::type == 0);
+
         if (Q.degre > degre)
             return *this;
         else
             return (*this = (*this % Q));
-    }
+    };
 
 
     friend polynome<T> operator/( polynome<T> const& temp1, polynome<T> const& temp2) {
-
-        if (type_algebre<T>::type != 0)
-            throw std::domain_error("division de polynomes : nécessite une division exacte sur T");
-
+        static_assert(type_algebre<T>::type == 0);
+//        if (type_algebre<T>::type != 0)
+//            throw std::domain_error("division de polynomes : nécessite une division exacte sur T");
 
         if (temp2.degre < 0) 
             throw std::domain_error("division de polynomes : division par 0");
@@ -353,8 +348,6 @@ public:
         return (a.degre > b.degre);
     };
 
-
-
     explicit inline operator bool() const {
         if (degre < 0)
             return false;
@@ -369,40 +362,16 @@ public:
     template<class U> explicit operator polynome<U>() const {
         polynome<U> result();
         result.coeffs.resize(coeffs.size());
-        for (int i(0); i < coeffs.size(); ++i) {
+        for (int i(0); i < coeffs.size(); ++i) 
             result.coeffs[i] = (U)coeffs[i];
-        }
+        
         result.getDegre();
         return result;
     };
 
+    void majListe();
 
-    void majListe() {
-        int i(coeffs.size() - 1);
-
-        while (! (bool) coeffs[i]) {
-            --i;
-            if (i == 0)
-                break;
-        };
-        if( i < coeffs.size()-1)
-            coeffs.erase(coeffs.begin() + i + 1, coeffs.end());
-        return;
-    };
-
-    inline void getDegre() {
-        majListe();
-
-        if (coeffs.size() == 0)
-            throw std::domain_error("la liste d'un polynome a 0 éléments");
-
-        int i;
-        for (i = (coeffs.size() - 1) ; i >= 0; --i) 
-            if ((bool)coeffs[i]) 
-                break;
-        
-        degre = i;
-    };
+    inline void getDegre();
 
     friend std::ostream& operator<<(std::ostream& os, const polynome<T>& element) {
         //        element.getDegre();
@@ -463,9 +432,41 @@ public:
     };
 
     //protected:
-    int degre;
-    std::vector<T> coeffs;
+
+    friend void swap(polynome<T>& gauche, polynome<T>& droit) {
+        std::swap(gauche.degre, droit.degre);
+        std::swap(gauche.coeffs, droit.coeffs);
+        return;
+    };
 
 };
 
+template<class T>
+void polynome<T>::majListe() {
+    int i(coeffs.size() - 1);
 
+    while (!(bool)coeffs[i]) {
+        --i;
+        if (i == 0)
+            break;
+    };
+    if (i < coeffs.size() - 1)
+        coeffs.erase(coeffs.begin() + i + 1, coeffs.end());
+    return;
+};
+
+
+template<class T>
+void polynome<T>::getDegre() {
+    majListe();
+
+    if (coeffs.size() == 0)
+        throw std::domain_error("la liste d'un polynome a 0 éléments");
+
+    int i;
+    for (i = (coeffs.size() - 1); i >= 0; --i)
+        if ((bool)coeffs[i])
+            break;
+
+    degre = i;
+};
