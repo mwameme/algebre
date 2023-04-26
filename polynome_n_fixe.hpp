@@ -5,7 +5,12 @@
 #include "polynome.hpp"
 
 #include "entete objets.hpp"
-#include "unite.hpp"
+
+template<class T, int n> class polynome_n_fixe;
+
+template<class T, int n, int m> bool operator==(polynome_n_fixe<T, n> const& gauche, polynome_n_fixe<T, m> const& droit) {
+	return false;
+};
 
 template<class T, int n> class polynome_n_fixe {
 public:
@@ -84,6 +89,11 @@ public:
 			if (m_poly.poly.coeffs[i].nul)
 				m_poly.nul = true;
 		return m_poly;
+	};
+
+
+	friend bool operator==(polynome_n_fixe<T, n>& gauche, polynome_n_fixe<T, n>& droit) {
+		return gauche.poly == droit.poly;
 	};
 
 	T get_T() {
@@ -206,6 +216,11 @@ public:
 		return m_poly;
 	};
 
+	friend bool operator==(polynome_n_fixe<T, 1>& gauche, polynome_n_fixe<T, 1>& droit) {
+		return gauche.poly == droit.poly;
+	}
+
+
 	T get_T() {
 		return poly.coeffs[0].get_T();
 	};
@@ -318,6 +333,11 @@ public:
 	template<class U> friend polynome_n_fixe<T, 0> operator*(const U& scalaire, const polynome_n_fixe<T, 0>& poly) {
 		return polynome_n_fixe<T, 0>(scalaire * poly.element);
 	};
+
+	friend bool operator==(polynome_n_fixe<T, 0>& gauche, polynome_n_fixe<T, 0>& droit) {
+		return gauche.element == droit.element;
+	}
+
 
 	T get_T() {
 		return element;

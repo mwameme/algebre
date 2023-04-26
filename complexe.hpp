@@ -4,8 +4,13 @@
 
 #include "entete objets.hpp"
 
+template<class T, class U> std::complex<T> operator*(const U& scalaire, const std::complex<T>& temp) {
+	return std::complex<T>(scalaire * temp.real, scalaire * temp.imag);
+}
+
 template<typename T> class complexe {
 public:
+
 
 	friend complexe<T> derivee(const complexe<T>& element) {
 		return complexe<T>(derivee(element.x), derivee(element.y));

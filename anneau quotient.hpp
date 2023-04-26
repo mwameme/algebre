@@ -2,9 +2,10 @@
 
 #include <exception>
 #include <iostream>
-#include "types.hpp"
 
 #include "entete objets.hpp"
+#include "types.hpp"
+
 
 template<class T> class anneau_quotient {
 public:

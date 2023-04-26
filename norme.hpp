@@ -1,13 +1,6 @@
 #pragma once
 
-
-#include "InfInt.h"
-#include <complex>
-#include "precision/fprecision.h"
-#include "precision/iprecision.h"
-
-#include "fonctions template.hpp" //abs
-#include "types.hpp" //pour rationnel
+#include "fonctions template.hpp"
 #include "entete objets.hpp"
 
 template<class T> class complex;
@@ -15,18 +8,18 @@ template<class T> class complex;
 template<class T> class erreur;
 template<class T> class erreur_l;
 template<class T> class anneau_quotient;
-template<typename T> class complexe;
+template<class T> class complexe;
 template<class T> class corps_quotient;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
-template<typename T> class polynome;
+template<class T> class polynome;
 template<class T> class polynome_n_rec;
 template<class T> class polynome_n_iter;
 template<class T> class rationnel;
+template<class T, int n> class polynome_n_fixe;
 
-
-
-template<class T> class type_algebre;
-
+class InfInt;
+class int_precision;
+class float_precision;
 
 //définition
 template<class T, typename Enable=void> class norme_T {
@@ -142,10 +135,10 @@ template<class T> class norme_T< polynome_n_rec<T> > {
 public:
 	static decltype(norme_T<T>::norme(T())) norme(polynome_n_rec<T> poly) {
 		if (poly.n_var >= 1) {
-			decltype(norme_T<T>::norme(T())) x = unite(norme_T<T>::norme(poly.element),false);
+			decltype(norme_T<T>::norme(T())) x = norme_T<T>::norme(unite(poly.element,false));
 //			x = unite(x,false);
-			for (int i(0); i < poly.coeffs.size(); ++i) {
-				x = x + norme_T<polynome_n_rec<T>>::norme(* poly.coeffs[i]);
+			for (int i(0); i < poly.poly.coeffs.size(); ++i) {
+				x = x + norme_T<polynome_n_rec<T>>::norme(poly.poly.coeffs[i]);
 			}
 			return x;
 		};

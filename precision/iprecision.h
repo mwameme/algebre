@@ -115,6 +115,8 @@ class int_precision
 
 
 	public:
+
+
 	// Constructor
 	int_precision();										// No initialization
  	int_precision( char, const size_t=SIZE_MAX);					// When initialized through a char

@@ -1,24 +1,11 @@
 #pragma once
-#include "anneau quotient.hpp"
-#include "complexe.hpp"
-#include "corps quotient.hpp"
-#include "matrice.hpp"
-#include "polynome.hpp"
-#include "polynome_n_rec.hpp"
-#include "polynome_n_iter.hpp"
-#include "rationnel.hpp"
-#include "norme.hpp"
-#include "types.hpp"
-#include "erreur.hpp"
-#include "simplifier polynome_n.hpp"
 
-#include "fonctions template.hpp"
-#include <complex>
-
+#include "objets.hpp"
 
 template<class T> class complex;
 
 template<class T> class erreur;
+template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<class T> class complexe;
 template<class T> class corps_quotient;
@@ -29,6 +16,25 @@ template<class T> class polynome_n_iter;
 template<class T> class rationnel;
 template<class T, int n> class polynome_n_fixe;
 
+class InfInt;
+class int_precision;
+class float_precision;
+
+template<class T> class type_algebre;
+template<class T, typename Enable = void> class norme_T;
+template<class T>  T unite(T const& element, bool test);
+
+template<class T> class scalaire_vecteur;
+
+#include "fonctions template.hpp"
+#include "unite.hpp"
+
+#include "types.hpp"
+#include "norme.hpp"
+
+#include "swap_T.hpp"
+
+#include "objets.hpp"
 
 //template<class T> class type_algebre;
 

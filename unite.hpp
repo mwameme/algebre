@@ -1,29 +1,34 @@
 #pragma once
 
-#include <complex>
-#include "InfInt.h"
-#include "precision/fprecision.h"
-#include "precision/iprecision.h"
-#include "erreur.hpp"
 
-#include "fonctions template.hpp" //abs
-#include "types.hpp" //pour rationnel
+#include "objets.hpp"
 #include "entete objets.hpp"
+#include "InfInt.h"
+#include "precision/iprecision.h"
+#include "precision/fprecision.h"
+#include "simplifier polynome_n.hpp"
+
+#include "erreur.hpp"
 
 template<class T> class complex;
 
 template<class T> class erreur;
 template<class T> class erreur_l;
 template<class T> class anneau_quotient;
-template<typename T> class complexe;
+template<class T> class complexe;
 template<class T> class corps_quotient;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
-template<typename T> class polynome;
+template<class T> class polynome;
 template<class T> class polynome_n_rec;
 template<class T> class polynome_n_iter;
 template<class T> class rationnel;
-template<class T> class scalaire_vecteur;
 template<class T, int n> class polynome_n_fixe;
+
+class InfInt;
+class int_precision;
+class float_precision;
+
+template<class T> class scalaire_vecteur;
 
 
 template<class T>  T unite(T const& element,bool test) {
@@ -109,22 +114,22 @@ template<class T>  complexe<T> unite(complexe<T> const& c, bool test) {
 
 template<class T>  complex<T> unite(complex<T> const& c, bool test) {
 	return complex<T>(unite(c.real(), test), unite(c.real(), false));
-}
+};
 
 
 template<class T>  rationnel<T> unite(rationnel<T> const& temp, bool test) {
-	return rationnel<T>(unite(temp.numerateur,test), unite(temp.numerateur,true));
-}
+	return rationnel<T>(unite(temp.numerateur, test), unite(temp.numerateur, true));
+};
 
 template<class T>  matrice<T> unite(matrice<T> const& m, bool test) {
-	matrice<T> result(m.taille_l, m.taille_c, unite(m.coeffs[0][0],false));
+	matrice<T> result(m.taille_l, m.taille_c, unite(m.coeffs[0][0], false));
 	if (test) {
 		T vrai_ = unite(m.coeffs[0][0], true);
 		for (int i(0); i < min(m.taille_l, m.taille_c); ++i)
 			result.coeffs[i][i] = vrai_;
 	}
 	return result;
-}
+};
 
 template<class T>  scalaire_vecteur<T> unite(scalaire_vecteur<T> const& temp, bool test) {
 	T element = unite(temp.scalaire, test);

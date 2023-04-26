@@ -5,9 +5,9 @@
 #include <initializer_list>
 
 #include "entete objets.hpp"
-#include "unite.hpp"
 #include "fact_for.hpp"
 #include "simplifier polynome_n.hpp"
+
 #include <algorithm>
 
 //#include <typeinfo> 
@@ -278,6 +278,18 @@ public:
 		std::swap(gauche.coeffs, droit.coeffs);
 		return;
 	};
+
+	friend bool operator==(matrice<T> const& gauche, matrice<T> const& droit) {
+		if (gauche.taille_l != droit.taille_l)
+			return false;
+		if (gauche.taille_c != droit.taille_c)
+			return false;
+		for (int i(0); i < gauche.taille_l; ++i)
+			for (int j(0); j < gauche.taille_c; ++j)
+				if (!(gauche.coeffs[i][j] == droit.coeffs[i][j]))
+					return false;
+		return true;
+	}
 
 
 	T determinant_anneau() const {

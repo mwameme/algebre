@@ -159,6 +159,7 @@
     <ClInclude Include="matrice.hpp" />
     <ClInclude Include="anneau quotient.hpp" />
     <ClInclude Include="norme.hpp" />
+    <ClInclude Include="objets.hpp" />
     <ClInclude Include="polynome_n_fixe.hpp" />
     <ClInclude Include="polynome_n_iter.hpp" />
     <ClInclude Include="precision\complexprecision.h" />

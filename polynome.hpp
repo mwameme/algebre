@@ -9,9 +9,6 @@
 #include <initializer_list>
 
 #include "entete objets.hpp"
-#include "types.hpp"
-#include "unite.hpp"
-#include "convertir_liste.hpp"
 
 template<class T> class type_algebre;
 

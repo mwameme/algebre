@@ -1,7 +1,8 @@
 #pragma once
+
 #include "unite.hpp"
 
-template<class T> T unite(T const& element,bool test);
+template<class T>  T unite(T const& element, bool test);
 
 
 template<class T> T derivee(T const& element) {

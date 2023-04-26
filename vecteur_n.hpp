@@ -4,8 +4,18 @@
 #include "n_for.hpp"
 #include <exception>
 
+#include "unite.hpp"
+
+template<class T>  T unite(T const& element, bool test);
+
 template<class T> class vecteur_n {
 public:
+
+	std::vector<int> puissances;
+	int puissance; //nombre de variables ... data[1][2]...[puissance]
+	std::vector<int> dimensions;
+	std::vector<T> data;
+
 	vecteur_n() {};
 
 	vecteur_n(std::vector<int> const& liste_dim) {
@@ -50,6 +60,12 @@ public:
 		data = temp.data;
 		puissances = temp.puissances;
 	};
+
+	vecteur_n(vecteur_n<T> && temp) {
+		swap(*this, temp);
+	};
+
+
 	
 	vecteur_n<T>& operator=(vecteur_n<T> const& temp) {
 		if (this == &temp)
@@ -60,6 +76,14 @@ public:
 		puissances = temp.puissances;
 		return *this;
 	};
+
+	vecteur_n<T>& operator=(vecteur_n<T> && temp) {
+		if (this == &temp)
+			return *this;
+		swap(*this, temp);
+		return *this;
+	};
+
 
 	/*
 	vecteur_n<T>& operator=(bool test) {
@@ -201,10 +225,13 @@ public:
 			modifier_dimension(dimensions_max);
 	};
 
-	std::vector<int> puissances;
-	int puissance; //nombre de variables ... data[1][2]...[puissance]
-	std::vector<int> dimensions;
-	std::vector<T> data;
+	friend void swap(vecteur_n<T>& gauche, vecteur_n<T>& droit) {
+		std::swap(gauche.puissance, droit.puissance);
+		swap(gauche.data, droit.data);
+		swap(gauche.puissances, droit.puissances);
+		swap(gauche.dimensions, droit.dimensions);
+		return;
+	}
 };
 
 //verifier >= dimension.

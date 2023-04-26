@@ -4,11 +4,6 @@
 #include <iostream>
 #include <vector>
 #include "entete objets.hpp"
-#include "fonctions template.hpp"
-#include "unite.hpp"
-#include "types.hpp"
-#include "norme.hpp"
-
 
 
 #include "interpolation.hpp"
@@ -223,7 +218,7 @@ int main()
 
         poly1 = false;
         cout << poly1.n_var << endl;
-        cout << poly1.coeffs[0]->n_var << endl;
+        cout << poly1.poly.coeffs[0].n_var << endl;
         cin >> question;
 
         polynome_n_rec<float> poly4 = poly3 * poly2;

@@ -134,5 +134,8 @@
     <ClInclude Include="swap_T.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
+    <ClInclude Include="objets.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -112,6 +112,7 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 	scalaire_vecteur<T> faux_T(0);
 	faux_T = faux;
 
+	//denominateur sous forme scalaire_vecteur
 	vecteur_n<scalaire_vecteur<T>> denom_vec_T(denom.coeffs.dimensions, faux_T); //même dimension que denom. Mais de type différent ...
 	polynome_n_iter<scalaire_vecteur<T>> denom_T;
 	denom_T.coeffs = denom_vec_T;
@@ -120,6 +121,8 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 
 	for (int i(0); i < denom.coeffs.data.size(); ++i)
 		denom_T.coeffs.data[i] = denom.coeffs.data[i]; //scalaire ... on recopie membre à membre. Type T. (modifie le scalaire)
+
+
 
 	faux_T.vecteur.resize(puissance); //on met à jour la taille du vecteur ... taille(faux_T) = taille(resultat_T)
 	polynome_n_iter<scalaire_vecteur<T>> resultat_T(degres, faux_T, denom.noms); //on connait le degré du résultat à l'avance ...

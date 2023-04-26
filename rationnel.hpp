@@ -8,10 +8,6 @@
 #include <initializer_list>
 
 #include "entete objets.hpp"
-#include "norme.hpp"
-#include "unite.hpp"
-#include "types.hpp"
-#include "swap_T.hpp"
 
 
 template<class T> T unite(T const& element, bool test);

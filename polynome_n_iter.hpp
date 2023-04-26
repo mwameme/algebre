@@ -13,10 +13,15 @@ template<class T> class vecteur_n;
 
 template<class T> class polynome_n_rec;
 
-template<class T> polynome_n_rec<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n,  std::string* noms);
+template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n,  std::string* noms);
 
 template<class T> class polynome_n_iter {
 public:
+
+	bool scalaire; //true si c'est juste un scalaire
+	std::string* noms;
+	vecteur_n<T> coeffs;
+
 
 	polynome_n_iter() {};
 
@@ -75,10 +80,15 @@ public:
 		scalaire = false;
 	};
 
-	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs) , noms(temp.noms),scalaire(temp.scalaire){
-
+	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs), noms(temp.noms), scalaire(temp.scalaire) {
 	};
 
+	polynome_n_iter(polynome_n_iter && temp)  {
+		swap(*this, temp);
+	};
+
+
+/*
 	polynome_n_iter(std::initializer_list<int> degres_, T element,std::string* noms_) {
 		std::vector<int> degres(degres_);
 
@@ -109,6 +119,8 @@ public:
 			scalaire = false;
 		}
 	};
+	*/
+
 
 	polynome_n_iter<T>& operator=(polynome_n_iter<T> const& temp) {
 		if (this == &temp)
@@ -118,6 +130,12 @@ public:
 		scalaire = temp.scalaire;
 		return *this;
 	};
+
+	polynome_n_iter<T>& operator=(polynome_n_iter<T>&& temp) {
+		swap(*this, temp);
+		return *this;
+	};
+
 
 	/*
 	polynome_n_iter<T>& operator=(bool test) {
@@ -326,10 +344,8 @@ public:
 	operator polynome_n_rec<T>() const {
 		if (scalaire)
 			return polynome_n_rec<T>(0, coeffs.data[0], noms);
-		polynome_n_rec<T>* adresse = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
-		polynome_n_rec<T> copie(*adresse);
-		delete adresse;
-		return copie;
+		polynome_n_rec<T> result = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
+		return result;
 	};
 
 	friend std::ostream& operator<<(std::ostream& os, polynome_n_iter<T> const& element) {
@@ -509,30 +525,41 @@ public:
 	};
 
 	void simplifier() {
-		if (! scalaire)
+		if (!scalaire)
 			coeffs.simplifier();
 		return;
-	}
+	};
 
 	void simplifier_2() {
-		*this = ((polynome_n_iter<T>) ((polynome_n_rec<T>) *this)); //deux conversions ... la premiere simplifie.
-	}
+		*this = ((polynome_n_iter<T>) ((polynome_n_rec<T>) * this)); //deux conversions ... la premiere simplifie.
+	};
 	
-	bool scalaire; //true si c'est juste un scalaire
-	std::string* noms;
-	vecteur_n<T> coeffs;
+	friend void swap(polynome_n_iter<T>& gauche, polynome_n_iter<T>& droit) {
+		std::swap(gauche.scalaire, droit.scalaire);
+		std::swap(gauche.noms, droit.noms);
+		std::swap(gauche.coeffs, droit.coeffs);
+		return;
+	};
+
+	friend bool operator==(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droit) {
+		if (gauche.scalaire != droit.scalaire)
+			return false;
+		return ((polynome_n_rec<T>) gauche) == ((polynome_n_rec<T>) droit);
+
+	};
 };
 
-template<class T> polynome_n_rec<T>* poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {
+template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {
 	if (n == 0)
-		return new polynome_n_rec<T>(*data);
+		return polynome_n_rec<T>(*data);
 
-	std::vector<polynome_n_rec<T>*> tab(0);
+	std::vector<polynome_n_rec<T>> tab(0);
+	tab.reserve(*dimensions);
 	for (int i(0); i < *dimensions; ++i)
 		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1, noms + 1));
 
-	T faux_ = unite(*data,false);
-	return new polynome_n_rec<T>(n, noms, faux_, tab); //simplifie aussi.
+	T faux = unite(*data,false);
+	return polynome_n_rec<T>(n, noms, faux, tab); //simplifie aussi.
 };
 
 

@@ -1,8 +1,4 @@
 #pragma once
-#include "entete objets.hpp"
-
-//template<class T> inline void swap_F(T& x, T& y);
-
 
 template<class T, class enable = void> class swap_T {
 public:
