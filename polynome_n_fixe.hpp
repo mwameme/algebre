@@ -44,6 +44,19 @@ public:
 		return *this;
 	};
 
+	polynome_n_fixe<T, n>& operator*=(const polynome_n_fixe<T, n>& temp) {
+		return (*this = (*this * temp));
+	};
+
+	template<class U>
+	polynome_n_fixe<T, n>& operator*=(U const& scalaire) {
+		poly *= scalaire;
+		nul = false;
+		for (int i(poly.coeffs.size() - 1); i >= 0; --i)
+			if (poly.coeffs[i].nul)
+				nul = true;
+		return *this;
+	};
 
 	friend polynome_n_fixe<T, n> operator*(const polynome_n_fixe<T, n>& gauche, const polynome_n_fixe<T, n>& droit) {
 		polynome_n_fixe<T, n> m_poly;
@@ -96,7 +109,7 @@ public:
 		return gauche.poly == droit.poly;
 	};
 
-	T get_T() {
+	T get_T() const {
 		return poly.coeffs[0].get_T();
 	};
 
@@ -141,11 +154,26 @@ public:
 	};
 
 
-	polynome_n_fixe<T, n>& operator=(const polynome_n_fixe<T, 1>&& temp) {
+	polynome_n_fixe<T, 1>& operator=(const polynome_n_fixe<T, 1>&& temp) {
 		nul = temp.nul;
 		swap(poly, temp.poly);
 		return *this;
 	};
+
+	polynome_n_fixe<T, 1>& operator*=(const polynome_n_fixe<T, 1>& temp) {
+		return (*this = (*this * temp));
+	};
+
+	template<class U>
+	polynome_n_fixe<T, n>& operator*=(U const& scalaire) {
+		poly *= scalaire;
+		nul = false;
+		for (int i(poly.coeffs.size() - 1); i >= 0; --i)
+			if (poly.coeffs[i].nul)
+				nul = true;
+		return *this;
+	};
+
 
 	friend polynome_n_fixe<T, 1> operator*(const polynome_n_fixe<T, 1>& gauche, const polynome_n_fixe<T, 1>& droit) {
 		polynome_n_fixe<T, 1> m_poly;
@@ -218,10 +246,10 @@ public:
 
 	friend bool operator==(polynome_n_fixe<T, 1>& gauche, polynome_n_fixe<T, 1>& droit) {
 		return gauche.poly == droit.poly;
-	}
+	};
 
 
-	T get_T() {
+	T get_T() const {
 		return poly.coeffs[0].get_T();
 	};
 
@@ -303,6 +331,18 @@ public:
 		return *this;
 	};
 
+	polynome_n_fixe<T, 0>& operator*=(const polynome_n_fixe<T, 0>& temp) {
+		element *= temp.element;
+		nul = (bool)element;
+		return *this;
+	};
+
+	template<class U>
+	polynome_n_fixe<T, 0>& operator*=(U const& scalaire) {
+		element *= scalaire;
+		nul = (bool)element;
+		return *this;
+	};
 
 	friend polynome_n_fixe<T, 0> operator*(const polynome_n_fixe<T, 0>& gauche, const polynome_n_fixe<T, 0>& droit) {
 		return polynome_n_fixe<T, 0>(gauche.element * droit.element);
@@ -339,7 +379,7 @@ public:
 	}
 
 
-	T get_T() {
+	T get_T() const {
 		return element;
 	};
 

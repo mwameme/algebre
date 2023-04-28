@@ -66,27 +66,6 @@ public:
 
 	explicit matrice() {}; //A NE PAS UTILISER
 
-	/*
-	template<class U> explicit matrice(std::initializer_list< std::initializer_list<U>> liste) {
-		taille_l = liste.size();
-		if (taille_l == 0)
-			throw std::domain_error("initialisation de matrice : liste vide");
-		taille_c = liste[0].size();
-		if (taille_c == 0)
-			throw std::domain_error("initialisation de matrice : nombre de colonnes nul");
-
-		for (int i(1); i < taille_l; ++i)
-			if (liste[i].size() != taille_c)
-				throw std::domain_error("initialisation de matrice : non-rectangulaire");
-
-		coeffs=std::vector<std::vector<T>>(taille_l, std::vector<T>(taille_c));
-		for (int i(0); i < taille_l; ++i)
-			for (int j(0); j < taille_c; ++j)
-				coeffs[i][j] = T(liste[i][j]);
-
-		return;
-	};
-	*/
 
 	template<class U> explicit matrice(std::vector< std::vector<U>> liste) {
 		taille_l = liste.size();
@@ -112,6 +91,18 @@ public:
 
 	matrice<T>& operator=(matrice<T>&& temp) {
 		swap(*this, temp);
+		return *this;
+	};
+
+	matrice<T>& operator*=(matrice<T> const& temp) {
+		return (*this = (*this * temp));
+	};
+
+	template<class U>
+	matrice<T>& operator*=(U const& scalaire) {
+		for (int i(0); i < taille_l; ++i)
+			for (int j(0); j < taille_c; ++j)
+				coeffs[i][j] *= scalaire;
 		return *this;
 	};
 
@@ -186,6 +177,10 @@ public:
 			for (int j(0); j < element.taille_c; ++j)
 				result.coeffs[i][j] = - element.coeffs[i][j];
 		return result;
+	};
+
+	friend matrice<T> operator/(matrice<T> const& gauche, matrice<T> const& droit) {
+		return gauche * droit.inverse();
 	};
 
 	void echangerLigne(int i, int j) {
@@ -1019,6 +1014,7 @@ matrice<T>& matrice<T>::operator=(const matrice<T>& temp) {
 	taille_l = temp.taille_l;
 	taille_c = temp.taille_c;
 	coeffs = temp.coeffs;
+	return *this;
 };
 
 /*

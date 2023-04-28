@@ -18,6 +18,8 @@
 
 #include "convertir_liste.hpp"
 
+#include "reduire_frac.hpp"
+
 using namespace std;
 
 /*
@@ -64,6 +66,13 @@ int main()
     long question;
 //    auto x = 4.5 % 4.1;
 
+    if (true) {
+        polynome<rationnel<int>> P(std::vector<int>({ 1,2,3,4 }));
+        cout << type_algebre< polynome<rationnel<int>>>::type;
+
+        cout << endl << "======FIN======" << endl;
+        cin >> question;
+    }
 
     if (false) {
         auto x = convertir_T<std::initializer_list<std::initializer_list<int>>>::convertir({ {1,2},{3,4}, {5,6} });

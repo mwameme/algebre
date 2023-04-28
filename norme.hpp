@@ -72,15 +72,15 @@ public:
 
 template<> class norme_T<double> {
 public:
-	static double norme(double x) {
-		return abs(x);
+	static float norme(double x) {
+		return abs((float)x);
 	};
 };
 
 template<> class norme_T<float_precision> {
 public:
-	static float_precision norme(float_precision x) {
-		return abs(x);
+	static float norme(float_precision x) {
+		return abs((float) x);
 	};
 };
 
@@ -88,9 +88,9 @@ template<class T> class norme_T<erreur<T>> {
 public:
 	static float norme(erreur<T> temp) {
 		if ((bool) temp)
-			return norme_T<float>::norme((float) temp.valeur);
+			return ((float) temp.valeur);
 		else
-			return norme_T<float>::norme((float) 0.);
+			return 0.;
 	};
 };
 
@@ -98,9 +98,9 @@ template<class T> class norme_T<erreur_l<T>> {
 public:
 	static float norme(erreur_l<T> temp) {
 		if ((bool)temp)
-			return norme_T<float>::norme((float)temp.valeur);
+			return (float)temp.valeur;
 		else
-			return norme_T<float>::norme((float)0.);
+			return 0.;
 	};
 };
 
@@ -113,10 +113,10 @@ public:
 	};
 };
 
-template<class T> class norme_T<complex<T>> {
+template<class T> class norme_T<std::complex<T>> {
 public:
-	static decltype(norme_T<T>::norme(T())) norme(complex<T> temp) {
-		return norme_T<T>::norme(temp.real()) + norme_T<T>::norme(temp.imag());
+	static decltype(norme_T<T>::norme(T())) norme(std::complex<T> temp) {
+		return norme_T<T>::norme(temp.real) + norme_T<T>::norme(temp.imag);
 	};
 };
 

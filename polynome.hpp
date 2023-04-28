@@ -95,8 +95,6 @@ public:
         getDegre();
     };
 
-
-
     polynome<T>& operator=(const polynome<T>& temp) {
         if (this == &temp)
             return *this;
@@ -113,7 +111,17 @@ public:
         return (*this);
     };
 
+    polynome<T>& operator*=(const polynome<T>& temp) {
+        return (*this = (*this * temp));
+    };
 
+    template<class U>
+    polynome<T>& operator*=(U const& scalaire) {
+        for (int i(0); i < coeffs.size(); ++i)
+            coeffs[i] *= scalaire;
+        getDegre();
+        return *this;
+    }
 
     friend polynome<T> operator*(const polynome<T>& temp1, const polynome<T>& temp2) {
 

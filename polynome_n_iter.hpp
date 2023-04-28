@@ -74,11 +74,18 @@ public:
 		}
 	};
 
-	polynome_n_iter(vecteur_n<T> tableau, std::string* noms_) { //au cas où ?
+	polynome_n_iter(const vecteur_n<T>& tableau, std::string* noms_) { //au cas où ?
 		coeffs = tableau;
 		noms = noms_;
 		scalaire = false;
 	};
+
+	polynome_n_iter(vecteur_n<T>&& tableau, std::string* noms_) { //au cas où ?
+		swap(coeffs, tableau);
+		noms = noms_;
+		scalaire = false;
+	};
+
 
 	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs), noms(temp.noms), scalaire(temp.scalaire) {
 	};
@@ -136,6 +143,20 @@ public:
 		return *this;
 	};
 
+	polynome_n_iter<T>& operator*=(polynome_n_iter<T> const& temp) {
+		return (*this = (*this * temp));
+	};
+
+	template<class U>
+	polynome_n_iter<T>& operator*=(U const& scalaire) {
+		if ((bool)scalaire)
+			for (int i(0); i < coeffs.data.size(); ++i)
+				coeffs.data[i] *= scalaire;
+		else
+			*this = polynome_n_iter(coeffs.puissance, unite(coeffs.data[0], false), noms);
+
+		return *this;
+	};
 
 	/*
 	polynome_n_iter<T>& operator=(bool test) {

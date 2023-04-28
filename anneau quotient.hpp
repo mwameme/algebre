@@ -5,12 +5,14 @@
 
 #include "entete objets.hpp"
 #include "types.hpp"
+#include "swap_T.hpp"
 
 
 template<class T> class anneau_quotient {
 public:
+    T element;
+    T quotient;
 
-//    static_assert(type_algebre(T()) == 1,"anneau_quotient : sans division");
     static_assert(type_algebre<T>::type == 1,"anneau_quotient<T> : T nécessite une division avec reste. Division exacte est futile");
 
     explicit anneau_quotient() :element(), quotient() {};
@@ -21,23 +23,32 @@ public:
     };
     
 
-    anneau_quotient(anneau_quotient<T> const& copie) {
-        element = copie.element;
-        quotient = copie.quotient;
+    anneau_quotient(anneau_quotient<T> const& copie) : element(copie.element), quotient(copie.quotient){    };
+
+    anneau_quotient(anneau_quotient<T>&& copie) {
+        swap(*this, copie);
+        return;
     };
 
-    /*
-    anneau_quotient<T>& operator=(bool test) {
-        element = test;
-        return *this;
-    };
-    */
+    anneau_quotient<T>& operator=(anneau_quotient<T> const& temp);
 
-    anneau_quotient<T>& operator=(anneau_quotient<T> const& temp) {
+    anneau_quotient<T>& operator=(anneau_quotient<T>&& temp) {
         if (this == &temp)
             return *this;
-        element = temp.element;
-        quotient = temp.quotient;
+        swap(*this, temp);
+        return *this;
+    };
+
+    anneau_quotient<T>& operator*=(anneau_quotient<T> const& droit) {
+        element *= droit.element;
+        element %= quotient;
+        return *this;
+    };
+
+    template<class U>
+    anneau_quotient<T>& operator*=(const U& scalaire) {
+        element *= scalaire;
+        element %= quotient;
         return *this;
     };
 
@@ -86,13 +97,6 @@ public:
         return (bool) element;
     };
 
-    /*
-    friend std::ostream& operator<<(std::ostream& os, const anneau_quotient<T>& temp) {
-        os << temp.element << " mod[" << temp.quotient << "] ";
-        return os;
-    };
-    */
-
     template<class U> U operator()(const U& temp) const {
         if ((bool) quotient(temp))
             std::cerr << "ATTENTION : évaluation de polynome : quotient(element) != 0" << std::endl;
@@ -108,7 +112,6 @@ public:
 
     template<class U> explicit operator anneau_quotient<U>() const {
         anneau_quotient<U> result((U)element, (U)quotient);
-        result.element = result.element % result.quotient;
         return result;
     };
 
@@ -129,7 +132,19 @@ public:
         return os;
     };
 
-    T element;
-    T quotient;
+    friend void swap(anneau_quotient<T>& gauche, anneau_quotient<T>& droit) {
+        swap_F(gauche.element, droit.element);
+        swap_F(gauche.quotient, droit.quotient);
+        return;
+    };
+
 };
 
+template<class T>
+anneau_quotient<T>& anneau_quotient<T>::operator=(anneau_quotient<T> const& temp) {
+    if (this == &temp)
+        return *this;
+    element = temp.element;
+    quotient = temp.quotient;
+    return *this;
+};

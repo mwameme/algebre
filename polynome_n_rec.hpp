@@ -187,6 +187,29 @@ public:
 		return *this;
 	};
 
+	polynome_n_rec<T>& operator*=(polynome_n_rec<T> const& temp) {
+		return (*this = (*this * temp));
+	};
+
+	template<class U>
+	polynome_n_rec<T>& operator*=(U const& scalaire) {
+		if (n_var == 0) {
+			element *= scalaire;
+			nul = (bool)element;
+		}
+		else {
+			poly *= scalaire;
+			nul = false;
+			for (int i(poly.coeffs.size() - 1); i >= 0; ++i)
+				if ((bool) poly.coeffs[i]) {
+					nul = true;
+					break;
+				}
+		}
+		return *this;
+	};
+
+
 
 	friend polynome_n_rec<T> operator*(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
 		if (temp1.n_var != temp2.n_var)

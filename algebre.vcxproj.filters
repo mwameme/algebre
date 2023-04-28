@@ -137,5 +137,8 @@
     <ClInclude Include="objets.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
+    <ClInclude Include="reduire_frac.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

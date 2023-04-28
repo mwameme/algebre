@@ -61,12 +61,6 @@ public:
 		if (!croissant)
 			return *this;
 
-		/*
-		std::vector<int> puissances(positions.size(), 1);
-		for (int j(positions.size() - 2); j >= i+1; ++j) 
-			puissances[j] = dimensions[j + 1] * puissances[j + 1];
-			*/
-
 		for (int j(i + 1); j < positions.size(); ++j)
 			if (positions[j] < positions[j - 1]) {
 //				position = position + (positions[j - 1] - positions[j]) * puissances[j];

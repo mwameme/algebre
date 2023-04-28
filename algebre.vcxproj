@@ -167,6 +167,7 @@
     <ClInclude Include="precision\fractionprecision.h" />
     <ClInclude Include="precision\intervalprecision.h" />
     <ClInclude Include="precision\iprecision.h" />
+    <ClInclude Include="reduire_frac.hpp" />
     <ClInclude Include="simplifier polynome_n.hpp" />
     <ClInclude Include="swap_T.hpp" />
     <ClInclude Include="types.hpp" />

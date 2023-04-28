@@ -3,14 +3,21 @@
 #include <complex>
 
 #include "entete objets.hpp"
+#include "swap_T.hpp"
 
 template<class T, class U> std::complex<T> operator*(const U& scalaire, const std::complex<T>& temp) {
 	return std::complex<T>(scalaire * temp.real, scalaire * temp.imag);
-}
+};
+
+template<class T>
+std::complex<T> derivee(const std::complex<T>& element) {
+	return std::complex<T>(derivee(element.real), derivee(element.imag));
+};
 
 template<typename T> class complexe {
 public:
-
+	T x;
+	T y;
 
 	friend complexe<T> derivee(const complexe<T>& element) {
 		return complexe<T>(derivee(element.x), derivee(element.y));
@@ -21,27 +28,36 @@ public:
 
 	complexe() : x(), y() {};
 
-	complexe(complexe<T>& copie) {
-		x = copie.x;
-		y = copie.y;
+	complexe(complexe<T> const& copie) : x(copie.x), y(copie.y) {	};
+
+	complexe(complexe<T>&& temp) {
+		swap(*this, temp);
+		return;
 	};
 	
-	complexe(std::complex<T> const& temp) {
-		x = temp.real();
-		y = temp.imag();
-	};
+	complexe(std::complex<T> const& temp) : x(temp.real) , y(temp.imag) {	};
 
 	explicit inline operator bool() {
 		return (((bool)x) || ((bool)y));
 	};
 
-	/*
-	template<class U> operator complexe<U>() {
-		complexe<U> result;
-		result.x = (U)x;
-		result.y = (U)y;
-		return result;
-	};*/
+	complexe<T>& operator=(complexe<T> const& temp);
+
+	complexe<T>& operator=(complexe<T>&& temp) {
+		swap(*this, temp);
+		return *this;
+	};
+
+	complexe<T>& operator*=(complexe<T> const& temp) {
+		return (*this = (*this * temp));
+	};
+
+	template<class U>
+	complexe<T>& operator*=(const U& scalaire) {
+		x *= scalaire;
+		y *= scalaire;
+		return *this;
+	};
 
 	friend complexe<T> operator*(const complexe<T>& z1, const complexe<T>& z2) {
 		return complexe<T>((z1.x * z1.x) - (z1.y * z2.y), (z1.x * z2.y) + (z1.y * z2.x));
@@ -77,14 +93,9 @@ public:
 		return complexe<T>(inv_module * (z1.x * z2.x + z1.y * z2.y), inv_module * ((z1.y * z2.x) - (z1.x * z2.y)));
 	};
 
-	/*
-	complexe<T>& operator=(bool test) {
-		x = test;
-		y = false;
-
-		return *this;
-	};
-	*/
+	T norme() const {
+		return (x * x) + (y * y);
+	}
 
 	friend bool operator==(const complexe<T>& temp1, const complexe<T>& temp2) {
 		return ((temp1.x == temp2.x) && (temp1.y == temp2.y));
@@ -101,7 +112,19 @@ public:
 		return temp;
 	};
 
-	T x;
-	T y;
+	friend void swap(complexe<T>& gauche, complexe<T>& droit) {
+		swap_F(gauche.x, droit.x);
+		swap_F(gauche.y, droit.y);
+		return;
+	};
+
 };
 
+template<class T>
+complexe<T>& complexe<T>::operator=(complexe<T> const& temp) {
+	if (this == &temp)
+		return *this;
+	x = temp.x;
+	y = temp.y;
+	return *this;
+};

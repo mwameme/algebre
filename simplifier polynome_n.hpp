@@ -5,10 +5,16 @@
 #include "unite.hpp"
 #include <vector>
 #include <iostream>
+#include "n_for.hpp"
+#include <algorithm>
 
 
 template<class T> class scalaire_vecteur {
 public:
+
+	T scalaire;
+	std::vector<T> vecteur;
+
 
 	scalaire_vecteur() : vecteur(0) { };
 
@@ -79,16 +85,16 @@ public:
 		return true;
 	};
 
-	T scalaire;
-	std::vector<T> vecteur;
 };
+
+
 
 template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& num, polynome_n_iter<T> const& denom) {
 	int n = num.coeffs.puissance;
 	if (num.coeffs.puissance != denom.coeffs.puissance)
-		throw std::domain_error("simplification de polynomes : n_var ne correspond pas");
+		throw std::domain_error("simplification de polynome_n_iter : n_var ne correspond pas");
 	if (((num.scalaire) && (!denom.scalaire)) || ((denom.scalaire) && (!num.scalaire)))
-		throw std::domain_error("multiplication de polynome_n_iter : scalaire * polynome");
+		throw std::domain_error("simplification de polynome_n_iter : scalaire / polynome");
 
 	if (num.scalaire)
 		return polynome_n_iter<T>(0, num.coeffs.data[0] / denom.coeffs.data[0], NULL);
@@ -122,49 +128,86 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 	for (int i(0); i < denom.coeffs.data.size(); ++i)
 		denom_T.coeffs.data[i] = denom.coeffs.data[i]; //scalaire ... on recopie membre à membre. Type T. (modifie le scalaire)
 
+	//on fait une optimisation de coût n^2 (calcul total de coût n^3)
+	//get positions_num
+	std::vector<std::vector<int>> positions_num;
+	positions_num.reserve(num.coeffs.data.size());
+	for (n_for iter(num.coeffs.dimensions); (bool)iter; ++iter)
+		if ((bool)num.coeffs.data[iter.position])
+			positions_num.push_back(iter.positions);
 
+	//get positions_denom
+	std::vector<std::vector<int>> positions_denom;
+	positions_denom.reserve(denom.coeffs.data.size());
+	for (n_for iter(denom.coeffs.dimensions); (bool)iter; ++iter)
+		if ((bool)denom.coeffs.data[iter.position])
+			positions_denom.push_back(iter.positions);
 
-	faux_T.vecteur.resize(puissance); //on met à jour la taille du vecteur ... taille(faux_T) = taille(resultat_T)
+	//get positions_R
+	std::vector<std::vector<int>> positions_R;
+	positions_R.reserve(puissance);
+	for(int i(0);i<positions_num.size();++i)
+		for (int j(0); j < positions_denom.size(); ++j) {
+			std::vector<int> vec_temp(n, 0);
+			bool test = true;
+			for (int k(0); k < n; ++k) {
+				int temp = positions_num[i][k] - positions_denom[j][k];
+				if (temp < 0) {
+					test = false;
+					break;
+				}
+				vec_temp[k] = temp;
+			}
+			positions_R.push_back(vec_temp);
+		}
+	//trier
+	std::sort(positions_R.begin(), positions_R.end());
+
+	//unique (à la main)
+	std::vector<std::vector<int>> positions_R2;
+	positions_R2.reserve(positions_R.size());
+	positions_R2.push_back(positions_R[0]);//vérifier au moins 1 ...
+	std::vector<int> temp_vec = positions_R2[0];
+	for (int i(0); i < positions_R.size(); ++i) {
+		if (temp_vec == positions_R[i])
+			continue;
+		temp_vec = positions_R[i];
+		positions_R2.push_back(temp_vec);
+	}
+
+	//unique a été fait !!! compter, et créer resultat_T
+
+	faux_T.vecteur.resize(positions_R2.size()); //on met à jour la taille du vecteur ... taille(faux_T) = taille(resultat_T)
 	polynome_n_iter<scalaire_vecteur<T>> resultat_T(degres, faux_T, denom.noms); //on connait le degré du résultat à l'avance ...
-	for (int i(0); i < resultat_T.coeffs.data.size(); ++i)
-		resultat_T.coeffs.data[i] = i; //on génère les vecteurs de la "base"
+	for (int i(0); i < positions_R2.size(); ++i)
+		resultat_T.coeffs.data[resultat_T.coeffs.accesseur(positions_R2[i])] = i; //on génère les vecteurs de la "base"
 
 	//on a le resultat, et le denom ... on les multiplie et extrait les équations !
 	polynome_n_iter<scalaire_vecteur<T>> num_T = denom_T * resultat_T; //normalement les dimensions correspondent. Car pas de simplification (je parle de data ...)
 
-	//OK
-//	std::cout << "tailles : " << denom_T.coeffs.data.size() << " ; " << denom.coeffs.data.size() << std::endl;
-//	std::cout << faux_T.vecteur.size() << " ; " << resultat_T.coeffs.data.size() << " ; " << num_T.coeffs.data.size() << " ; " << num.coeffs.data.size() << std::endl;
-
 	//construire la matrice. Il y a autant d'équations que le nombre(num_T) = nombre(num) : taille_l
 	//le nombre de variables est nombre(resultat_T) : taille_c
-	matrice<T> m_matrice(num_T.coeffs.data.size(), resultat_T.coeffs.data.size(), faux); //matrice remplie avec faux.
+
+	//on implémente num = num_T. On ne garde que : (bool) num.coeffs.data[i] == true
+	matrice<T> m_matrice(positions_num.size(), positions_R2.size(), faux); //matrice remplie avec faux.
 	std::vector<T> Y(m_matrice.taille_l); //pour resoudre ...
-	for (int i(0); i < m_matrice.taille_l; ++i) {//pour chacune des lignes
-		Y[i] = num.coeffs.data[i];
-		for (int j(0); j < m_matrice.taille_c; ++j)
-			m_matrice.coeffs[i][j] = num_T.coeffs.data[i].vecteur[j];
+	int j = 0;
+	for (int i(0); i < num.coeffs.data.size(); ++i) {//pour chacune des lignes
+		if ((bool)num.coeffs.data[i]) {
+			Y[j] = num.coeffs.data[i];
+			for (int k(0); k < m_matrice.taille_c; ++k)
+				m_matrice.coeffs[j][k] = num_T.coeffs.data[i].vecteur[k];
+			++j;
+		}
 	}
 
-	//	std::cout << m_matrice << std::endl;
-		/*
-		for (int i(0); i < m_matrice.taille_l; ++i)
-			if ((bool)Y[i]) {
-				for (int j(0); j < m_matrice.taille_c; ++j)
-					std::cout << m_matrice.coeffs[i][j];
-				std::cout << std::endl;
-			}
-		long question;
-		std::cin >> question;
-		*/
-
-	std::vector<T> X = m_matrice.resoudre(Y);
+	std::vector<T> X = m_matrice.resoudre(Y); //taille : positions_R2.size()
 	if (X.size() == 0) //non simplifiable
-		return polynome_n_iter<T>(0, faux, NULL);
+		return polynome_n_iter<T>(0, faux, NULL); //exception ?
 
-	polynome_n_iter<T> resultat(degres, faux, denom.noms);
-	for (int i(0); i < resultat.coeffs.data.size(); ++i)
-		resultat.coeffs.data[i] = X[i]; //on sait que e_i = X_i ... c'était le but.
+	polynome_n_iter<T> resultat(degres, faux, num.noms);
+	for (int i(0); i < positions_R2.size(); ++i)
+		resultat.coeffs.data[resultat.coeffs.accesseur(positions_R2[i])] = X[i]; //on sait que e_i = X_i ... c'était le but.
 
 	resultat.simplifier_2();
 

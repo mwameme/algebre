@@ -40,6 +40,11 @@ public:
 
     rationnel(const rationnel<T>& copie) : numerateur(copie.numerateur), denominateur(copie.denominateur) {    };
 
+    rationnel(rationnel<T>&& temp) {
+        swap(*this, temp);
+        return;
+    };
+
     template<class U> explicit rationnel(std::vector<U> const& liste) {
         numerateur = T(liste[0]);
         if (liste.size() > 1)
@@ -49,9 +54,26 @@ public:
         simplifier();
     };
 
-
-
     rationnel<T>& operator=(const rationnel<T>& temp);
+
+    rationnel<T>& operator=(rationnel<T>&& temp) {
+        swap(*this, temp);
+        return *this;
+    };
+
+    rationnel<T>& operator*=(const rationnel<T>& temp) {
+        numerateur *= temp.numerateur;
+        denominateur *= temp.denominateur;
+        simplifier();
+        return *this;
+    };
+
+    template<class U>
+    rationnel<T>& operator*=(U const& scalaire) {
+        numerateur *= scalaire;
+        simplifier();
+        return *this;
+    };
 
     void simplifier();
 
@@ -151,6 +173,35 @@ public:
         swap_F(gauche.denominateur, droit.denominateur);
         return;
     };
+
+    friend bool operator<(rationnel<T>& gauche, rationnel<T>& droit) { //seulement pour T = entier.
+        static_assert(std::is_same<type_algebre<T>::corps, void>::value);
+
+        bool test = true;
+        if (gauche.denominateur < 0)
+            test = !test;
+        if (droit.denominateur < 0)
+            test = !test;
+        if (test)
+            return gauche.numerateur * droit.denominateur < droit.numerateur * gauche.denominateur;
+        else
+            return !(gauche.numerateur * droit.denominateur < droit.numerateur * gauche.denominateur);
+    };
+
+    friend bool operator>(rationnel<T>& gauche, rationnel<T>& droit) { //seulement pour T = entier.
+        static_assert(std::is_same<type_algebre<T>::corps, void>::value);
+
+        bool test = true;
+        if (gauche.denominateur < 0)
+            test = !test;
+        if (droit.denominateur < 0)
+            test = !test;
+        if (test)
+            return gauche.numerateur * droit.denominateur > droit.numerateur * gauche.denominateur;
+        else
+            return !(gauche.numerateur * droit.denominateur > droit.numerateur * gauche.denominateur);
+    };
+
 
 };
 
