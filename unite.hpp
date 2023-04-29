@@ -12,7 +12,7 @@
 
 template<class T> class complex;
 
-template<class T> class erreur;
+template<class T> class erreur_b;
 template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<class T> class complexe;
@@ -69,11 +69,11 @@ template<class T>  T unite(T const& element,bool test) {
 	return float_precision(test ? 1 : 0, element.precision(), element.mode());
 }
 
-template<class T>  erreur<T> unite(erreur<T> const& temp, bool test) {
+template<class T>  erreur_b<T> unite(erreur_b<T> const& temp, bool test) {
 	if (test)
-		return erreur<T>(unite(temp.valeur, test), precision_relative(temp.valeur));
+		return erreur_b<T>(unite(temp.valeur, test), precision_relative(temp.valeur));
 	else
-		return erreur<T>(unite(temp.valeur, test), 0.);
+		return erreur_b<T>(unite(temp.valeur, test), 0.);
 }
 
 template<class T>  erreur_l<T> unite(erreur_l<T> const& temp, bool test) {

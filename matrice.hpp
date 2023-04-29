@@ -541,7 +541,7 @@ public:
 		}
 	};
 
-	std::vector<T> resoudre(std::vector<T> Y) const { //renvoit vecteur vide si erreur ...
+	std::vector<T> resoudre(std::vector<T> Y) const { //renvoit vecteur vide si erreur_b ...
 		static_assert(type_algebre<T>::type == 0);
 		if constexpr (type_algebre<T>::approx == 0) {
 			matrice<T> m_matrice(*this);
@@ -569,7 +569,7 @@ public:
 				}
 			}
 
-			//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur
+			//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
 			for (int i(0); i < taille_l; ++i) {
 				bool test = false;
 				for (int j(0); j < taille_c; ++j)
@@ -705,7 +705,7 @@ public:
 				--n_restant;
 			}
 
-			//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur
+			//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
 			for (int i(0); i < taille_l; ++i) {
 				bool test = false;
 				for (int j(0); j < taille_c; ++j)
@@ -1255,7 +1255,7 @@ matrice<T>& matrice<T>::operator=(const matrice<T>& temp) {
 			}
 		}
 
-		//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur
+		//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
 		for (int i(0); i < taille_l; ++i) {
 			bool test = false;
 			for (int j(0); j < taille_c; ++j)
@@ -1394,7 +1394,7 @@ matrice<T>& matrice<T>::operator=(const matrice<T>& temp) {
 			--n_restant;
 		}
 
-		//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur
+		//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
 		for (int i(0); i < taille_l; ++i) {
 			bool test = false;
 			for (int j(0); j < taille_c; ++j)

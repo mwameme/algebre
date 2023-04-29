@@ -90,7 +90,7 @@ public:
 		else {
 			if (conditions[i].degre <= 0) {
 //				conditions[i] = R * conditions[i];
-				conditions[i] = poly_save; //pour diminuer l'erreur. cas approx
+				conditions[i] = poly_save; //pour diminuer l'erreur_b. cas approx
 				return false; //l'élément testé est toujours nul dans ce cas : Q = R * qqchose, et R est la nouvelle condition
 			}
 			else {
@@ -346,7 +346,7 @@ public:
 		else {
 			if (conditions[i].degre <= 0) {
 				//				conditions[i] = R * conditions[i];
-				conditions[i] = poly_save; //pour diminuer l'erreur. cas approx
+				conditions[i] = poly_save; //pour diminuer l'erreur_b. cas approx
 				return false; //l'élément testé est toujours nul dans ce cas : Q = R * qqchose, et R est la nouvelle condition
 			}
 			else {
@@ -639,7 +639,7 @@ public :
 //diviseur de zero : friend ; rationnel  a==b
 //dérivée : friend (n'a pas de sens pour _quotient)
 
-//class double_erreur
+//class double_erreur_b
 
 //matrice<T> * vecteur<U>.
 // => instaurer la multiplication par U à gauche comme à droite. pour T*T rien ne change.

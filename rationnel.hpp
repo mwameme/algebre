@@ -99,7 +99,7 @@ public:
     template<class U> U operator()(const U& element) const {
         U result = denominateur(element);
         if (!(bool)result) {
-            //            std:cerr << "erreur : division par zero lors d'une évaluation de polynome" << std::endl;
+            //            std:cerr << "erreur_b : division par zero lors d'une évaluation de polynome" << std::endl;
             throw std::domain_error("division par zero lors d'une évaluation de fraction polynome");
         }
         return (numerateur(element) / result);

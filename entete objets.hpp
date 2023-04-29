@@ -4,7 +4,7 @@
 
 template<class T> class complex;
 
-template<class T> class erreur;
+template<class T> class erreur_b;
 template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<class T> class complexe;

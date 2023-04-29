@@ -23,7 +23,7 @@
 using namespace std;
 
 /*
-template<class T> class erreur;
+template<class T> class erreur_b;
 template<class T> class anneau_quotient;
 template<typename T> class complexe;
 template<class T> class corps_quotient;
@@ -49,7 +49,7 @@ template matrice<double>;
 template anneau_quotient<polynome<rationnel<InfInt>>>;
 template corps_quotient<polynome<rationnel<InfInt>>>;
 template polynome_n_rec<rationnel<InfInt>>;
-template erreur<float_precision>;
+template erreur_b<float_precision>;
 */
 
 
@@ -425,11 +425,11 @@ int main()
     if (false) {
         float_precision x11(1.23), x12(1.54), x21(0.27), x22(0.31);
 
-        vector<vector<erreur<float_precision>>> vec2 = { {erreur<float_precision>(x11) , erreur<float_precision>(x12)},{erreur<float_precision>(x21),erreur<float_precision>(x22)} };
+        vector<vector<erreur_b<float_precision>>> vec2 = { {erreur_b<float_precision>(x11) , erreur_b<float_precision>(x12)},{erreur_b<float_precision>(x21),erreur_b<float_precision>(x22)} };
 
-//        vector<vector<erreur<float_precision>>> vec2 = { {erreur<float_precision>(1.23) , erreur<float_precision>(1.54)},{erreur<float_precision>(0.27),erreur<float_precision>(0.31)} };
-        matrice<erreur<float_precision>> m_matrice2(vec2);
-        calcul_condition<erreur<float_precision>> calcul2(m_matrice2);
+//        vector<vector<erreur_b<float_precision>>> vec2 = { {erreur_b<float_precision>(1.23) , erreur_b<float_precision>(1.54)},{erreur_b<float_precision>(0.27),erreur_b<float_precision>(0.31)} };
+        matrice<erreur_b<float_precision>> m_matrice2(vec2);
+        calcul_condition<erreur_b<float_precision>> calcul2(m_matrice2);
         cin >> question;
 
         cout << "matrice : " << m_matrice2 << endl;
@@ -440,7 +440,7 @@ int main()
         cout << "inverse :" << endl << inv2 << endl;
         cout << "inverse * matrice : " << endl << inv2 * m_matrice2 << endl;
 
-        polynome<erreur<float_precision>> polyCar2 = m_matrice2.polynomeCaracteristique();
+        polynome<erreur_b<float_precision>> polyCar2 = m_matrice2.polynomeCaracteristique();
         cout << "polynome Caracteristique" << endl << polyCar2 << endl << endl;
 
         cout << "multiplicte max " << polyCar2.multiplicite_max() << endl;
@@ -449,7 +449,7 @@ int main()
 
         cin >> question;
 
-        sous_ev_condition<erreur<float_precision>>* m_sous_ev2 = calcul2.calculer();
+        sous_ev_condition<erreur_b<float_precision>>* m_sous_ev2 = calcul2.calculer();
         cout << "afficher le résultat du calcul des conditions" << endl;
         cout << *m_sous_ev2 << endl;
         cout << "======FIN======" << endl;
@@ -457,11 +457,11 @@ int main()
 
     };
 
-    //test erreur<double> : diagonalisation
+    //test erreur_b<double> : diagonalisation
     if (false) {
-        vector<vector<erreur<double>>> vec2 = { {erreur<double>(1.23) , erreur<double>(1.54)},{erreur<double>(0.27),erreur<double>(0.31)} };
-        matrice<erreur<double>> m_matrice2(vec2);
-        calcul_condition<erreur<double>> calcul2(m_matrice2);
+        vector<vector<erreur_b<double>>> vec2 = { {erreur_b<double>(1.23) , erreur_b<double>(1.54)},{erreur_b<double>(0.27),erreur_b<double>(0.31)} };
+        matrice<erreur_b<double>> m_matrice2(vec2);
+        calcul_condition<erreur_b<double>> calcul2(m_matrice2);
         cin >> question;
 
         cout << "matrice : " << m_matrice2 << endl;
@@ -472,7 +472,7 @@ int main()
         cout << "inverse :" << endl << inv2 << endl;
         cout << "inverse * matrice : " << endl << inv2 * m_matrice2 << endl;
 
-        polynome<erreur<double>> polyCar2 = m_matrice2.polynomeCaracteristique();
+        polynome<erreur_b<double>> polyCar2 = m_matrice2.polynomeCaracteristique();
         cout << "polynome Caracteristique" << endl << polyCar2 << endl << endl;
 
         cout << "multiplicte max " << polyCar2.multiplicite_max() << endl;
@@ -481,7 +481,7 @@ int main()
 
         cin >> question;
 
-        sous_ev_condition<erreur<double>>* m_sous_ev2 = calcul2.calculer();
+        sous_ev_condition<erreur_b<double>>* m_sous_ev2 = calcul2.calculer();
         cout << "afficher le résultat du calcul des conditions" << endl;
         cout << *m_sous_ev2 << endl;
         cout << "======FIN======" << endl;
@@ -698,7 +698,7 @@ int main()
 //   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
 //   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
 //   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
-//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
+//   4. Utilisez la fenêtre Liste d'erreur_bs pour voir les erreur_bs.
 //   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
 //   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.
 

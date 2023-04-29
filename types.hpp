@@ -4,7 +4,7 @@
 #include <complex>
 
 
-template<class T> class erreur;
+template<class T> class erreur_b;
 template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<class T> class complexe;
@@ -134,9 +134,9 @@ public:
 };
 
 
-template<class T> class type_algebre<erreur<T>> {
+template<class T> class type_algebre<erreur_b<T>> {
 public:
-	using corps = erreur<T>;
+	using corps = erreur_b<T>;
 
 	static constexpr int type = 0;
 	static constexpr int approx = 1;
@@ -399,7 +399,7 @@ template<class T> constexpr int type_algebre(complexe<T>& element) {
 		return 2;
 };
 
-template<class T> constexpr int type_algebre(erreur<T>& element) {
+template<class T> constexpr int type_algebre(erreur_b<T>& element) {
 	return type_algebre(T());
 };
 
@@ -439,7 +439,7 @@ template<class T> constexpr int type_approx(float_precision& element) {
 };
 
 // composés
-template<class T> constexpr int type_approx(erreur<T>& element) {
+template<class T> constexpr int type_approx(erreur_b<T>& element) {
 	return type_approx(T());
 };
 

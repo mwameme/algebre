@@ -5,7 +5,7 @@
 
 template<class T> class complex;
 
-template<class T> class erreur;
+template<class T> class erreur_b;
 template<class T> class erreur_l;
 template<class T> class anneau_quotient;
 template<class T> class complexe;
@@ -84,9 +84,9 @@ public:
 	};
 };
 
-template<class T> class norme_T<erreur<T>> {
+template<class T> class norme_T<erreur_b<T>> {
 public:
-	static float norme(erreur<T> temp) {
+	static float norme(erreur_b<T> temp) {
 		if ((bool) temp)
 			return ((float) temp.valeur);
 		else
