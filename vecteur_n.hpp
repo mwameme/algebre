@@ -19,15 +19,17 @@ public:
 	vecteur_n() {};
 
 	vecteur_n(std::vector<int> const& liste_dim) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (liste_dim.size() == 0)
 			throw std::domain_error("vecteur_n : liste vide");
-
+#endif
 		dimensions = liste_dim;
 		puissance = dimensions.size();
+#ifdef ALGEBRA_USE_EXCEPTION
 		for (int i(0); i < puissance; ++i)
 			if (dimensions[i] < 0)
 				throw std::domain_error("vecteur_n : une dimension < 0");
-
+#endif
 		puissances= std::vector<int>(puissance);
 		puissances[puissance - 1] = 1;
 		for (int i(puissance-2); i >= 0; --i)
@@ -37,15 +39,17 @@ public:
 	};
 
 	vecteur_n(std::vector<int> const& liste_dim,T const& element) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (liste_dim.size() == 0)
 			throw std::domain_error("vecteur_n : liste vide");
-
+#endif
 		dimensions = liste_dim;
 		puissance = dimensions.size();
+#ifdef ALGEBRA_USE_EXCEPTION
 		for (int i(0); i < puissance; ++i)
 			if (dimensions[i] < 0)
 				throw std::domain_error("vecteur_n : une dimension < 0");
-
+#endif
 		puissances = std::vector<int>(puissance);
 		puissances[puissance - 1] = 1;
 		for (int i(puissance - 2); i >= 0; --i)

@@ -35,18 +35,20 @@ public:
 
     explicit polynome(std::vector<T> const& tab) {
         coeffs = tab;
-        if (coeffs.size() == 0) {
+#ifdef ALGEBRA_USE_EXCEPTION
+        if (coeffs.size() == 0) 
             throw std::domain_error("polynome : la taille du vecteur des coeffs doit être > 0");
-        }
+#endif        
         getDegre();
     };
 
 
     explicit polynome(std::vector<T>&& tab) {
         std::swap(coeffs, tab);
-        if (coeffs.size() == 0) {
+#ifdef ALGEBRA_USE_EXCEPTION
+        if (coeffs.size() == 0) 
             throw std::domain_error("polynome : la taille du vecteur des coeffs doit être > 0");
-        }
+#endif
         getDegre();
     };
 
@@ -111,6 +113,21 @@ public:
         return (*this);
     };
 
+    polynome<T>& operator+=(polynome<T> const& autre) {
+        if (coeffs.size() >= autre.coeffs.size()) {
+            for (int i(0); i < coeffs.size(); ++i)
+                coeffs[i] += autre.coeffs[i];
+            return *this;
+        }
+        coeffs.reserve(autre.coeffs.size());
+        for (int i(0); i < coeffs.size(); ++i)
+            coeffs[i] += autre.coeffs[i];
+        for (int i(coeffs.size()); i < autre.coeffs.size(); ++i)
+            coeffs.push_back(autre.coeffs[i]);
+        getDegre();
+        return *this;
+    };
+
     polynome<T>& operator*=(const polynome<T>& temp) {
         return (*this = (*this * temp));
     };
@@ -163,8 +180,6 @@ public:
 
     friend polynome<T> operator%(const polynome<T>& temp1, const polynome<T>& temp2) {
         static_assert(type_algebre<T>::type == 0);
-//        if (type_algebre<T>::type != 0)
-//            throw std::domain_error("modulo de polynomes : nécessite une division exacte sur T");
 
         T faux = unite( temp1.coeffs[0],false);
 
@@ -201,8 +216,6 @@ public:
 
     friend polynome<T> operator/( polynome<T> const& temp1, polynome<T> const& temp2) {
         static_assert(type_algebre<T>::type == 0);
-//        if (type_algebre<T>::type != 0)
-//            throw std::domain_error("division de polynomes : nécessite une division exacte sur T");
 
         if (temp2.degre < 0) 
             throw std::domain_error("division de polynomes : division par 0");
@@ -354,14 +367,7 @@ public:
     };
 
     explicit inline operator bool() const {
-        if (degre < 0)
-            return false;
-        for (int i(coeffs.size() -1); i >= 0; --i) {
-            if ((bool) coeffs[i]) {
-                return true;
-            }
-        }
-        return false;
+        return (degre >= 0);
     };
 
     template<class U> explicit operator polynome<U>() const {
@@ -436,8 +442,6 @@ public:
         return multiplicite;
     };
 
-    //protected:
-
     friend void swap(polynome<T>& gauche, polynome<T>& droit) {
         std::swap(gauche.degre, droit.degre);
         std::swap(gauche.coeffs, droit.coeffs);
@@ -463,15 +467,24 @@ void polynome<T>::majListe() {
 
 template<class T>
 void polynome<T>::getDegre() {
-    majListe();
-
-    if (coeffs.size() == 0)
-        throw std::domain_error("la liste d'un polynome a 0 éléments");
-
-    int i;
-    for (i = (coeffs.size() - 1); i >= 0; --i)
-        if ((bool)coeffs[i])
+    int i(coeffs.size() - 1);
+#ifdef ALGEBRA_USE_EXCEPTION
+    if (i < 0)
+        throw std::domain_error("polynome vide");
+#endif
+    while (!(bool)coeffs[i]) {
+        --i;
+        if (i == 0)
             break;
+    };
+    if (i < coeffs.size() - 1)
+        coeffs.erase(coeffs.begin() + i + 1, coeffs.end());
 
-    degre = i;
+    if (i > 0)
+        degre = i;
+    else 
+        degre = (bool) coeffs[0] ? 0 : -1;
+    
+    return;
+
 };

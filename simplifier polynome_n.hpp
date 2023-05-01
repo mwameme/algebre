@@ -68,9 +68,10 @@ public:
 			return droit;
 		if (droit.vecteur.size() == 0)
 			return gauche;
-
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (gauche.vecteur.size() != droit.vecteur.size())
 			throw std::domain_error("addition de scalaire_vecteur : les dimensions ne correspondent pas");
+#endif
 
 		scalaire_vecteur<T> resultat(droit.vecteur.size());
 		resultat.scalaire = gauche.scalaire + droit.scalaire;
@@ -91,11 +92,12 @@ public:
 
 template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& num, polynome_n_iter<T> const& denom) {
 	int n = num.coeffs.puissance;
+#ifdef ALGEBRA_USE_EXCEPTION
 	if (num.coeffs.puissance != denom.coeffs.puissance)
 		throw std::domain_error("simplification de polynome_n_iter : n_var ne correspond pas");
 	if (((num.scalaire) && (!denom.scalaire)) || ((denom.scalaire) && (!num.scalaire)))
 		throw std::domain_error("simplification de polynome_n_iter : scalaire / polynome");
-
+#endif
 	if (num.scalaire)
 		return polynome_n_iter<T>(0, num.coeffs.data[0] / denom.coeffs.data[0], NULL);
 

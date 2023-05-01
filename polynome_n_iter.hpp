@@ -22,13 +22,15 @@ public:
 	std::string* noms;
 	vecteur_n<T> coeffs;
 
+	using iterator = typename std::vector<T>::iterator;
 
 	polynome_n_iter() {};
 
 	polynome_n_iter(int n_var, T element,std::string* noms_) {//polynome de degre 0. utilisé pour unite
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (n_var < 0)
 			throw std::domain_error("polynome_n_iter : n_var < 0.");
-
+#endif
 		if (n_var == 0) {
 			std::vector<int> dimensions(1, 1);
 			coeffs =vecteur_n<T>(dimensions);
@@ -94,7 +96,6 @@ public:
 		swap(*this, temp);
 	};
 
-
 /*
 	polynome_n_iter(std::initializer_list<int> degres_, T element,std::string* noms_) {
 		std::vector<int> degres(degres_);
@@ -128,7 +129,6 @@ public:
 	};
 	*/
 
-
 	polynome_n_iter<T>& operator=(polynome_n_iter<T> const& temp) {
 		if (this == &temp)
 			return *this;
@@ -158,6 +158,22 @@ public:
 		return *this;
 	};
 
+	polynome_n_iter<T>& operator+=(polynome_n_iter<T> const& autre) {
+#ifdef ALGEBRA_USE_EXCEPTION
+		if (coeffs.puissance != autre.puissance)
+			throw std::domain_error("addition de polynomes : puissances ne correspondent pas");
+#endif
+		std::vector<int> dim_finales(coeffs.puissance, 0);
+		for (int i(0); i < coeffs.puissance; ++i)
+			dim_finales[i] = max(coeffs.dimensions[i], autre.coeffs.dimensions[i]);
+
+		coeffs.modifier_dimensions(dim_finales);
+		polynome_n_iter<T> copie(autre);
+		copie.modifier_dimensions(dim_finales);
+		for (int i(0); i < coeffs.data.size(); ++i)
+			coeffs.data[i] += copie.data[i];
+		return *this;
+	};
 	/*
 	polynome_n_iter<T>& operator=(bool test) {
 		T temp = unite(coeffs.data[0],test);
@@ -175,15 +191,16 @@ public:
 	*/
 
 	friend polynome_n_iter<T> operator+(polynome_n_iter<T> const& gauche_, polynome_n_iter<T> const& droite_) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
 		if(((gauche_.scalaire) && (! droite_.scalaire)) || ((droite_.scalaire) && (! gauche_.scalaire)))
 			throw std::domain_error("addition de polynome_n_iter : scalaire + polynome");
 
-		if (gauche_.scalaire) {
+		if (gauche_.scalaire) 
 			return polynome_n_iter(0, gauche_.coeffs.data[0] + droite_.coeffs.data[0], NULL);
-		}
+#endif
 
 		polynome_n_iter<T> gauche = gauche_;
 		polynome_n_iter<T> droite = droite_;
@@ -200,6 +217,7 @@ public:
 	};
 
 	friend polynome_n_iter<T> operator-(polynome_n_iter<T> const& gauche_, polynome_n_iter<T> const& droite_) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, soustraction : le nombre de variables ne correspond pas.");
 
@@ -208,7 +226,7 @@ public:
 
 		if (gauche_.scalaire)
 			return polynome_n_iter(0, gauche_.coeffs.data[0] - droite_.coeffs.data[0], NULL);
-
+#endif
 		polynome_n_iter<T> gauche = gauche_;
 		polynome_n_iter<T> droite = droite_;
 		int n = gauche.coeffs.puissance;
@@ -231,13 +249,19 @@ public:
 	};
 
 	friend polynome_n_iter<T> operator*(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) { // mettre le polynome le plus sparse à droite ! optimisé.
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, multiplication : le nombre de variables ne correspond pas.");
 		if (((gauche.scalaire) && (!droite.scalaire)) || ((droite.scalaire) && (!gauche.scalaire)))
 			throw std::domain_error("multiplication de polynome_n_iter : scalaire * polynome");
-
+#endif
 		if (gauche.scalaire)
 			return polynome_n_iter(0, gauche.coeffs.data[0] * droite.coeffs.data[0], NULL);
+
+		if (!(bool)gauche)
+			return polynome_n_iter<T>(gauche.coeffs.puissance, unite(gauche.coeffs.data[0], false), gauche.noms);
+		if (!(bool) droite)
+			return polynome_n_iter<T>(droite.coeffs.puissance, unite(droite.coeffs.data[0], false), droite.noms);
 
 		//mettre la plus sparse à droite
 		int n_sparse = 0;
@@ -356,6 +380,9 @@ public:
 		if (scalaire) 
 			return (bool)coeffs.data[0];
 
+		if ((bool)coeffs.data[coeffs.data.size() - 1])
+			return true;
+
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i])
 				return true;
@@ -388,6 +415,7 @@ public:
 	};
 
 	polynome_n_iter<T> operator() (int i, polynome_n_iter<T> const& Y) const {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if ((i >= coeffs.puissance) || (i < 0))
 			throw std::domain_error("evaluation de polynome_n_rec : i non-conforme");
 
@@ -396,7 +424,7 @@ public:
 
 		if (Y.scalaire)
 			throw std::domain_error("evaluation de polynome_n_iter : polynome=scalaire");
-
+#endif
 		if (coeffs.puissance == 1) {
 			T result = unite(coeffs.data[0], false);
 			T puissance = unite(result, true);
@@ -461,6 +489,7 @@ public:
 	template<class U> U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ... 
 																//Plus précisément polynome de taille n-1
 																// Est utile pour évaluer une fraction de polynome_n_iter ... On évalue le numerateur puis le denominateur ...
+#ifdef ALGEBRA_USE_EXCEPTION
 		if ((i >= coeffs.puissance) || (i < 0))
 			throw std::domain_error("evaluation de polynome_n_rec : i non-conforme");
 
@@ -469,7 +498,7 @@ public:
 
 		if (Y.scalaire)
 			throw std::domain_error("evaluation de polynome_n_iter : polynome=scalaire");
-
+#endif
 		if (coeffs.puissance == 1) {
 			U result = unite(Y, false);
 			T puissance = unite(Y, true);
@@ -531,8 +560,10 @@ public:
 	};
 
 	polynome_n_iter<T> operator() (int i, T element, std::string* noms_) const {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (coeffs.puissance <= 0)
 			throw std::domain_error("evaluation de polynome_n_rec : puissance requise >0");
+#endif
 		polynome_n_iter<T> Y(coeffs.puissance - 1, element, noms_);
 		return *this(i, Y);
 	};
@@ -567,6 +598,14 @@ public:
 			return false;
 		return ((polynome_n_rec<T>) gauche) == ((polynome_n_rec<T>) droit);
 
+	};
+
+	typename iterator begin() const {
+		return coeffs.data.begin();
+	};
+
+	typename iterator end() const {
+		return coeffs.data.end();
 	};
 };
 

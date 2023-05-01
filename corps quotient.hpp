@@ -50,6 +50,12 @@ public:
         return *this;
     };
 
+    corps_quotient<T>& operator+=(corps_quotient<T> const& autre) {
+        element += autre.element;
+        element %= quotient;
+        return *this;
+    };
+
 
     friend corps_quotient<T> operator*(corps_quotient<T> const& temp1, corps_quotient<T> const& temp2) {
         corps_quotient<T> result((temp1.element * temp2.element) % temp1.quotient, temp1.quotient);
@@ -123,8 +129,10 @@ public:
     };
 
     template<class U> U operator()(const U& temp) const {
+#ifdef ALGEBRA_USE_EXCEPTION
         if ((bool)quotient(temp))
-            std::cerr << "ATTENTION : évaluation de polynome : quotient(element) != 0" << std::endl;
+            throw std::domain_error("ATTENTION : évaluation de polynome : quotient(element) != 0");
+#endif
         return element(temp);
     };
 

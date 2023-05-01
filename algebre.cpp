@@ -22,43 +22,9 @@
 
 using namespace std;
 
-/*
-template<class T> class erreur_b;
-template<class T> class anneau_quotient;
-template<typename T> class complexe;
-template<class T> class corps_quotient;
-template<class T, class enable1 = void, class enable2 = void> class matrice;
-template<typename T> class polynome;
-template<class T> class polynome_n_rec;
-template<class T> class polynome_n_iter;
-template<class T, class enable = void> class rationnel;
+#ifdef ALGEBRA_USE_EXCEPTION
 
-
-template<class T, class Enable = void> class norme_T;
-template<class T, class enable1 = void, class enable2 = void> class matrice;
-
-template polynome_n_rec<float>;
-*/
-
-/*
-template rationnel<InfInt>;
-template polynome<rationnel<InfInt>>;
-template rationnel<polynome<rationnel<InfInt>>>;
-//template polynome_quotient<rationnel<InfInt>>;
-template matrice<double>;
-template anneau_quotient<polynome<rationnel<InfInt>>>;
-template corps_quotient<polynome<rationnel<InfInt>>>;
-template polynome_n_rec<rationnel<InfInt>>;
-template erreur_b<float_precision>;
-*/
-
-
-//template rationnel<polynome<double>>;
-//template matrice< rationnel<polynome<double>>>;
-
-//fraction
-
-
+#endif
 
 
 int main()

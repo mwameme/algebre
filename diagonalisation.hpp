@@ -19,9 +19,10 @@ template<class T> class calcul_condition<T,typename std::enable_if_t<type_algebr
 public:
 
 	calcul_condition(matrice<T> m_matrice,bool vecteurs_propres = false) { //vecteurs propre : choisit de résoudre A.X=0 ou A^n.X=0
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (m_matrice.taille_l != m_matrice.taille_c)
 			throw std::domain_error("diagonalisation : dimensions ne coincident pas");
-
+#endif
 		polynome<T> chi = m_matrice.polynomeCaracteristique();
 		polynome<T> chi_ = chi;
 
@@ -276,9 +277,10 @@ template<class T> class calcul_condition<T, typename std::enable_if_t<type_algeb
 public:
 
 	calcul_condition(matrice<T> m_matrice, bool vecteurs_propres = false) { //vecteurs propre : choisit de résoudre A.X=0 ou A^n.X=0
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (m_matrice.taille_l != m_matrice.taille_c)
 			throw std::domain_error("diagonalisation : dimensions ne coincident pas");
-
+#endif
 		polynome<T> chi = m_matrice.polynomeCaracteristique();
 		polynome<T> chi_ = chi;
 

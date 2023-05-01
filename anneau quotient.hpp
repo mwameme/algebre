@@ -8,6 +8,8 @@
 #include "swap_T.hpp"
 
 
+
+
 template<class T> class anneau_quotient {
 public:
     T element;
@@ -48,6 +50,12 @@ public:
     template<class U>
     anneau_quotient<T>& operator*=(const U& scalaire) {
         element *= scalaire;
+        element %= quotient;
+        return *this;
+    };
+
+    anneau_quotient<T>& operator+=(anneau_quotient<T> const& droit) {
+        element += droit.element;
         element %= quotient;
         return *this;
     };
@@ -98,8 +106,10 @@ public:
     };
 
     template<class U> U operator()(const U& temp) const {
+#ifdef ALGEBRA_USE_EXCEPTION
         if ((bool) quotient(temp))
             std::cerr << "ATTENTION : évaluation de polynome : quotient(element) != 0" << std::endl;
+#endif
         return element(temp);
     };
 

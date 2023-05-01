@@ -12,6 +12,57 @@ template<class T, int n, int m> bool operator==(polynome_n_fixe<T, n> const& gau
 	return false;
 };
 
+
+template<class T, int n> class pointeur_n;
+
+/*
+template <auto Start, auto End, auto Inc, class F>
+constexpr void constexpr_for(F&& f)
+{
+	if constexpr (Inc > 0) {
+		if constexpr (Start <= End)
+		{
+			f(std::integral_constant<decltype(Start), Start>());
+			constexpr_for<Start + Inc, End, Inc>(f);
+		}
+	}
+	else 
+		if constexpr (Start >= End)
+		{
+			f(std::integral_constant<decltype(Start), Start>());
+			constexpr_for<Start + Inc, End, Inc>(f);
+		}
+}
+*/
+
+
+template <int start, int end, class F>
+constexpr void constexpr_for(F&& f) //utilisé pour g, croissant
+{
+	if constexpr (start <= end)
+	{
+		(f(std::integral_constant<int, start>()));
+		constexpr_for<start + 1, end>(f);
+	}
+	else return;
+
+};
+
+template <int start, int end, int end2, class F, class G>
+constexpr void constexpr_for_2(F&& f, G&& g)
+{
+	if constexpr (start >= end)
+	{
+		if (f(std::integral_constant<int, start>()))
+			constexpr_for_2<start - 1, end, end2>(f, g);
+		else
+			constexpr_for<start + 1, end2>(g);
+	}
+	else return;
+};
+
+
+
 template<class T, int n> class polynome_n_fixe {
 public:
 
@@ -38,7 +89,7 @@ public:
 		return *this;
 	};
 
-	polynome_n_fixe<T, n>& operator=(const polynome_n_fixe<T, n>&& temp) {
+	polynome_n_fixe<T, n>& operator=(polynome_n_fixe<T, n>&& temp) {
 		nul = temp.nul;
 		swap(poly, temp.poly);
 		return *this;
@@ -51,40 +102,44 @@ public:
 	template<class U>
 	polynome_n_fixe<T, n>& operator*=(U const& scalaire) {
 		poly *= scalaire;
-		nul = false;
-		for (int i(poly.coeffs.size() - 1); i >= 0; --i)
-			if (poly.coeffs[i].nul)
-				nul = true;
+		nul = (bool)poly;
+		return *this;
+	};
+
+	polynome_n_fixe<T, n>& operator+=(polynome_n_fixe<T, n> const& autre) {
+		poly += autre.poly;
+		nul = (bool)poly;
 		return *this;
 	};
 
 	friend polynome_n_fixe<T, n> operator*(const polynome_n_fixe<T, n>& gauche, const polynome_n_fixe<T, n>& droit) {
+		if (!gauche.nul)
+			return gauche;
+		if (!droit.nul)
+			return droit;
+
 		polynome_n_fixe<T, n> m_poly;
 		m_poly.poly = gauche.poly * droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
+
 		return m_poly;
 	};
 
 	friend polynome_n_fixe<T, n> operator+(const polynome_n_fixe<T, n>& gauche, const polynome_n_fixe<T, n>& droit) {
+		if (!gauche.nul)
+			return droit;
+		if (!droit.nul)
+			return gauche;
 		polynome_n_fixe<T, n> m_poly;
 		m_poly.poly = gauche.poly + droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
 		return m_poly;
 	};
 
 	friend polynome_n_fixe<T, n> operator-(const polynome_n_fixe<T, n>& gauche, const polynome_n_fixe<T, n>& droit) {
 		polynome_n_fixe<T, n> m_poly;
 		m_poly.poly = gauche.poly - droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
 		return m_poly;
 	};
 
@@ -97,10 +152,8 @@ public:
 	template<class U> friend polynome_n_fixe<T, n> operator*(const U& scalaire, const polynome_n_fixe<T, n>& polynome_) {
 		polynome_n_fixe<T, n> m_poly(polynome_);
 		m_poly.poly = scalaire * m_poly.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
+
 		return m_poly;
 	};
 
@@ -123,8 +176,119 @@ public:
 		return;
 	};
 
+	int lenght() {
+		int somme = 0;
+		for (int i(0); i < poly.coeffs.size(); ++i)
+			somme += poly.coeffs[i].length;
+		return somme;
+	};
+
+
+	class iterator {
+	public:
+
+		pointeur_n<T, n> pointeurs;
+		std::vector<int> positions;
+		bool termine;
+
+		iterator& operator++() {
+			constexpr_for_2<n - 1, 0, n - 1>([&](auto i) { //premiere fonction : mettre a jour les positions.
+				++positions[i];
+				if (positions[i] >= pointeurs.get<i>()->poly.coeffs.size()) {
+					positions[i] = 0;
+					if (i == 0) {
+						termine = false;
+						return false;
+					}
+					return true;
+				}
+				else
+					return false; //lors de return false, position i est bonne. recommencer à i+1
+
+				}, [&](auto j) { //deuxieme fonction : mettre a jour les pointeurs.
+					pointeurs.get<j>() = &pointeurs.get<j - 1>()->poly.coeffs[positions[j - 1]];
+					return;
+				});
+
+			return *this;
+		};
+
+		iterator(poly_fixe<T, n> const& temp) : pointeurs(temp), positions(n, 0), termine(true) {	};
+
+		operator bool() {
+			return termine;
+		};
+
+		T operator*() {
+			return pointeurs.get<n>()->poly.coeffs[positions[n - 1]].element;
+		};
+
+		friend bool operator==(iterator const& it1, iterator const& it2) {
+			if ((it1.termine == it2.termine) && (it1.pointeurs.get<0>() == it2.pointeurs.get<0>()) && (it1.positions == it1.positions))
+				return true;
+			else
+				return false;
+		};
+
+		friend bool operator!=(iterator const& it1, iterator const& it2) {
+			if (it1.termine != it2.termine)
+				return true;
+			if (it1.positions != it2.termine)
+				return true;
+			if (it1.pointeurs.get<0>() != it2.pointeurs.get<0>())
+				return true;
+			return false;
+		};
+
+	};
+
+	iterator begin() const {
+		return iterator(*this);
+	};
+
+	iterator end() const {
+		iterator it(*this);
+		it.termine = false;
+		return it;
+	};
+
+
 };
 
+template<class T, int n> class pointeur_n;
+
+template<class T> class pointeur_n<T, 1> {
+public:
+	poly_fixe<T, 1>* pointeur;
+
+	template<int m>
+	poly_fixe<T, 1>*& get() {
+		//		static_assert(m == 0);
+		return pointeur;
+	};
+
+	pointeur_n(poly_fixe<T, 1>& poly) {
+		pointeur = &poly;
+	};
+
+};
+
+template<class T, int n> class pointeur_n {
+public:
+	poly_fixe<T, n>* pointeur;
+	pointeur_n<T, n - 1> pointeurs;
+
+	template<int m>
+	auto*& get() {
+		if constexpr (m == 0)
+			return pointeur;
+		else
+			return pointeurs.get<m - 1>();
+	};
+
+	pointeur_n(poly_fixe<T, n>& poly) : pointeur(&poly), pointeurs(poly.poly.coeffs[0]) {	};
+
+};
 
 
 template<class T> class polynome_n_fixe<T, 1> {
@@ -133,10 +297,10 @@ public:
 	bool nul;
 
 	polynome_n_fixe() {};
-	polynome_n_fixe(T element) : poly(polynome_n_fixe<T,0>(element)), nul((bool)element) {};
-	polynome_n_fixe(std::vector<int> vec, T element); //monome
-	polynome_n_fixe(int* vec, T element, T faux); //monome interne
-	polynome_n_fixe(const polynome_n_fixe<T, 1>& copie) : poly(copie.poly), nul(copie.nul) {	};
+	polynome_n_fixe(T element) : poly(polynome_n_fixe<T,0>(element)), nul((bool)element) { };
+	polynome_n_fixe(std::vector<int> vec, T element) { }; //monome
+	polynome_n_fixe(int* vec, T element, T faux) { }; //monome interne
+	polynome_n_fixe(const polynome_n_fixe<T, 1>& copie) : poly(copie.poly), nul(copie.nul) { };
 
 	polynome_n_fixe(polynome_n_fixe<T, 1>&& temp) {
 		nul = temp.nul;
@@ -154,7 +318,7 @@ public:
 	};
 
 
-	polynome_n_fixe<T, 1>& operator=(const polynome_n_fixe<T, 1>&& temp) {
+	polynome_n_fixe<T, 1>& operator=(polynome_n_fixe<T, 1>&& temp) {
 		nul = temp.nul;
 		swap(poly, temp.poly);
 		return *this;
@@ -165,23 +329,24 @@ public:
 	};
 
 	template<class U>
-	polynome_n_fixe<T, n>& operator*=(U const& scalaire) {
+	polynome_n_fixe<T, 1>& operator*=(U const& scalaire) {
 		poly *= scalaire;
-		nul = false;
-		for (int i(poly.coeffs.size() - 1); i >= 0; --i)
-			if (poly.coeffs[i].nul)
-				nul = true;
+
+		nul = (bool)poly;
 		return *this;
 	};
 
+	polynome_n_fixe<T, 1>& operator+=(polynome_n_fixe<T, 1> const& autre) {
+		poly += autre.poly;
+		nul = (bool)poly;
+		return *this;
+	};
 
 	friend polynome_n_fixe<T, 1> operator*(const polynome_n_fixe<T, 1>& gauche, const polynome_n_fixe<T, 1>& droit) {
 		polynome_n_fixe<T, 1> m_poly;
 		m_poly.poly = gauche.poly * droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
+
 		return m_poly;
 
 	};
@@ -189,20 +354,14 @@ public:
 	friend polynome_n_fixe<T, 1> operator+(const polynome_n_fixe<T, 1>& gauche, const polynome_n_fixe<T, 1>& droit) {
 		polynome_n_fixe<T, 1> m_poly;
 		m_poly.poly = gauche.poly + droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
 		return m_poly;
 	};
 
 	friend polynome_n_fixe<T, 1> operator-(const polynome_n_fixe<T, 1>& gauche, const polynome_n_fixe<T, 1>& droit) {
 		polynome_n_fixe<T, 1> m_poly;
 		m_poly.poly = gauche.poly * droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
 		return m_poly;
 	};
 
@@ -214,33 +373,29 @@ public:
 
 	friend polynome_n_fixe<T, 1> operator/(const polynome_n_fixe<T, 1>& gauche, const polynome_n_fixe<T, 1>& droit) {
 		static_assert(type_algebre<T>::type == 0);
+
 		polynome_n_fixe<T, 1> m_poly;
 		m_poly.poly = gauche.poly / droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
+
 		return m_poly;
 	};
 
 	friend polynome_n_fixe<T, 1> operator%(const polynome_n_fixe<T, 1>& gauche, const polynome_n_fixe<T, 1>& droit) {
 		static_assert(type_algebre<T>::type == 0);
+
 		polynome_n_fixe<T, 1> m_poly;
 		m_poly.poly = gauche.poly % droit.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
+
 		return m_poly;
 	};
 
 	template<class U> friend polynome_n_fixe<T, 1> operator*(const U& scalaire, const polynome_n_fixe<T, 1>& polynome_) {
 		polynome_n_fixe<T, 1> m_poly(polynome_);
 		m_poly.poly = scalaire * m_poly.poly;
-		m_poly.nul = false;
-		for (int i(m_poly.poly.coeffs.size() - 1); i >= 0; --i)
-			if (m_poly.poly.coeffs[i].nul)
-				m_poly.nul = true;
+		m_poly.nul = (bool)m_poly.poly;
+
 		return m_poly;
 	};
 
@@ -262,12 +417,75 @@ public:
 		swap(gauche.poly, droit.poly);
 		return;
 	};
+
+	int length() {
+		return poly.coeffs.size();
+	};
+
+	class iterator {
+	public:
+		polynome_n_fixe<T, 1>* pointeur;
+		int p;
+		bool termine;
+
+		iterator(polynome_n_fixe<T, 1> const& temp) {
+			pointeur(&temp), termine(true), p(0) { };
+
+			iterator& operator++() {
+				++p;
+				if (p >= pointeur->poly.coeffs.size()) {
+					p = 0;
+					termine = false;
+				};
+				return;
+			};
+		}
+
+		operator bool() {
+			return termine;
+		};
+
+		bool operator==(iterator const& it1, iterator const& it2) {
+			if ((it1.termine != it2.termine) || (it1.pointeur != it2.pointeur) || (it1.p != it2.p))
+				return false;
+			else
+				return true;
+		}
+
+		bool operator!=(iterator const& it1, iterator const& it2) {
+			if (it1.termine != it2.termine)
+				return true;
+			if (it1.pointeur != it2.pointeur)
+				return true;
+			if (it1.p != it2.p)
+				return true;
+			return false;
+		};
+
+		T operator*() {
+			retturn pointeur->poly.coeffs[p].element;
+		};
+
+	};
+
+	iterator begin() const {
+		return iterator(*this);
+	};
+
+	iterator end() const {
+		iterator it(*this);
+		it.termine = false;
+		return it;
+	};
+
 };
 
 
 template<class T, int n> polynome_n_fixe<T, n>::polynome_n_fixe(std::vector<int> vec, T element) {
+#ifdef ALGEBRA_USE_EXCEPTION
 	if (vec.size() != n)
 		throw std::domain_error("constructeur de polynome_n_fixe : n ne correspond pas");
+#endif
 	for (int i(0); i < vec.size(); ++i)
 		if (vec[i] < 0) {
 			poly = polynome<polynome_n_fixe<T, n - 1>>(polynome_n_fixe<T, n - 1>(unite(element, false)));
@@ -300,6 +518,42 @@ template<class T, int n> polynome_n_fixe<T, n>::polynome_n_fixe(int* vec, T elem
 	poly = polynome<polynome_n_fixe<T, n - 1>>(vec_poly);
 };
 
+template<class T> polynome_n_fixe<T, 1>::polynome_n_fixe(std::vector<int> vec, T element) {
+#ifdef ALGEBRA_USE_EXCEPTION
+	if (vec.size() != 1)
+		throw std::domain_error("constructeur de polynome_n_fixe : n ne correspond pas");
+#endif
+	if (vec[0] < 0) {
+			poly = polynome<polynome_n_fixe<T, 0>>(polynome_n_fixe<T, 0>(unite(element, false)));
+			nul = false;
+			return;
+		}
+	if (!(bool)element) {
+		poly = polynome<polynome_n_fixe<T, 0>>(polynome_n_fixe<T, 0>(element));
+		nul = false;
+		return;
+	}
+	nul = true;
+	int p = vec[0];
+	T faux = unite(element, false);
+
+	polynome_n_fixe<T, 0> sous_poly(faux);
+	std::vector< polynome_n_fixe<T, 0>> vec_poly(p + 1, sous_poly);
+	vec_poly[p] = polynome_n_fixe<T, 0>(element);
+	poly = polynome<polynome_n_fixe<T, 0>>(vec_poly);
+};
+
+
+template<class T>
+polynome_n_fixe<T, 1>::polynome_n_fixe(int* vec, T element, T faux) {  //monome interne
+	int p = *vec;
+	nul = true;
+
+	polynome_n_fixe<T, 0> sous_poly(faux);
+	std::vector< polynome_n_fixe<T, 0>> vec_poly(p + 1, sous_poly);
+	vec_poly[p] = polynome_n_fixe<T, 0>(element);
+	poly = polynome<polynome_n_fixe<T, 0>>(vec_poly);
+};
 
 template<class T> class polynome_n_fixe<T, 0> {
 public:
@@ -343,6 +597,12 @@ public:
 		nul = (bool)element;
 		return *this;
 	};
+
+	polynome_n_fixe<T, 0>& operator+=(polynome_n_fixe<T, 0> const& autre) {
+		element += autre.element;
+		nul = (bool)element;
+		return *this;
+	}
 
 	friend polynome_n_fixe<T, 0> operator*(const polynome_n_fixe<T, 0>& gauche, const polynome_n_fixe<T, 0>& droit) {
 		return polynome_n_fixe<T, 0>(gauche.element * droit.element);
@@ -392,6 +652,10 @@ public:
 		std::swap(gauche.nul, droit.nul);
 		swap(gauche.poly, droit.poly);
 		return;
+	};
+
+	int length() {
+		return 1;
 	};
 };
 

@@ -47,7 +47,6 @@ public:
 		element = element_;
 		n_var = 0;
 		noms_variables = NULL;
-		poly.coeffs.resize(0);
 		nul = (bool)element;
 	};
 
@@ -59,23 +58,17 @@ public:
 	};
 
 	polynome_n_rec(int n_var_, std::string* noms_, T element_, std::vector<polynome_n_rec<T>> const& vec) : n_var(n_var_),noms_variables(noms_),poly(vec),element(element_){ //à partir d'un vecteur de pointeurs. Utilisé pour construire (* et +)
-		nul = false;
-		for (int i(poly.coeffs.size() - 1); i >= 0; --i)
-			if ((bool)poly.coeffs[i])
-				nul = true;
+		nul = (bool) poly;
 		return;
 	};
 
 	polynome_n_rec(int n_var_, std::string* noms_, T element_, std::vector<polynome_n_rec<T>> && vec) : n_var(n_var_), noms_variables(noms_), poly(vec), element(element_) { //à partir d'un vecteur de pointeurs. Utilisé pour construire (* et +)
-		nul = false;
-		for (int i(poly.coeffs.size() - 1); i >= 0; --i)
-			if ((bool)poly.coeffs[i])
-				nul = true;
+		nul = (bool)poly;
 		return;
 	};
 
 
-	polynome_n_rec(std::vector<int> liste, std::string* noms, const T element_) { //liste : degrés ... Monome.
+	polynome_n_rec(std::vector<int> liste, std::string* noms, const T& element_) { //liste : degrés ... Monome.
 		noms_variables = noms;
 		n_var = liste.size();
 
@@ -92,19 +85,21 @@ public:
 			if (liste[i] < 0) {
 				nul = false;
 				poly = { poly_faux };
+				return;
 			}
 
 		if (!(bool)element_) {
 			nul = false;
 			poly = { poly_faux };
+			return;
 		}
 
 		std::vector<polynome_n_rec<T>> m_vec(liste[0] + 1, poly_faux);
 		m_vec[liste[0] + 1] = polynome_n_rec<T>(liste.data() + 1, n_var - 1, noms_variables + 1, element_, element);
 
 		poly = polynome<polynome_n_rec<T>>(m_vec);
+		nul = (bool) poly;
 
-//		polynome_n_rec(int* liste, int n, std::string * noms, T const& element_, T const& faux
 		return;
 	};
 
@@ -115,10 +110,10 @@ public:
 			nul = true; //vérifié précédemment
 			element = faux;
 
-			polynome_n_rec<T> poly_faux(polynome_n_rec<T>(n_var - 1, element, noms + 1));
+			polynome_n_rec<T> poly_faux(polynome_n_rec<T>(n_var - 1, faux, noms + 1));
 
 			std::vector<polynome_n_rec<T>> m_vec(liste[0] + 1, poly_faux);
-			m_vec[liste[0] + 1] = polynome_n_rec<T>(liste + 1, n_var - 1, noms_variables + 1, element_, element);
+			m_vec[liste[0] + 1] = polynome_n_rec<T>(liste + 1, n_var - 1, noms_variables + 1, element_, faux);
 
 			poly = polynome<polynome_n_rec<T>>(m_vec);
 		}
@@ -199,43 +194,49 @@ public:
 		}
 		else {
 			poly *= scalaire;
-			nul = false;
-			for (int i(poly.coeffs.size() - 1); i >= 0; ++i)
-				if ((bool) poly.coeffs[i]) {
-					nul = true;
-					break;
-				}
+			nul = (bool)poly;
 		}
 		return *this;
 	};
 
+	polynome_n_rec<T>& operator+=(polynome_n_rec<T> const& autre) {
+#ifdef ALGEBRA_USE_EXCEPTION
+		if (n_var != autre.n_var)
+			throw std::domain_error("addition de polynome_n_rec : n_var ne correspondent pas");
+#endif
+		if (n_var == 0) {
+			element += autre.element;
+			return *this;
+		}
+		poly += autre.poly;
+		nul = (bool)poly;
+		return *this;
+	};
 
 
 	friend polynome_n_rec<T> operator*(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
-		
 		if (temp1.n_var ==0)
 			return polynome_n_rec<T>(temp1.element * temp2.element);
-
+#endif
 		polynome_n_rec<T> result;
 		result.poly = temp1.poly * temp2.poly;
 		result.noms_variables = temp1.noms_variables;
 		result.element = temp1.element;
 		result.n_var = temp1.n_var;
 
-		result.nul = false;
-		for (int i(result.poly.coeffs.size() - 1); i >= 0; --i)
-			if ((bool)result.poly.coeffs[i])
-				result.nul = true;
+		result.nul = (bool)result.poly;
 
 		return result;
 	}
 
 	friend polynome_n_rec<T> operator+(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
-
+#endif
 		if (temp1.n_var == 0)
 			return polynome_n_rec<T>(temp1.element + temp2.element);
 
@@ -245,10 +246,7 @@ public:
 		result.element = temp1.element;
 		result.n_var = temp1.n_var;
 
-		result.nul = false;
-		for (int i(result.poly.coeffs.size() - 1); i >= 0; --i)
-			if ((bool)result.poly.coeffs[i])
-				result.nul = true;
+		result.nul = (bool)result.poly;
 
 		return result;
 
@@ -256,22 +254,19 @@ public:
 
 
 	friend polynome_n_rec<T> operator-(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
+#ifdef ALGEBRA_USE_EXCEPTION
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
-
+#endif
 		if (temp1.n_var == 0)
 			return polynome_n_rec<T>(temp1.element - temp2.element);
-
 		polynome_n_rec<T> result;
 		result.poly = temp1.poly - temp2.poly;
 		result.noms_variables = temp1.noms_variables;
 		result.element = temp1.element;
 		result.n_var = temp1.n_var;
 
-		result.nul = false;
-		for (int i(result.poly.coeffs.size() - 1); i >= 0; --i)
-			if ((bool)result.poly.coeffs[i])
-				result.nul = true;
+		result.nul = (bool)result.poly;
 
 		return result;
 	};
@@ -318,13 +313,12 @@ public:
 			if (temp.n_var > 0) {
 				polynome_n_rec<T> result;
 				result.poly = scalaire * temp.poly;
-				result.nul = false;
-				for (int i(result.poly.coeffs.size() - 1); i >= 0; --i)
-					if ((bool)result.poly.coeffs[i])
-						result.nul = true;
 				result.noms_variables = temp.noms_variables;
 				result.element = temp.element;
-				result.n_var;
+				result.n_var = temp.n_var;
+
+				result.nul = (bool) result.poly;
+
 				return result;
 			}
 			else 
@@ -345,12 +339,10 @@ public:
 		result.element = (U)element;
 		result.noms_variables = noms_variables;
 		result.poly = (polynome<polynome_n_rec<U>>) poly;
-
-		result.nul = false;
-		for (int i(result.poly.coeffs.size() - 1); i >= 0; --i)
-			if ((bool)result.poly.coeffs[i])
-				result.nul = true;
 		result.n_var = n_var;
+
+		result.nul = (bool)result.poly;
+
 		return result;
 	};
 
@@ -396,7 +388,7 @@ public:
 		return result;
 	};
 
-	void simplifier() { //reparcourt tout, met à jour nul.
+	void simplifier() { //reparcourt tout, met à jour nul, réduit les polynomes.
 		if (n_var == 0) {
 			nul = (bool)element;
 			return nul;
@@ -404,20 +396,9 @@ public:
 		for (int i(0); i < poly.coeffs.size(); ++i)
 			poly.coeffs[i].simplifier();
 
-		int trouve_int = 0;
-		bool trouve = false;
-		for (int i(poly.coeffs.size() - 1); i >= 0; --i) {
-			if (poly.coeffs[i].nul) {
-				trouve_int = i;
-				trouve = true;
-				break;
-			}
-		}
+		poly.getDegre();
 
-		if (trouve_int + 1 < poly.coeffs.size())
-			poly.coeffs.erase(poly.coeffs.begin() + trouve_int + 1, poly.coeffs.end());
-
-		nul = trouve;
+		nul = (bool) poly;
 	};
 
 	friend void swap(polynome_n_rec<T>& gauche, polynome_n_rec<T>& droit) {
@@ -427,6 +408,94 @@ public:
 		swap_F(gauche.element, droit.element);
 		swap_F(gauche.poly, droit.poly);
 		return;
+	};
+
+	class iterator {
+	public:
+		int n_var;
+
+		std::vector<int> positions;
+		std::vector<polynome_n_rec<T>*> pointeurs;
+		bool termine;
+
+
+		iterator& operator++() {
+			if (n_var == 0) {
+				termine = false;
+				return *this;
+			};
+
+			int i = n_var - 1;
+			++positions[i];
+			while (positions[i] >= pointeurs[i]->poly.coeffs.size()) {
+				positions[i] = 0;
+				if (i == 0) {
+					termine = false;
+					return *this;
+				}
+				++positions[i - 1];
+				--i;
+			}
+			for (int j = i + 1; j < n_var; ++j)
+				pointeurs[j] = &pointeurs[j - 1]->poly.coeffs[positions[j - 1]];
+			return *this;
+		};
+
+		bool operator==(iterator const& autre) const {
+			return (pointeurs[0] == autre.pointeurs[0]) && (positions == autre.positions) && (termine = autre.termine);
+		};
+
+		bool operator!=(iterator const& autre) const {
+			if (termine != autre.termine)
+				return true;
+			if (pointeurs[0] != autre.pointeurs[0])
+				return true;
+			if (n_var != 0)
+				return (positions != autre.positions);
+			else
+				return false;
+		};
+
+		T operator*() const {
+			if (n_var > 0)
+				return pointeurs[n_var - 1]->poly.coeffs[positions[n_var - 1]].element;
+			else
+				return pointeurs[0]->element;
+		};
+
+		iterator(polynome_n_rec<T> const& temp) : positions(temp.n_var, 0), n_var(temp.n_var), pointeurs(temp.n_var) ,termine(true){
+			if (n_var > 0) {
+				pointeurs[0] = &temp;
+				for (int i(1); i < n_var; ++i)
+					pointeurs[i] = &pointeurs[i - 1]->poly.coeffs[0];
+			}
+			else {
+				pointeurs = { &temp };
+			};
+		};
+	};
+
+	iterator begin() {
+		return iterator(*this);
+	};
+
+	iterator end() {
+		iterator it(*this);
+		it.termine = false;
+		return it;
+	};
+
+	int length() {
+		if (n_var == 0)
+			return 1;
+		if (n_var == 1)
+			return poly.coeffs.size();
+		else {
+			int somme = 0;
+			for (int i(0); i < poly.coeffs.size(); ++i)
+				somme += poly.coeffs[i].length;
+			return somme;
+		};
 	};
 
 };

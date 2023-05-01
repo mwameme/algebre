@@ -75,6 +75,11 @@ public:
         return *this;
     };
 
+    rationnel<T>& operator+=(const rationnel<T>& temp) {
+        return (*this = (*this + temp));
+    };
+
+
     void simplifier();
 
     friend rationnel<T> operator* (const rationnel<T>& temp1, const rationnel<T>& temp2) {
@@ -98,10 +103,10 @@ public:
 
     template<class U> U operator()(const U& element) const {
         U result = denominateur(element);
-        if (!(bool)result) {
-            //            std:cerr << "erreur_b : division par zero lors d'une évaluation de polynome" << std::endl;
+#ifdef ALGEBRA_USE_EXCEPTION
+        if (!(bool)result)
             throw std::domain_error("division par zero lors d'une évaluation de fraction polynome");
-        }
+#endif
         return (numerateur(element) / result);
     };
 

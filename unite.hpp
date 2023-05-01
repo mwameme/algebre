@@ -9,6 +9,7 @@
 #include "simplifier polynome_n.hpp"
 
 #include "erreur.hpp"
+#include <complex>
 
 template<class T> class complex;
 
@@ -112,8 +113,8 @@ template<class T>  complexe<T> unite(complexe<T> const& c, bool test) {
 	return complexe<T>(unite(c.x,test), unite(c.x,false));
 }
 
-template<class T>  complex<T> unite(complex<T> const& c, bool test) {
-	return complex<T>(unite(c.real(), test), unite(c.real(), false));
+template<class T>  std::complex<T> unite(std::complex<T> const& c, bool test) {
+	return std::complex<T>(unite(c.real(), test), unite(c.real(), false));
 };
 
 

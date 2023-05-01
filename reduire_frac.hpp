@@ -190,6 +190,10 @@ public:
 				auto frac = rationnel<decltype(pgcd)>(ppcm, pgcd);
 				ratio.numerateur = frac * ratio.numerateur;
 				ratio.denominateur = frac * ratio.denominateur;
+#ifdef ALGEBRA_USE_EXCEPTION
+				if (!(bool)denominateur)
+					throw std::domain_error("un 0 au denominateur d'une fraction");
+#endif
 				return;
 			}
 		}
@@ -292,6 +296,10 @@ public:
 			auto ppcm = calcul_objet<std::vector<T>>::PPCM(vec);
 			auto pgcd = calcul_objet<std::vector<T>>::PGCD(vec);
 			auto frac = rationnel<decltype(pgcd)>(ppcm, pgcd);
+#ifdef ALGEBRA_USE_EXCEPTION
+			if (!(bool)frac.denominateur)
+				throw std::domain_error("un 0 au denominateur d'une fraction");
+#endif
 			for (int i(0); i < vec.size(); ++i)
 				vec[i] = frac * vec[i];
 			return;

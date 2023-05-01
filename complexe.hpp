@@ -59,6 +59,12 @@ public:
 		return *this;
 	};
 
+	complexe<T>& operator+=(complexe<T> const& autre) {
+		x += autre.x;
+		y += autre.y;
+		return *this;
+	};
+
 	friend complexe<T> operator*(const complexe<T>& z1, const complexe<T>& z2) {
 		return complexe<T>((z1.x * z1.x) - (z1.y * z2.y), (z1.x * z2.y) + (z1.y * z2.x));
 	};
