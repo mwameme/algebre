@@ -144,3 +144,15 @@ template<class T, int n> polynome_n_fixe<T, n> unite(polynome_n_fixe<T, n>& temp
 	element = unite(element, test);
 	return polynome_n_fixe<T, n>(element);
 };
+
+template<class T, int n> polynome_n_fixe<T, 1> unite(polynome_n_fixe<T, 1>& temp, bool test) {
+	T element = temp.get_T();
+	element = unite(element, test);
+	return polynome_n_fixe<T, 1>(element);
+};
+
+template<class T, int n> polynome_n_fixe<T, 0> unite(polynome_n_fixe<T, 0>& temp, bool test) {
+	T element = temp.get_T();
+	element = unite(element, test);
+	return polynome_n_fixe<T, 0>(element);
+};

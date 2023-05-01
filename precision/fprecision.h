@@ -360,10 +360,15 @@ class float_precision {
 		  return ((float) temp > x);
 	  };
 	  
-	  friend float_precision operator*(int const& x, float_precision const& temp){
+	  friend float_precision operator*(long long x, float_precision const& temp){
 		  return float_precision(x,temp.mPrec,temp.mRmode) * temp;
 	  };
 	  
+	  float_precision operator*=(long long x) {
+		  float_precision temp(x, mPrec, mRmode);
+		  return (*this *= temp);
+	  }
+
 	  /*
 	  float_precision& operator=(bool test){
 		  int x=test;

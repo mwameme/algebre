@@ -54,7 +54,7 @@ public:
 
 
 
-    explicit polynome() { // : degre(-1), coeffs(1) {
+    explicit polynome() : degre(-1){ // : degre(-1), coeffs(1) {
     }; //problème si utilisé ... est juste là pour les fonctions template.
 
 

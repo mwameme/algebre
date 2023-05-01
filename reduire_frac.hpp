@@ -188,8 +188,11 @@ public:
 				auto ppcm = PPCM(calcul_objet<T>::PPCM(ratio.numerateur), calcul_objet<T>::PPCM(ratio.denominateur));
 				auto pgcd = PGCD(calcul_objet<T>::PGCD(ratio.numerateur), calcul_objet<T>::PGCD(ratio.denominateur));
 				auto frac = rationnel<decltype(pgcd)>(ppcm, pgcd);
-				ratio.numerateur = frac * ratio.numerateur;
-				ratio.denominateur = frac * ratio.denominateur;
+				ratio.numerateur *= frac;
+				ratio.denominateur *= frac;
+				frac = rationnel<decltype(pgcd)>(unite(pgcd, true), PGCD(ratio.numerateur) * PGCD(ratio.denominateur));
+				ratio.numerateur *= frac;
+				ratio.denominateur *= frac;
 #ifdef ALGEBRA_USE_EXCEPTION
 				if (!(bool)denominateur)
 					throw std::domain_error("un 0 au denominateur d'une fraction");

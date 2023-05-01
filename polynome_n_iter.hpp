@@ -47,7 +47,7 @@ public:
 		}
 	};
 
-	polynome_n_iter(std::vector<int> degres, T element, std::string* noms_){ //monome. degres >0. Transforme degres en dimensions ...  ATTENTION créé avec degrés
+	polynome_n_iter(std::vector<int> degres, T element, std::string* noms_,bool is_degre=true){ //monome. degres >0. Transforme degres en dimensions ...  ATTENTION créé avec degrés
 		if (degres.size() == 0) {
 			degres = { 1 };
 			coeffs=vecteur_n<T>(degres);
@@ -56,15 +56,22 @@ public:
 			noms = NULL;
 		}
 		else {
-			for (int i(0); i < degres.size(); ++i)
-				if (degres[i] < 0) {
-					degres = std::vector<int>(degres.size(), 0);
-					element = unite(element, false);
-					break;
-				}
+			if (is_degre) {
+				for (int i(0); i < degres.size(); ++i)
+					if (degres[i] < 0) {
+						degres = std::vector<int>(degres.size(), 0);
+						element = unite(element, false);
+						break;
+					}
 
+				for (int i(0); i < degres.size(); ++i)
+					degres[i] += 1; //dimensions
+			}
+#ifdef ALGEBRA_USE_EXCEPTION
 			for (int i(0); i < degres.size(); ++i)
-				degres[i] += 1; //dimensions
+				if (degres[i] < 0)
+					throw std::domain_error("declaration de polynome_n_iter avec un vecteur de dimensions : une dimension négative");
+#endif
 			coeffs = vecteur_n<T>(degres);
 			T faux_ = unite(element, false);
 

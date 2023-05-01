@@ -9,6 +9,9 @@
 #include "unite.hpp"
 #include "swap_T.hpp"
 
+#include "polynome_n_fixe.hpp"
+
+template<class T, int n> class polynome_n_fixe;
 
 template<class T>  T unite(T const& element, bool test);
 
@@ -27,7 +30,7 @@ public:
 	polynome<polynome_n_rec<T>> poly;
 
 
-	polynome_n_rec() {};
+	polynome_n_rec() : n_var(0),noms_variables(NULL) ,nul(false) {};
 
 	polynome_n_rec(int n, T temp, std::string* noms) { //constructeur de base. polynome vide.
 		n_var = n;
@@ -497,6 +500,11 @@ public:
 			return somme;
 		};
 	};
+
+	template<int n>
+	operator polynome_n_fixe<T, n>() {
+
+	}
 
 };
 

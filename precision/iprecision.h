@@ -201,7 +201,7 @@ class int_precision
 	*/
 
 	
-	friend int_precision operator*(long long const gauche, int_precision const droit) {
+	friend int_precision operator*(long long gauche, int_precision const droit) {
 		int_precision temp = gauche;
 		return temp * droit;
 	};
@@ -209,6 +209,11 @@ class int_precision
 	int_precision& operator*=(long long scalaire) {
 		int_precision temp = scalaire;
 		return (*this *= temp);
+	};
+
+	int_precision& operator+=(long long scalaire) {
+		int_precision temp = scalaire;
+		return (*this += temp);
 	};
 
 	// ============================================================================
