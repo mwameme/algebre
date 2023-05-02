@@ -8,12 +8,17 @@
 
 #include "entete objets.hpp"
 #include <iostream>
+#include "polynome_n_sparse.hpp"
 
 template<class T> class vecteur_n;
 
 template<class T> class polynome_n_rec;
 
 template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n,  std::string* noms);
+
+template<class T> class polynome_n_sparse;
+template<class T> class monome;
+
 
 template<class T> class polynome_n_iter {
 public:
@@ -47,7 +52,9 @@ public:
 		}
 	};
 
-	polynome_n_iter(std::vector<int> degres, T element, std::string* noms_,bool is_degre=true){ //monome. degres >0. Transforme degres en dimensions ...  ATTENTION créé avec degrés
+	polynome_n_iter(std::vector<int> degres, T element, std::string* noms_,bool is_degre=true){
+										//monome. degres >0. Transforme degres en dimensions ...  
+										//si true ATTENTION créé avec degrés
 		if (degres.size() == 0) {
 			degres = { 1 };
 			coeffs=vecteur_n<T>(degres);
@@ -57,20 +64,22 @@ public:
 		}
 		else {
 			if (is_degre) {
+#ifdef ALGEBRA_USE_EXCEPTION
 				for (int i(0); i < degres.size(); ++i)
 					if (degres[i] < 0) {
-						degres = std::vector<int>(degres.size(), 0);
-						element = unite(element, false);
-						break;
+//						degres = std::vector<int>(degres.size(), 0);
+//						element = unite(element, false);
+//						break;
+						throw std::domain_error("creation de polynome_n_iter : degre negatif");
 					}
-
+#endif
 				for (int i(0); i < degres.size(); ++i)
 					degres[i] += 1; //dimensions
 			}
 #ifdef ALGEBRA_USE_EXCEPTION
 			for (int i(0); i < degres.size(); ++i)
-				if (degres[i] < 0)
-					throw std::domain_error("declaration de polynome_n_iter avec un vecteur de dimensions : une dimension négative");
+				if (degres[i] <= 0)
+					throw std::domain_error("declaration de polynome_n_iter avec un vecteur de dimensions : une dimension <= 0");
 #endif
 			coeffs = vecteur_n<T>(degres);
 			T faux_ = unite(element, false);
@@ -181,21 +190,6 @@ public:
 			coeffs.data[i] += copie.data[i];
 		return *this;
 	};
-	/*
-	polynome_n_iter<T>& operator=(bool test) {
-		T temp = unite(coeffs.data[0],test);
-		if (scalaire)
-			coeffs.data[0] = temp;
-		else {
-			std::vector<int> dimensions(coeffs.puissance, 1);
-			coeffs = vecteur_n<T>(dimensions);
-			coeffs.data[0] = temp;
-			scalaire = false;
-		}
-
-		return *this;
-	};
-	*/
 
 	friend polynome_n_iter<T> operator+(polynome_n_iter<T> const& gauche_, polynome_n_iter<T> const& droite_) {
 #ifdef ALGEBRA_USE_EXCEPTION
@@ -614,6 +608,16 @@ public:
 	typename iterator end() const {
 		return coeffs.data.end();
 	};
+
+	operator polynome_n_sparse<T>() const {
+		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(coeffs.puissance, 0), unite(coeffs.data[0], false)));
+		poly.noms = noms;
+		for (int i(0); i < coeffs.data.size(); ++i)
+			if ((bool)coeffs.data[i])
+				poly.ajouter(monome<T>(coeffs.position(i), coeffs.data[i]));
+		poly.simplifier();
+		return poly;
+	}
 };
 
 template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {

@@ -522,13 +522,14 @@ template<class T, int n> polynome_n_fixe<T, n>::polynome_n_fixe(std::vector<int>
 #ifdef ALGEBRA_USE_EXCEPTION
 	if (vec.size() != n)
 		throw std::domain_error("constructeur de polynome_n_fixe : n ne correspond pas");
-#endif
 	for (int i(0); i < vec.size(); ++i)
 		if (vec[i] < 0) {
-			poly = polynome<polynome_n_fixe<T, n - 1>>(polynome_n_fixe<T, n - 1>(unite(element, false)));
-			nul = false;
-			return;
+//			poly = polynome<polynome_n_fixe<T, n - 1>>(polynome_n_fixe<T, n - 1>(unite(element, false)));
+//			nul = false;
+//			return;
+			throw std::domain_error("constructeur de polynome_n_fixe : un degre est negatif");
 		}
+#endif
 	if (!(bool)element) {
 		poly = polynome<polynome_n_fixe<T, n - 1>>(polynome_n_fixe<T, n - 1>(element));
 		nul = false;
@@ -559,12 +560,13 @@ template<class T> polynome_n_fixe<T, 1>::polynome_n_fixe(std::vector<int> vec, T
 #ifdef ALGEBRA_USE_EXCEPTION
 	if (vec.size() != 1)
 		throw std::domain_error("constructeur de polynome_n_fixe : n ne correspond pas");
-#endif
 	if (vec[0] < 0) {
-			poly = polynome<polynome_n_fixe<T, 0>>(polynome_n_fixe<T, 0>(unite(element, false)));
-			nul = false;
-			return;
+//			poly = polynome<polynome_n_fixe<T, 0>>(polynome_n_fixe<T, 0>(unite(element, false)));
+//			nul = false;
+//			return;
+			throw std::domain_error("constructeur de polynome_n_fixe : un degre est negatif");
 		}
+#endif
 	if (!(bool)element) {
 		poly = polynome<polynome_n_fixe<T, 0>>(polynome_n_fixe<T, 0>(element));
 		nul = false;

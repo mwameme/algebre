@@ -7,6 +7,9 @@
 #include "polynome.hpp"
 #include "polynome_n_rec.hpp"
 #include "polynome_n_iter.hpp"
+#include "polynome_n_sparse.hpp"
+#include "polynome_n_fixe.hpp"
+
 #include "rationnel.hpp"
 #include "norme.hpp"
 #include "types.hpp"

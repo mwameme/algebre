@@ -31,6 +31,9 @@ class float_precision;
 
 template<class T> class scalaire_vecteur;
 
+template<class T> class polynome_n_sparse;
+template<class T> class monome;
+
 
 template<class T>  T unite(T const& element,bool test) {
 	T vrai_ = element;
@@ -139,20 +142,35 @@ template<class T>  scalaire_vecteur<T> unite(scalaire_vecteur<T> const& temp, bo
 	return retour;
 };
 
-template<class T, int n> polynome_n_fixe<T, n> unite(polynome_n_fixe<T, n>& temp, bool test) {
+template<class T, int n> polynome_n_fixe<T, n> unite(polynome_n_fixe<T, n> const& temp, bool test) {
 	T element = temp.get_T();
 	element = unite(element, test);
 	return polynome_n_fixe<T, n>(element);
 };
 
-template<class T, int n> polynome_n_fixe<T, 1> unite(polynome_n_fixe<T, 1>& temp, bool test) {
+template<class T, int n> polynome_n_fixe<T, 1> unite(polynome_n_fixe<T, 1> const& temp, bool test) {
 	T element = temp.get_T();
 	element = unite(element, test);
 	return polynome_n_fixe<T, 1>(element);
 };
 
-template<class T, int n> polynome_n_fixe<T, 0> unite(polynome_n_fixe<T, 0>& temp, bool test) {
+template<class T, int n> polynome_n_fixe<T, 0> unite(polynome_n_fixe<T, 0> const& temp, bool test) {
 	T element = temp.get_T();
 	element = unite(element, test);
 	return polynome_n_fixe<T, 0>(element);
+};
+
+template<class T>
+monome<T> unite(monome<T> const& temp, bool test) {
+	monome<T> local(temp);
+	for (int i(0); i < local.degres.size(); ++i)
+		local.degres[i] = 0;
+	local.element = unite(local.element, test);
+	return local;
+};
+
+template<class T> 
+polynome_n_sparse<T> unite(polynome_n_sparse<T> const& temp, bool test) {
+	monome<T> local = unite(temp.monomes[0], test);
+	return polynome_n_sparse<T>(local);
 };

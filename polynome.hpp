@@ -33,7 +33,7 @@ public:
     };
     
 
-    explicit polynome(std::vector<T> const& tab) {
+    polynome(std::vector<T> const& tab) {
         coeffs = tab;
 #ifdef ALGEBRA_USE_EXCEPTION
         if (coeffs.size() == 0) 
@@ -43,7 +43,7 @@ public:
     };
 
 
-    explicit polynome(std::vector<T>&& tab) {
+    polynome(std::vector<T>&& tab) {
         std::swap(coeffs, tab);
 #ifdef ALGEBRA_USE_EXCEPTION
         if (coeffs.size() == 0) 
@@ -54,7 +54,7 @@ public:
 
 
 
-    explicit polynome() : degre(-1){ // : degre(-1), coeffs(1) {
+    polynome() : degre(-1){ // : degre(-1), coeffs(1) {
     }; //problème si utilisé ... est juste là pour les fonctions template.
 
 

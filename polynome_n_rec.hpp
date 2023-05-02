@@ -10,6 +10,10 @@
 #include "swap_T.hpp"
 
 #include "polynome_n_fixe.hpp"
+#include "polynome_n_sparse.hpp"
+
+template<class T> class polynome_n_sparse;
+template<class T> class monome;
 
 template<class T, int n> class polynome_n_fixe;
 
@@ -83,14 +87,11 @@ public:
 		element = unite(element_, false);
 
 		polynome_n_rec<T> poly_faux(polynome_n_rec<T>(n_var - 1, element, noms + 1));
-
-		for(int i(0);i<liste.size();++i)
-			if (liste[i] < 0) {
-				nul = false;
-				poly = { poly_faux };
-				return;
-			}
-
+#ifdef ALGEBRA_USE_EXCEPTION
+		for (int i(0); i < liste.size(); ++i)
+			if (liste[i] < 0)
+				throw std::domain_error("creation de polynome_n_rec : un degre est negatif");
+#endif
 		if (!(bool)element_) {
 			nul = false;
 			poly = { poly_faux };
@@ -501,9 +502,14 @@ public:
 		};
 	};
 
-	template<int n>
-	operator polynome_n_fixe<T, n>() {
+	operator polynome_n_sparse<T>() const {
+		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(n_var, 0), unite(element, false)));
 
+		for (iterator it = begin(); (bool)it; ++it)
+			if ((bool)*it)
+				poly.ajouter(monome<T>(it.positions, *it));
+		poly.noms = noms_variables;
+		poly.simplifier();//non nécessaire ...
 	}
 
 };

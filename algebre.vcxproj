@@ -162,6 +162,7 @@
     <ClInclude Include="objets.hpp" />
     <ClInclude Include="polynome_n_fixe.hpp" />
     <ClInclude Include="polynome_n_iter.hpp" />
+    <ClInclude Include="polynome_n_sparse.hpp" />
     <ClInclude Include="precision\complexprecision.h" />
     <ClInclude Include="precision\fprecision.h" />
     <ClInclude Include="precision\fractionprecision.h" />

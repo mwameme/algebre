@@ -140,5 +140,8 @@
     <ClInclude Include="reduire_frac.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
+    <ClInclude Include="polynome_n_sparse.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

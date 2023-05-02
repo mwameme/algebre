@@ -8,6 +8,7 @@
 #include "precision/fprecision.h"
 #include "types.hpp"
 
+#include "swap_T.hpp"
 
 inline float precision_relative(double x) {
 	return carre(1.0e-15);
@@ -28,6 +29,10 @@ template<class T> class erreur_b {
 public :
 	static_assert((type_algebre<T>::type == 0) && (type_algebre<T>::approx == 1), "erreur_b<T> : T doit être approché, avec division exacte");
 
+	T valeur;
+	float precision;
+
+
 	erreur_b() :precision(0) {
 		valeur = 0;
 		precision = 0.;
@@ -38,13 +43,6 @@ public :
 		valeur = valeur_;
 		precision = carre((float)valeur) * precision_relative(valeur);
 	};
-
-	/*
-	erreur_b(bool const& test) {
-		valeur = test;
-		precision = precision_relative(valeur);
-	};
-	*/
 
 
 	erreur_b(T const& valeur_, float const& precision_) { //faire attention au carré
@@ -57,6 +55,23 @@ public :
 		valeur = temp.valeur;
 		precision = temp.precision;
 	};
+
+	erreur_b<T>& operator=(erreur_b<T> const& temp) {
+		if (this == &temp)
+			return *this;
+		valeur = temp.valeur;
+		precision = temp.precision;
+		return *this;
+	};
+
+	erreur_b<T>& operator+=(erreur_b<T> const& autre) {
+		return (*this = (*this + autre));
+	}
+
+	erreur_b<T>& operator*=(erreur_b<T> const& autre) {
+		return (*this = (*this * autre));
+	}
+
 
 	explicit inline operator bool() const {
 		if (carre((float)valeur) <= (20. * precision))
@@ -160,23 +175,6 @@ public :
 	};
 
 
-	erreur_b<T>& operator=(erreur_b<T> const& temp) {
-		if (this == &temp)
-			return *this;
-		valeur = temp.valeur;
-		precision = temp.precision;
-		return *this;
-	};
-
-	/*
-	erreur_b<T>& operator=(bool test) {
-		precision = precision_relative(valeur);
-		valeur = test;
-		return *this;
-	};
-	*/
-
-
 	friend bool operator==(erreur_b<T> temp1, erreur_b<T> temp2) {
 		return !((bool)(temp1 - temp2));
 	};
@@ -201,9 +199,11 @@ public :
 		return valeur;
 	};
 
-
-	T valeur;
-	float precision;
+	friend void swap(erreur_b<T>& gauche, erreur_b<T>& droit) {
+		swap_F(gauche.valeur, droit.valeur);
+		std::swap(gauche.precision, droit.precision);
+		return;
+	};
 };
 
 
@@ -227,6 +227,9 @@ inline float precision_relative_l(float_precision const& x) {
 template<class T> class erreur_l {
 public:
 	static_assert((type_algebre<T>::type == 0) && (type_algebre<T>::approx == 1), "erreur_b<T> : T doit être approché, avec division exacte");
+
+	T valeur;
+	float precision;
 
 	erreur_l() :precision(0.), valeur(0.) {	};
 
@@ -255,7 +258,21 @@ public:
 			return true;
 	};
 
+	erreur_l<T>& operator=(erreur_l<T> const& temp) {
+		if (this == &temp)
+			return *this;
+		valeur = temp.valeur;
+		precision = temp.precision;
+		return *this;
+	};
 
+	erreur_l<T>& operator+=(erreur_l<T> const& autre) {
+		return (*this = (*this + autre));
+	};
+
+	erreur_l<T>& operator*=(erreur_l<T> const& autre) {
+		return (*this = (*this * autre));
+	};
 
 	friend erreur_l<T> operator*(erreur_l<T> const& temp1, erreur_l<T> const& temp2) {
 		erreur_l<T> result(temp1.valeur * temp2.valeur, 0.);
@@ -349,24 +366,6 @@ public:
 		return result;
 	};
 
-
-	erreur_l<T>& operator=(erreur_l<T> const& temp) {
-		if (this == &temp)
-			return *this;
-		valeur = temp.valeur;
-		precision = temp.precision;
-		return *this;
-	};
-
-	/*
-	erreur_b<T>& operator=(bool test) {
-		precision = precision_relative_l(valeur);
-		valeur = test;
-		return *this;
-	};
-	*/
-
-
 	friend bool operator==(erreur_l<T> temp1, erreur_l<T> temp2) {
 		return !((bool)(temp1 - temp2));
 	};
@@ -391,8 +390,11 @@ public:
 		return valeur;
 	};
 
+	friend void swap(erreur_l<T>& gauche, erreur_l<T>& droit) {
+		swap_F(gauche.valeur, droit.valeur);
+		std::swap(gauche.precision, droit.precision);
+		return;
+	};
 
-	T valeur;
-	float precision;
 };
 

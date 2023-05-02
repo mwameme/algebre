@@ -194,13 +194,16 @@ public:
         return false;
     };
 
-    /*
-    const InfInt& operator=(bool test) {
-        int test_ = test;
-        return (*this = test_);
-    };
-    */
 
+    const InfInt& operator*=(long long x) {
+        InfInt temp(x);
+        return *this *= temp;
+    };
+
+    const InfInt& operator+=(long long x) {
+        InfInt temp(x);
+        return *this += temp;
+    };
 
     explicit operator double() const {
         double puissance = 1;

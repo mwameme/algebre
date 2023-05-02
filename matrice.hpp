@@ -225,15 +225,15 @@ public:
 		if (i == j)
 			throw std::domain_error("ajout de lignes : même ligne");
 #endif
-		for (int k(0); k < taille_c; ++k) {
-			coeffs[j][k] += coefficient * coeffs[i][k];
-		}
+		for (int k(0); k < taille_c; ++k)
+			coeffs[j][k] += (coefficient * coeffs[i][k]); // + coeffs[j][k]
+		
 		return;
 	};
 
 	void multiplierLigne(int i, T coefficient) {
 		for (int j(0); j < taille_c; ++j)
-			coeffs[i][j] *= coefficient;
+			coeffs[i][j] *= coefficient; // *coeffs[i][j];
 	};
 
 

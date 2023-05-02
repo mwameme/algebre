@@ -26,6 +26,10 @@ template<class T>  T unite(T const& element, bool test);
 
 template<class T> class scalaire_vecteur;
 
+template<class T> class polynome_n_sparse;
+template<class T> class monome;
+
+
 #include "fonctions template.hpp"
 #include "unite.hpp"
 
