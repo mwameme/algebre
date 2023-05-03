@@ -336,7 +336,8 @@ public:
 		return nul;
 	};
 
-	template<class U> operator polynome_n_rec<U>() {
+	template<class U>
+	operator polynome_n_rec<U>() {
 		if (n_var == 0)
 			return polynome_n_rec<U>((U)element);
 		polynome_n_rec<U> result;
@@ -350,26 +351,33 @@ public:
 		return result;
 	};
 
-	std::vector<int> getDegre_tab() const { //ATTENTION : degrés et non dimensions !
+	int max_degre(int i) const {
+		if (i == 0)
+			return poly.degre;
+		int result = -1;
+		for (int j(0); j < poly.coeffs.size(); ++j)
+			result = max(result, poly.coeffs[i].max_degre(i - 1));
+		return result;
+	}
+
+
+	std::vector<int> max_degre() const { //ATTENTION : degrés et non dimensions !
 		std::vector<int> tab(n_var, -1);
-		getDegre(tab.data());
+		max_degre(tab.data());
 		return tab;
 	};
 
-	void getDegre(int* degres) const {
+	void max_degre(int* degres) const {
 		int i = 0;
-		for (i = poly.coeffs.size() - 1; i >= 0; --i)
-			if (poly.coeffs[i].nul)
-				break;
 
-		if (*degres < i)
-			*degres = i;
+		if (*degres < poly.degre)
+			*degres = poly.degre;
 		if (n_var == 1)
 			return;
 
-		for (int j(i); j >= 0; --j)
+		for (int j(0); j <poly.coeffs.size() ; ++j)
 			if (poly.coeffs[j].nul)
-				poly.coeffs[j].getDegre(degres + 1);
+				poly.coeffs[j].max_degre(degres + 1);
 		return;
 	};
 
@@ -379,7 +387,7 @@ public:
 		if (!nul)
 			return polynome_n_iter<T>(n_var, unite(element, false), noms_variables);
 
-		std::vector<int> degres = getDegre_tab();
+		std::vector<int> degres = max_degre();
 		T faux = unite(element,false);
 
 		polynome_n_iter<T> result(degres, faux, noms_variables); //degrés ... se transforme en dimensions (+1).
@@ -489,16 +497,16 @@ public:
 		return it;
 	};
 
-	int length() {
+	int length() { //taille en mémoire
 		if (n_var == 0)
 			return 1;
 		if (n_var == 1)
-			return poly.coeffs.size();
+			return poly.coeffs.size()+1;
 		else {
 			int somme = 0;
 			for (int i(0); i < poly.coeffs.size(); ++i)
-				somme += poly.coeffs[i].length;
-			return somme;
+				somme += poly.coeffs[i].length();
+			return somme+1;
 		};
 	};
 

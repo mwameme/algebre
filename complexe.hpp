@@ -37,7 +37,7 @@ public:
 	
 	complexe(std::complex<T> const& temp) : x(temp.real) , y(temp.imag) {	};
 
-	explicit inline operator bool() {
+	explicit inline operator bool() const {
 		return (((bool)x) || ((bool)y));
 	};
 

@@ -164,10 +164,10 @@ public:
 	};
 
 	template<class U>
-	polynome_n_iter<T>& operator*=(U const& scalaire) {
-		if ((bool)scalaire)
+	polynome_n_iter<T>& operator*=(U const& scalaire_) {
+		if ((bool)scalaire_)
 			for (int i(0); i < coeffs.data.size(); ++i)
-				coeffs.data[i] *= scalaire;
+				coeffs.data[i] *= scalaire_;
 		else
 			*this = polynome_n_iter(coeffs.puissance, unite(coeffs.data[0], false), noms);
 
@@ -387,8 +387,27 @@ public:
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i])
 				return true;
+//		std::vector<int> vec(coeffs.puissance, 1);
+//		coeffs.modifier_dimensions(vec);
 		return false;
 	};
+
+	
+	explicit inline operator bool()  {
+		if (scalaire)
+			return (bool)coeffs.data[0];
+
+		if ((bool)coeffs.data[coeffs.data.size() - 1])
+			return true;
+
+		for (int i(0); i < coeffs.data.size(); ++i)
+			if ((bool)coeffs.data[i])
+				return true;
+		std::vector<int> vec(coeffs.puissance, 1);
+		coeffs.modifier_dimensions(vec);
+		return false;
+	};
+	
 
 	operator polynome_n_rec<T>() const {
 		if (scalaire)
@@ -590,7 +609,7 @@ public:
 	friend void swap(polynome_n_iter<T>& gauche, polynome_n_iter<T>& droit) {
 		std::swap(gauche.scalaire, droit.scalaire);
 		std::swap(gauche.noms, droit.noms);
-		std::swap(gauche.coeffs, droit.coeffs);
+		swap(gauche.coeffs, droit.coeffs);
 		return;
 	};
 
@@ -617,7 +636,43 @@ public:
 				poly.ajouter(monome<T>(coeffs.position(i), coeffs.data[i]));
 		poly.simplifier();
 		return poly;
-	}
+	};
+
+	template<class U>
+	operator polynome_n_iter<U>() const { //degre element noms false
+		if (scalaire)
+			return polynome_n_iter<U>(std::vector<int>(0), (U)coeffs.data[0], NULL);
+		polynome_n_iter<U> poly(coeffs.dimensions, unite((U)coeffs.data[0], false), noms, false); //false car ce sont les dimensions, et non les degrés ...
+		for (int i(0); i < poly.coeffs.data.size(); ++i)
+			poly.coeffs.data[i] = (U)coeffs.data[i];
+		return poly;
+	};
+
+	std::vector<int> max_degre() const {
+		std::vector<int> result(coeffs.puissance, -1);
+		for (int i(0); i < coeffs.data.size(); ++i)
+			if ((bool)coeffs.data[i]) {
+				std::vector<int> positions = coeffs.position(i);
+				for (int j(0); j < coeffs.puissance; ++j)
+					if (positions[j] > result[j])
+						result[j] = positions[j];
+			}
+		return result;
+	};
+
+	int max_degre(int deg) const {
+		int result = -1;
+		int pow = coeffs.puissances[deg];
+		int dim = coeffs.dimensions[deg];
+		for (int i(0); i < coeffs.data.size(); ++i)
+			if ((bool)coeffs.data[i]) {
+				int pos = (i / pow) % dim;
+				if (pos > result)
+					result = pos;
+			}
+		return result;
+	};
+
 };
 
 template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {

@@ -173,7 +173,7 @@ public:
         polynome<T> result(temp);
 
         for (int i(0); i < temp.coeffs.size(); ++i)
-            result.coeffs[i] = scalaire * result.coeffs[i];
+            result.coeffs[i] *= scalaire;
         result.getDegre();
         return result;
     };

@@ -39,7 +39,7 @@ constexpr void constexpr_for(F&& f)
 
 
 template <int start, int end, class F>
-constexpr void constexpr_for(F&& f) //utilisé pour g, croissant
+constexpr inline void constexpr_for(F&& f) //utilisé pour g, croissant
 {
 	if constexpr (start <= end)
 	{
@@ -51,7 +51,7 @@ constexpr void constexpr_for(F&& f) //utilisé pour g, croissant
 };
 
 template <int start, int end, int end2, class F, class G>
-constexpr void constexpr_for_2(F&& f, G&& g)
+constexpr inline void constexpr_for_2(F&& f, G&& g)
 {
 	if constexpr (start >= end)
 	{
@@ -168,7 +168,7 @@ public:
 		return poly.coeffs[0].get_T();
 	};
 
-	explicit operator bool() {
+	explicit operator bool() const {
 		return nul;
 	};
 
@@ -181,8 +181,8 @@ public:
 	int lenght() {
 		int somme = 0;
 		for (int i(0); i < poly.coeffs.size(); ++i)
-			somme += poly.coeffs[i].length;
-		return somme;
+			somme += poly.coeffs[i].length();
+		return somme+1;
 	};
 
 
@@ -217,7 +217,7 @@ public:
 
 		iterator(polynome_n_fixe<T, n> const& temp) : pointeurs(temp), positions(n, 0), termine(true) {	};
 
-		operator bool() {
+		operator bool() const {
 			return termine;
 		};
 
@@ -271,6 +271,30 @@ public:
 		result.poly = (polynome<polynome_n_rec<T>>) poly;
 
 		return result;
+	};
+
+	int max_degre(int i) const {
+		if (i == 0)
+			return poly.degre;
+		int result = -1;
+		for (int j(0); j < poly.coeffs.size(); ++j)
+			result = max(result, poly.coeffs[i].max_degre(i-1));
+		return result;
+	}
+
+	std::vector<int> max_degre() const {
+		std::vector<int> result(n, -1);
+		max_degre(result.data());
+		return result;
+	};
+
+	void max_degre(int* p) const{
+		if (poly.degre > p[0])
+			p[0] = poly.degre;
+		for (int i(0); i < poly.coeffs.size(); ++i)
+			if((bool) poly.coeffs[i])
+				poly.coeffs[i].max_degre(p + 1);
+		return;
 	};
 };
 
@@ -350,7 +374,6 @@ public:
 	template<class U>
 	polynome_n_fixe<T, 1>& operator*=(U const& scalaire) {
 		poly *= scalaire;
-
 		nul = (bool)poly;
 		return *this;
 	};
@@ -427,7 +450,7 @@ public:
 		return poly.coeffs[0].get_T();
 	};
 
-	explicit operator bool() {
+	explicit operator bool() const {
 		return nul;
 	};
 
@@ -458,7 +481,7 @@ public:
 			return;
 		};
 		
-		operator bool() {
+		operator bool() const {
 			return termine;
 		};
 
@@ -514,7 +537,28 @@ public:
 		return result;
 	};
 
+	int max_degre(int i) const {
+#ifdef ALGEBRA_USE_EXCEPTION
+		if (i != 0)
+			throw std::domain_error("polynome_n_fixe : get_degre : i >= n");
+#endif
+		return poly.degre;
+	}
 
+	std::vector<int> max_degre() const {
+		std::vector<int> result{ poly.degre };
+		return result;
+	};
+
+	void max_degre(int* p) const {
+		if (poly.degre > p[0])
+			p[0] = poly.degre;
+		return;
+	};
+
+	int lenght() {
+		return poly.coeffs.size() + 1;
+	}
 };
 
 
@@ -682,7 +726,7 @@ public:
 		return element;
 	};
 
-	explicit operator bool() {
+	explicit operator bool() const {
 		return nul;
 	};
 
@@ -713,6 +757,7 @@ public:
 
 		return result;
 	};
+
 
 };
 
