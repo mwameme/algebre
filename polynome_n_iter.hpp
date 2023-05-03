@@ -620,11 +620,11 @@ public:
 
 	};
 
-	typename iterator begin() const {
+	typename iterator begin()  {
 		return coeffs.data.begin();
 	};
 
-	typename iterator end() const {
+	typename iterator end()  {
 		return coeffs.data.end();
 	};
 
@@ -633,7 +633,7 @@ public:
 		poly.noms = noms;
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i])
-				poly.ajouter(monome<T>(coeffs.position(i), coeffs.data[i]));
+				poly.ajouter(monome<T>(coeffs.positions(i), coeffs.data[i]));
 		poly.simplifier();
 		return poly;
 	};
@@ -652,7 +652,7 @@ public:
 		std::vector<int> result(coeffs.puissance, -1);
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i]) {
-				std::vector<int> positions = coeffs.position(i);
+				std::vector<int> positions = coeffs.positions(i);
 				for (int j(0); j < coeffs.puissance; ++j)
 					if (positions[j] > result[j])
 						result[j] = positions[j];

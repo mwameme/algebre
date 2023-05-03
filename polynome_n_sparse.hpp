@@ -110,6 +110,8 @@ public:
 	std::string* noms;
 	bool est_trie; //si true, la liste est triee ...
 
+	using iterator = typename std::vector<monome<T>>::iterator;
+
 //	std:function<bool(monomes*,monomes*)> 
 
 	polynome_n_sparse(int n, std::string* noms_) : n_var(n), noms(noms_),est_trie(true) {};
@@ -448,7 +450,7 @@ public:
 		if (!est_trie)
 			simplifier();
 		for (int i(0); i < monomes.size(); ++i) {
-			result.coeffs.data[result.coeffs.accesseur(monomes[i].degres)] = monomes[i].element;
+			result.coeffs.data[result.coeffs.position(monomes[i].degres)] = monomes[i].element;
 		};
 		return result;
 	};
@@ -486,5 +488,11 @@ public:
 		return poly;
 	}
 
+	typename iterator begin() {
+		return monomes.begin();
+	};
 
+	typename iterator end() {
+		return monomes.end();
+	}
 };

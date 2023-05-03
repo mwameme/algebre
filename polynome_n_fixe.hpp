@@ -215,7 +215,7 @@ public:
 			return *this;
 		};
 
-		iterator(polynome_n_fixe<T, n> const& temp) : pointeurs(temp), positions(n, 0), termine(true) {	};
+		iterator(polynome_n_fixe<T, n> & temp) : pointeurs(temp), positions(n, 0), termine(true) {	};
 
 		operator bool() const {
 			return termine;
@@ -244,11 +244,11 @@ public:
 
 	};
 
-	iterator begin() const {
+	iterator begin()  {
 		return iterator(*this);
 	};
 
-	iterator end() const {
+	iterator end()  {
 		iterator it(*this);
 		it.termine = false;
 		return it;
@@ -258,7 +258,7 @@ public:
 	operator polynome_n_fixe<U, n>() {
 		polynome_n_fixe<U,n> result();
 		result.poly = (polynome<polynome_n_fixe<U, n - 1>>) poly;
-		result.nul = (bool)result.poly;
+		result.nul = (bool) result.poly;
 
 		return result;
 	}
@@ -508,11 +508,11 @@ public:
 
 	};
 
-	iterator begin() const {
+	iterator begin() {
 		return iterator(*this);
 	};
 
-	iterator end() const {
+	iterator end() {
 		iterator it(*this);
 		it.termine = false;
 		return it;

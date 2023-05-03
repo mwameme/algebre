@@ -475,7 +475,7 @@ public:
 				return pointeurs[0]->element;
 		};
 
-		iterator(polynome_n_rec<T> const& temp) : positions(temp.n_var, 0), n_var(temp.n_var), pointeurs(temp.n_var) ,termine(true){
+		iterator(polynome_n_rec<T> & temp) : positions(temp.n_var, 0), n_var(temp.n_var), pointeurs(temp.n_var,NULL) ,termine(true){
 			if (n_var > 0) {
 				pointeurs[0] = &temp;
 				for (int i(1); i < n_var; ++i)
@@ -485,6 +485,10 @@ public:
 				pointeurs = { &temp };
 			};
 		};
+
+		operator bool() const {
+			return termine;
+		}
 	};
 
 	iterator begin() {
@@ -519,6 +523,43 @@ public:
 		poly.noms = noms_variables;
 		poly.simplifier();//non nécessaire ...
 	}
+
+	polynome_n_rec<T> operator()(int i, polynome_n_rec<T> const& poly) const {
+		polynome_n_rec<T> result = unite(poly, false);
+		int m_pow = max_degre(i);
+#ifdef ALGEBRA_USE_EXCEPTION
+		if (poly.n_var != (n_var - 1))
+			throw std::domain_error("evaluation de polynome n_sparse : les degrés ne correspondent pas");
+#endif
+		std::vector< polynome_n_rec<T>> vec_pow;
+		vec_pow.reserve(m_pow + 1);
+		vec_pow.push_back(unite(poly, true));
+		for (int j(1); j < vec_pow.size(); ++j)
+			vec_pow[j] = vec_pow[j - 1] * poly;
+
+		for (iterator it = begin(); (bool) it; ++it) {
+			if (!(bool)*it)
+				continue;
+			std::vector<int> temp_degres = it.positions;
+			int pow = temp_degres[i];
+			temp_degres.erase(temp_degres.begin() + i);
+
+			//			polynome_n_sparse<T> temp_poly(monome<T>(temp_degres, monomes[j].element));
+
+			polynome_n_rec<T> temp_poly(vec_pow[pow]); //On fait à la main et on simplifie seulement à la fin : + rapide
+			polynome_n_rec<T> monome_(n_var - 1, temp_degres, *it);
+			result += monome_ * temp_poly;
+		};
+
+		result.noms_variables = poly.noms_variables;
+		return result;
+		//marche avec résultat scalaire ? je crois
+	};
+
+	polynome_n_rec<T> operator()(int i, T const& Y) const {
+		polynome_n_rec<T> poly(n_var-1,Y,noms_variables);
+		return *this(i, poly);
+	};
 
 };
 

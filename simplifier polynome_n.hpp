@@ -182,7 +182,7 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 	faux_T.vecteur.resize(positions_R2.size()); //on met à jour la taille du vecteur ... taille(faux_T) = taille(resultat_T)
 	polynome_n_iter<scalaire_vecteur<T>> resultat_T(degres, faux_T, denom.noms); //on connait le degré du résultat à l'avance ...
 	for (int i(0); i < positions_R2.size(); ++i)
-		resultat_T.coeffs.data[resultat_T.coeffs.accesseur(positions_R2[i])] = i; //on génère les vecteurs de la "base"
+		resultat_T.coeffs.data[resultat_T.coeffs.position(positions_R2[i])] = i; //on génère les vecteurs de la "base"
 
 	//on a le resultat, et le denom ... on les multiplie et extrait les équations !
 	polynome_n_iter<scalaire_vecteur<T>> num_T = denom_T * resultat_T; //normalement les dimensions correspondent. Car pas de simplification (je parle de data ...)
@@ -209,7 +209,7 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 
 	polynome_n_iter<T> resultat(degres, faux, num.noms);
 	for (int i(0); i < positions_R2.size(); ++i)
-		resultat.coeffs.data[resultat.coeffs.accesseur(positions_R2[i])] = X[i]; //on sait que e_i = X_i ... c'était le but.
+		resultat.coeffs.data[resultat.coeffs.position(positions_R2[i])] = X[i]; //on sait que e_i = X_i ... c'était le but.
 
 	resultat.simplifier_2();
 

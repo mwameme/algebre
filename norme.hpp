@@ -2,6 +2,7 @@
 
 #include "fonctions template.hpp"
 #include "entete objets.hpp"
+#include "polynome_n_rec.hpp"
 
 template<class T> class complex;
 
@@ -13,6 +14,7 @@ template<class T> class corps_quotient;
 template<class T, class enable1 = void, class enable2 = void> class matrice;
 template<class T> class polynome;
 template<class T> class polynome_n_rec;
+
 template<class T> class polynome_n_iter;
 template<class T> class rationnel;
 template<class T, int n> class polynome_n_fixe;
@@ -131,6 +133,7 @@ public:
 	};
 };
 
+/*
 template<class T> class norme_T< polynome_n_rec<T> > {
 public:
 	static decltype(norme_T<T>::norme(T())) norme(polynome_n_rec<T> poly) {
@@ -144,7 +147,23 @@ public:
 		};
 		return norme_T<T>::norme(poly.element);
 	};
+};*/
+
+template<class T> class norme_T< polynome_n_rec<T> > {
+public:
+	static decltype(norme_T<T>::norme(T())) norme(polynome_n_rec<T> poly) {
+		if (poly.n_var >= 1) {
+			decltype(norme_T<T>::norme(T())) x = norme_T<T>::norme(unite(poly.element, false));
+			//			x = unite(x,false);
+			for (auto it=poly.begin(); (bool) it; ++it) {
+				x  += norme_T<T>::norme(*it);
+			}
+			return x;
+		};
+		return norme_T<T>::norme(poly.element);
+	};
 };
+
 
 template<class T> class norme_T< polynome_n_iter<T> > {
 public:
@@ -156,6 +175,24 @@ public:
 		return x;
 	};
 };
+
+
+template<class T,int n> class norme_T< polynome_n_fixe<T,n> > {
+public:
+	static decltype(norme_T<T>::norme(T())) norme(polynome_n_fixe<T,n> poly) {
+		if constexpr(n >= 1) {
+			decltype(norme_T<T>::norme(T())) x = norme_T<T>::norme(unite(poly.get_T(), false));
+			//			x = unite(x,false);
+			for (auto it = poly.begin(); (bool) it; ++it) {
+				x += norme_T<T>::norme(*it);
+			}
+			return x;
+		}
+		else
+			return norme_T<T>::norme(poly.element);
+	};
+};
+
 
 
 

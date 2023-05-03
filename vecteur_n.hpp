@@ -97,45 +97,41 @@ public:
 	};
 	*/
 
-	int accesseur(std::vector<int> const& positions) const { //position doit être de la bonne taille (et du bon format)
+	int position(std::vector<int> const& positions_) const { //position doit être de la bonne taille (et du bon format)
 		int expo = 1;
 		int pos = 0;
 		for (int i(puissance - 1); i >= 0; --i) {
-			pos = pos + positions[i] * puissances[i];
+			pos = pos + positions_[i] * puissances[i];
 		}
 		return pos;
 	};
 
-	std::vector<int> position(int pos) const{
+	std::vector<int> positions(int pos_) const{
 		std::vector<int> retour(puissance, 0);
 
 		for (int i(puissance - 1); i >= 0; --i) {
-			retour[i] = pos % dimensions[i];
-			pos = pos / dimensions[i];
+			retour[i] = pos_ % dimensions[i];
+			pos_ = pos_ / dimensions[i];
 		}
 
 		return retour;
 	};
 
-	bool accesseur_possible(std::vector<int> const& position) const {
-		if (position.size() != puissance)
+	bool accesseur_possible(std::vector<int> const& positions_) const {
+		if (positions_.size() != puissance)
 			return false;
 		for (int i(0); i < puissance; ++i)
-			if (position[i] >= dimensions[i])
+			if (positions_[i] >= dimensions[i])
 				return false;
 		return true;
 	};
 
-	inline T& operator[](std::vector<int> position)  { //
-		if (accesseur_possible(position))
-			return data[accesseur(position)];
+	inline T& operator[](std::vector<int> positions_)  { //
+		return data[position(positions_)];
 	};
 
-	inline T operator[](std::vector<int> position) const { //
-		if (accesseur_possible(position))
-			return data[accesseur(position)];
-		T element = unite(data[0],false);
-		return element;
+	inline T operator[](std::vector<int> positions_) const { //
+		return data[position(positions_)];
 	};
 
 	inline T& operator[](int position) {
