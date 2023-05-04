@@ -15,6 +15,7 @@ template<class T> class polynome_n_rec;
 template<class T> class polynome_n_iter;
 template<class T> class rationnel;
 template<class T, int n> class polynome_n_fixe;
+template<class T> class polynome_n_sparse;
 
 class InfInt;
 class int_precision;
@@ -28,7 +29,7 @@ public:
 	static constexpr int approx=0; //0 : exact ; 1 : approché 
 	static constexpr bool is_ratio = false; //dit si il y a un rationnel, en oubliant le rationnel<int> éventue de la fin
 	static constexpr bool is_objet = true; //dit si il y a au moins un objet ... (polynomes)
-	//	static constexpr bool is_corps_ratio = false; //dit si le corps de base est un rationnel d'entier. mal défini pour les autres types.
+	static constexpr bool is_corps_ratio = false; //dit si le corps de base est un rationnel d'entier. vaut false pour les entiers et les réels ... 
 };
 
 template<class T> class type_algebre<polynome<T>> {
@@ -39,7 +40,20 @@ public:
 	static constexpr int approx= type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = true;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
 };
+
+template<class T> class type_algebre<polynome_n_sparse<T>> {
+public:
+	using corps = typename type_algebre<T>::corps;
+
+	static constexpr int type = 2;
+	static constexpr int approx = type_algebre<T>::approx;
+	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
+	static constexpr bool is_objet = true;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
+};
+
 
 template<class T> class type_algebre<polynome_n_rec<T>> {
 public:
@@ -49,6 +63,7 @@ public:
 	static constexpr int approx = type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = true;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
 };
 
 template<class T> class type_algebre<polynome_n_iter<T>> {
@@ -59,6 +74,8 @@ public:
 	static constexpr int approx = type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = true;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
+
 };
 
 template<class T,int n> class type_algebre<polynome_n_fixe<T,n>> {
@@ -69,6 +86,29 @@ public:
 	static constexpr int approx = type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = true;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
+};
+
+template<class T> class type_algebre<polynome_n_fixe<T, 1>> {
+public:
+	using corps = typename type_algebre<T>::corps;
+
+	static constexpr int type = (type_algebre<T>::type == 0 ? 1 : 2);
+	static constexpr int approx = type_algebre<T>::approx;
+	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
+	static constexpr bool is_objet = true;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
+};
+
+template<class T> class type_algebre<polynome_n_fixe<T, 0>> {
+public:
+	using corps = typename type_algebre<T>::corps;
+
+	static constexpr int type = type_algebre<T>::type;
+	static constexpr int approx = type_algebre<T>::approx;
+	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
+	static constexpr bool is_objet = type_algebre<T>::is_objet;
+	static constexpr bool is_corps_ratio = type_algebre<T>::is_corps_ratio;
 };
 
 
@@ -82,6 +122,7 @@ public:
 	static constexpr int approx = type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = type_algebre<T>::is_objet;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
 };
 
 template<class T> class type_algebre<corps_quotient<T>> {
@@ -93,7 +134,7 @@ public:
 	static constexpr int approx= type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = type_algebre<T>::is_objet;
-	static constexpr bool is_corps_ratio = false;
+	static constexpr bool is_corps_ratio = (std::is_same< corps_quotient<T>, corps >::value) ? false : type_algebre<T>::is_corps_ratio;
 };
 
 /*
@@ -130,7 +171,7 @@ public:
 	static constexpr int approx= type_algebre<T>::approx;
 	static constexpr bool is_ratio = get_ratio();
 	static constexpr bool is_objet = type_algebre<T>::is_objet;
-	static constexpr bool is_corps_ratio = true;
+	static constexpr bool is_corps_ratio = (std::is_same< rationnel<T>, corps >::value) ? true : type_algebre<T>::is_corps_ratio;
 };
 
 
@@ -190,6 +231,8 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
+	static constexpr bool is_corps_ratio = false;
+
 };
 
 template<> class type_algebre<long> {
@@ -200,6 +243,8 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
+	static constexpr bool is_corps_ratio = false;
+
 };
 
 template<> class type_algebre<long long> {
@@ -210,6 +255,8 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
+	static constexpr bool is_corps_ratio = false;
+
 };
 
 
@@ -222,6 +269,8 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
+	static constexpr bool is_corps_ratio = false;
+
 };
 
 template<> class type_algebre<InfInt> {
@@ -232,6 +281,8 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
+	static constexpr bool is_corps_ratio = false;
+
 };
 
 template<> class type_algebre<float> {

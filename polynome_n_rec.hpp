@@ -466,7 +466,7 @@ public:
 	operator polynome_n_sparse<T>() const {
 		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(n_var, 0), unite(element, false)));
 
-		for (iterator it = begin(); (bool)it; ++it)
+		for (iterator it = cbegin(); (bool)it; ++it)
 			if ((bool)*it)
 				poly.ajouter(monome<T>(it.positions, *it));
 		poly.noms = noms_variables;
@@ -486,7 +486,7 @@ public:
 		for (int j(1); j < vec_pow.size(); ++j)
 			vec_pow[j] = vec_pow[j - 1] * poly;
 
-		for (iterator it = begin(); (bool) it; ++it) {
+		for (iterator it = cbegin(); (bool) it; ++it) {
 			if (!(bool)*it)
 				continue;
 			std::vector<int> temp_degres = it.positions;

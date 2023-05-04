@@ -736,6 +736,11 @@ public:
 		position = i;
 	};
 
+	void operator+(int i) {
+		position += i;
+		return;
+	}
+
 	void go_position(std::vector<int> pos) {
 		position = pointeur->coeffs.position(pos);
 	};

@@ -183,7 +183,7 @@ public:
 		if constexpr (n >= 1) {
 			decltype(norme_T<T>::norme(T())) x = norme_T<T>::norme(unite(poly.get_T(), false));
 			//			x = unite(x,false);
-			for (auto it = poly.begin(); (bool)it; ++it) {
+			for (auto it = poly.cbegin(); (bool)it; ++it) {
 				x += norme_T<T>::norme(*it);
 			}
 			return x;
