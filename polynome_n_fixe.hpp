@@ -185,71 +185,30 @@ public:
 		return somme+1;
 	};
 
+	template<class I>
+	class iterator_polynome_n_fixe;
 
-	class iterator {
-	public:
+	using iterator = iterator_polynome_n_fixe<T>;
+	using const_iterator = iterator_polynome_n_fixe<const T>;
 
-		pointeur_n<T, n> pointeurs;
-		std::vector<int> positions;
-		bool termine;
 
-		iterator& operator++() {
-			constexpr_for_2<n - 1, 0, n - 1>([&](auto i) { //premiere fonction : mettre a jour les positions.
-				++positions[i];
-				if (positions[i] >= pointeurs.get<i>()->poly.coeffs.size()) {
-					positions[i] = 0;
-					if (i == 0) {
-						termine = false;
-						return false;
-					}
-					return true;
-				}
-				else
-					return false; //lors de return false, position i est bonne. recommencer à i+1
-
-				}, [&](auto j) { //deuxieme fonction : mettre a jour les pointeurs.
-					pointeurs.get<j>() = &pointeurs.get<j - 1>()->poly.coeffs[positions[j - 1]];
-					return;
-				});
-
-			return *this;
-		};
-
-		iterator(polynome_n_fixe<T, n> & temp) : pointeurs(temp), positions(n, 0), termine(true) {	};
-
-		operator bool() const {
-			return termine;
-		};
-
-		T operator*() {
-			return pointeurs.get<n>()->poly.coeffs[positions[n - 1]].element;
-		};
-
-		friend bool operator==(iterator const& it1, iterator const& it2) {
-			if ((it1.termine == it2.termine) && (it1.pointeurs.get<0>() == it2.pointeurs.get<0>()) && (it1.positions == it1.positions))
-				return true;
-			else
-				return false;
-		};
-
-		friend bool operator!=(iterator const& it1, iterator const& it2) {
-			if (it1.termine != it2.termine)
-				return true;
-			if (it1.positions != it2.termine)
-				return true;
-			if (it1.pointeurs.get<0>() != it2.pointeurs.get<0>())
-				return true;
-			return false;
-		};
-
-	};
-
-	iterator begin()  {
+	iterator begin() {
 		return iterator(*this);
 	};
 
-	iterator end()  {
+	iterator end() {
 		iterator it(*this);
+		it.termine = false;
+		return it;
+	};
+
+
+	const_iterator cbegin() const {
+		return const_iterator(*this);
+	};
+
+	const_iterator end() const {
+		const_iterator it(*this);
 		it.termine = false;
 		return it;
 	};
@@ -330,8 +289,131 @@ public:
 	};
 
 	pointeur_n(polynome_n_fixe<T, n>& poly) : pointeur(&poly), pointeurs(poly.poly.coeffs[0]) {	};
+};
+
+
+template<class T, int n> class pointeur_n_const;
+
+template<class T> class pointeur_n_const<T, 1> {
+public:
+	const polynome_n_fixe<T, 1>* pointeur;
+
+	template<int m>
+	const polynome_n_fixe<T, 1>*& get() {
+		//		static_assert(m == 0);
+		return pointeur;
+	};
+
+	pointeur_n_const(const polynome_n_fixe<T, 1>& poly) {
+		pointeur = &poly;
+	};
 
 };
+
+template<class T, int n> class pointeur_n_const {
+public:
+	const polynome_n_fixe<T, n>* pointeur;
+	pointeur_n_const<T, n - 1> pointeurs;
+
+	template<int m>
+	auto*& get() {
+		if constexpr (m == 0)
+			return pointeur;
+		else
+			return pointeurs.get<m - 1>();
+	};
+
+	pointeur_n_const(const polynome_n_fixe<T, n>& poly) : pointeur(&poly), pointeurs(poly.poly.coeffs[0]) {	};
+};
+
+template<class T,int n> template<class I>
+class polynome_n_fixe<T,n>::iterator_polynome_n_fixe {
+public:
+	using value_type = std::remove_const_t<I>;
+	using poly_type = std::conditional_t< std::is_const_v<I>, const polynome_n_fixe<value_type,n>, polynome_n_fixe<value_type,n>	>;
+
+	std::conditional_t < std::is_const_v<I>, pointeur_n_const<T, n>, pointeur_n<T,n> > pointeurs;
+	std::vector<int> positions;
+	bool termine;
+
+	iterator_polynome_n_fixe& operator++() {
+		constexpr_for_2<n - 1, 0, n - 1>([&](auto i) { //premiere fonction : mettre a jour les positions.
+			++positions[i];
+			if (positions[i] >= pointeurs.get<i>()->poly.coeffs.size()) {
+				positions[i] = 0;
+				if (i == 0) {
+					termine = false;
+					return false;
+				}
+				return true;
+			}
+			else
+				return false; //lors de return false, position i est bonne. recommencer à i+1
+
+			}, [&](auto j) { //deuxieme fonction : mettre a jour les pointeurs.
+				pointeurs.get<j>() = &pointeurs.get<j - 1>()->poly.coeffs[positions[j - 1]];
+				return;
+			});
+
+		return *this;
+	};
+
+	void go_position(std::vector<int> new_positions) {
+		positions = new_positions;
+
+		constexpr_for<1, n-1>([&](auto j) { //deuxieme fonction : mettre a jour les pointeurs.
+#ifdef ALGEBRA_USE_EXCEPTION
+			if (positions[j - 1] >= pointeurs.get<j - 1>()->poly.coeffs.size())
+				throw std::domain_error("poolynome_n_fixe::iterator, position hors domaine");
+#endif
+			pointeurs.get<j>() = &pointeurs.get<j - 1>()->poly.coeffs[positions[j - 1]];
+			return;
+			});
+		return;
+	}
+
+	iterator_polynome_n_fixe(poly_type & temp) : pointeurs(temp), positions(n, 0), termine(true) {	};
+
+	iterator_polynome_n_fixe(iterator_polynome_n_fixe const& copie) {
+		pointeurs = copie.pointeurs;
+		positions = copie.positions;
+		termine = copie.termine;
+	};
+
+	iterator_polynome_n_fixe& operator=(iterator_polynome_n_fixe const& copie) {
+		pointeurs = copie.pointeurs;
+		positions = copie.positions;
+		termine = copie.termine;
+	};
+
+
+	operator bool() const {
+		return termine;
+	};
+
+	I& operator*() {
+		return pointeurs.get<n>()->poly.coeffs[positions[n - 1]].element;
+	};
+
+	friend bool operator==(iterator_polynome_n_fixe const& it1, iterator_polynome_n_fixe const& it2) {
+		if ((it1.termine == it2.termine) && (it1.pointeurs.get<0>() == it2.pointeurs.get<0>()) && (it1.positions == it1.positions))
+			return true;
+		else
+			return false;
+	};
+
+	friend bool operator!=(iterator_polynome_n_fixe const& it1, iterator_polynome_n_fixe const& it2) {
+		if (it1.termine != it2.termine)
+			return true;
+		if (it1.positions != it2.termine)
+			return true;
+		if (it1.pointeurs.get<0>() != it2.pointeurs.get<0>())
+			return true;
+		return false;
+	};
+	 
+};
+
 
 
 template<class T> class polynome_n_fixe<T, 1> {
@@ -464,6 +546,7 @@ public:
 		return poly.coeffs.size();
 	};
 
+	/*
 	class iterator {
 	public:
 		polynome_n_fixe<T, 1>* pointeur;
@@ -507,6 +590,13 @@ public:
 		};
 
 	};
+	*/
+
+	template<class I>
+	class iterator_polynome_n_fixe;
+
+	using iterator = iterator_polynome_n_fixe<T>;
+	using const_iterator = iterator_polynome_n_fixe<const T>;
 
 	iterator begin() {
 		return iterator(*this);
@@ -517,6 +607,18 @@ public:
 		it.termine = false;
 		return it;
 	};
+
+
+	const_iterator cbegin() const {
+		return const_iterator(*this);
+	};
+
+	const_iterator cend() const {
+		const_iterator it(*this);
+		it.termine = false;
+		return it;
+	};
+
 
 	template<class U>
 	operator polynome_n_fixe<U, 1>() {
@@ -637,6 +739,74 @@ polynome_n_fixe<T, 1>::polynome_n_fixe(int* vec, T element, T faux) {  //monome 
 	vec_poly[p] = polynome_n_fixe<T, 0>(element);
 	poly = polynome<polynome_n_fixe<T, 0>>(vec_poly);
 };
+
+
+template<class T> template<class I>
+class polynome_n_fixe<T, 1>::iterator_polynome_n_fixe {
+public:
+
+	using value_type = std::remove_const_t<I>;
+	using poly_type = std::conditional_t< std::is_const_v<I>, const polynome_n_fixe<value_type, 1>, polynome_n_fixe<value_type, 1>	>;
+
+	poly_type* pointeur;
+
+	int p;
+	bool termine;
+
+	iterator_polynome_n_fixe(poly_type& temp) : pointeur(&temp), termine(true), p(0) { };
+
+	iterator_polynome_n_fixe(iterator_polynome_n_fixe const& copie) {
+		p=copie.p;
+		termine = copie.termine;
+	}
+
+	iterator_polynome_n_fixe& operator=(iterator_polynome_n_fixe const& copie) {
+		p=copie.p;
+		termine = copie.termine;
+		return *this;
+	}
+
+	iterator_polynome_n_fixe& operator++() {
+		++p;
+		if (p >= pointeur->poly.coeffs.size()) {
+			p = 0;
+			termine = false;
+		};
+		return *this;
+	};
+
+	operator bool() const {
+		return termine;
+	};
+
+	friend bool operator==(iterator_polynome_n_fixe const& it1, iterator_polynome_n_fixe const& it2) {
+		if ((it1.termine != it2.termine) || (it1.pointeur != it2.pointeur) || (it1.p != it2.p))
+			return false;
+		else
+			return true;
+	}
+
+	friend bool operator!=(iterator_polynome_n_fixe const& it1, iterator_polynome_n_fixe const& it2) {
+		if (it1.termine != it2.termine)
+			return true;
+		if (it1.pointeur != it2.pointeur)
+			return true;
+		if (it1.p != it2.p)
+			return true;
+		return false;
+	};
+
+	void go_position(int j) {
+		p = j;
+		return;
+	};
+
+	I& operator*() {
+		return pointeur->poly.coeffs[p].element;
+	};
+
+};
+
 
 template<class T> class polynome_n_fixe<T, 0> {
 public:

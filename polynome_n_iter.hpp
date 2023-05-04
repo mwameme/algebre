@@ -27,7 +27,6 @@ public:
 	std::string* noms;
 	vecteur_n<T> coeffs;
 
-	using iterator = typename std::vector<T>::iterator;
 
 	polynome_n_iter() {};
 
@@ -620,12 +619,30 @@ public:
 
 	};
 
-	typename iterator begin()  {
-		return coeffs.data.begin();
+	template<class I>
+	class iterator_polynome_n_iter;
+
+	using iterator = iterator_polynome_n_iter<T>;
+	using const_iterator = iterator_polynome_n_iter<const T>;
+
+	iterator begin() {
+		return iterator(*this);
 	};
 
-	typename iterator end()  {
-		return coeffs.data.end();
+	iterator end() {
+		iterator it(*this);
+		it.position = coeffs.data.size();
+		return it;
+	};
+
+	const_iterator cbegin() const {
+		return const_iterator(*this);
+	};
+
+	const_iterator cend() const {
+		const_iterator it(*this);
+		it.position = coeffs.data.size();
+		return it;
 	};
 
 	operator polynome_n_sparse<T>() const {
@@ -689,8 +706,53 @@ template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int*
 };
 
 
+template<class T> template<class I>
+class polynome_n_iter<T>::iterator_polynome_n_iter {
+public:
+	using value_type = std::remove_const_t<I>;
+	using poly_type = std::conditional_t< std::is_const_v<I>, const polynome_n_iter<value_type>, polynome_n_iter<value_type>	>;
 
+	poly_type* pointeur;
+	int position;
 
+	iterator_polynome_n_iter& operator++() {
+		++position;
+		return *this;
+	};
+
+	operator bool() const {
+		return position < pointeur->coeffs.data.size();
+	};
+
+	I& operator*() {
+		return pointeur->coeffs.data[position];
+	};
+
+	std::vector<int> positions() const {
+		return pointeur->coeffs.positions(position);
+	};
+
+	void go_position(int i) {
+		position = i;
+	};
+
+	void go_position(std::vector<int> pos) {
+		position = pointeur->coeffs.position(pos);
+	};
+
+	friend bool operator==(iterator_polynome_n_iter const& gauche, iterator_polynome_n_iter const& droit) {
+		return ((gauche.pointeur == droit.pointeur) && (gauche.position == droit.position));
+	};
+
+	friend bool operator!=(iterator_polynome_n_iter const& gauche, iterator_polynome_n_iter const& droit) {
+		return ((gauche.pointeur != droit.pointeur) || (gauche.position != droit.position));
+	};
+
+	iterator_polynome_n_iter(poly_type& poly) {
+		pointeur = &poly;
+		position = 0;
+	};
+};
 // Verifier les dimensions : polynome nul. OK
 // convertir en polynome_n_rec, et réciproquement. OK
 // mettre a jour types et norme.

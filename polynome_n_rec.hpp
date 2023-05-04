@@ -422,74 +422,12 @@ public:
 		return;
 	};
 
-	class iterator {
-	public:
-		int n_var;
+	template<class I>
+	class iterator_polynome_n_rec;
 
-		std::vector<int> positions;
-		std::vector<polynome_n_rec<T>*> pointeurs;
-		bool termine;
+	using iterator = iterator_polynome_n_rec<T>;
+	using const_iterator = iterator_polynome_n_rec<const T>;
 
-
-		iterator& operator++() {
-			if (n_var == 0) {
-				termine = false;
-				return *this;
-			};
-
-			int i = n_var - 1;
-			++positions[i];
-			while (positions[i] >= pointeurs[i]->poly.coeffs.size()) {
-				positions[i] = 0;
-				if (i == 0) {
-					termine = false;
-					return *this;
-				}
-				++positions[i - 1];
-				--i;
-			}
-			for (int j = i + 1; j < n_var; ++j)
-				pointeurs[j] = &pointeurs[j - 1]->poly.coeffs[positions[j - 1]];
-			return *this;
-		};
-
-		bool operator==(iterator const& autre) const {
-			return (pointeurs[0] == autre.pointeurs[0]) && (positions == autre.positions) && (termine = autre.termine);
-		};
-
-		bool operator!=(iterator const& autre) const {
-			if (termine != autre.termine)
-				return true;
-			if (pointeurs[0] != autre.pointeurs[0])
-				return true;
-			if (n_var != 0)
-				return (positions != autre.positions);
-			else
-				return false;
-		};
-
-		T operator*() const {
-			if (n_var > 0)
-				return pointeurs[n_var - 1]->poly.coeffs[positions[n_var - 1]].element;
-			else
-				return pointeurs[0]->element;
-		};
-
-		iterator(polynome_n_rec<T> & temp) : positions(temp.n_var, 0), n_var(temp.n_var), pointeurs(temp.n_var,NULL) ,termine(true){
-			if (n_var > 0) {
-				pointeurs[0] = &temp;
-				for (int i(1); i < n_var; ++i)
-					pointeurs[i] = &pointeurs[i - 1]->poly.coeffs[0];
-			}
-			else {
-				pointeurs = { &temp };
-			};
-		};
-
-		operator bool() const {
-			return termine;
-		}
-	};
 
 	iterator begin() {
 		return iterator(*this);
@@ -500,6 +438,17 @@ public:
 		it.termine = false;
 		return it;
 	};
+
+	const_iterator cbegin() const {
+		return const_iterator(*this);
+	};
+
+	const_iterator end() const {
+		const_iterator it(*this);
+		it.termine = false;
+		return it;
+	};
+
 
 	int length() { //taille en mémoire
 		if (n_var == 0)
@@ -572,7 +521,79 @@ template<class T> void parcourir_convert(polynome_n_rec<T> const* objet, T* data
 	}
 	for (int i(objet->poly.coeffs.size() - 1); i >= 0; --i) {
 		if (objet->poly.coeffs[i].nul)
-			parcourir_convert(& objet->poly.coeffs[i], data + (i * (puissances[0])), puissances + 1);
+			parcourir_convert(&objet->poly.coeffs[i], data + (i * (puissances[0])), puissances + 1);
 	}
 	return;
-}
+};
+
+template<class T> template<class I >
+class polynome_n_rec<T>::iterator_polynome_n_rec{
+public:
+	int n_var;
+	using value_type = std::remove_const_t<I>;
+	using poly_type = std::conditional_t< std::is_const_v<I>, const polynome_n_rec<value_type>, polynome_n_rec<value_type>	>;
+
+	std::vector<int> positions;
+	std::vector<poly_type *> pointeurs;
+	bool termine;
+
+
+	iterator_polynome_n_rec& operator++() {
+		if (n_var == 0) {
+			termine = false;
+			return *this;
+		};
+
+		int i = n_var - 1;
+		++positions[i];
+		while (positions[i] >= pointeurs[i]->poly.coeffs.size()) {
+			positions[i] = 0;
+			if (i == 0) {
+				termine = false;
+				return *this;
+			}
+			++positions[i - 1];
+			--i;
+		}
+		for (int j = i + 1; j < n_var; ++j)
+			pointeurs[j] = &pointeurs[j - 1]->poly.coeffs[positions[j - 1]];
+		return *this;
+	};
+
+	bool operator==(iterator const& autre) const {
+		return (pointeurs[0] == autre.pointeurs[0]) && (positions == autre.positions) && (termine = autre.termine);
+	};
+
+	bool operator!=(iterator const& autre) const {
+		if (termine != autre.termine)
+			return true;
+		if (pointeurs[0] != autre.pointeurs[0])
+			return true;
+		if (n_var != 0)
+			return (positions != autre.positions);
+		else
+			return false;
+	};
+
+	I& operator*() const {
+		if (n_var > 0)
+			return pointeurs[n_var - 1]->poly.coeffs[positions[n_var - 1]].element;
+		else
+			return pointeurs[0]->element;
+	};
+
+	iterator_polynome_n_rec(poly_type& temp) : positions(temp.n_var, 0), n_var(temp.n_var), pointeurs(temp.n_var, NULL), termine(true) {
+		if (n_var > 0) {
+			pointeurs[0] = &temp;
+			for (int i(1); i < n_var; ++i)
+				pointeurs[i] = &pointeurs[i - 1]->poly.coeffs[0];
+		}
+		else {
+			pointeurs = { &temp };
+		};
+	};
+
+	operator bool() const {
+		return termine;
+	};
+};

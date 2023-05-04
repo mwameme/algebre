@@ -111,6 +111,8 @@ public:
 	bool est_trie; //si true, la liste est triee ...
 
 	using iterator = typename std::vector<monome<T>>::iterator;
+	using const_iterator = typename std::vector<monome<T>>::const_iterator;
+
 
 //	std:function<bool(monomes*,monomes*)> 
 
@@ -495,4 +497,14 @@ public:
 	typename iterator end() {
 		return monomes.end();
 	}
+
+	typename const_iterator cbegin()  const {
+		return monomes.cbegin();
+	};
+
+	typename const_iterator cend() const {
+		return monomes.cend();
+	}
+
 };
+
