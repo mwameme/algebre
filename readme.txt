@@ -14,3 +14,13 @@ si P et Q sont des polynomes à n variables, on ne peut pas simplifier P/Q. Mais
 Ont été aussi programmé des n_for : une boucle for incrémente une seule variable à la fois, avec des bornes de début et de fin, mais un n_for incrémente une liste de variables, avec une liste de bornes de fin. Dans le même style, il y a fact_for, qui parcourt toutes les permutations dans nombres entre 1 et n (ces même nombres, dans un ordre différent). Il y a encore un vecteur_n qui est un vecteur de plusieurs dimensions : il stocke x_{ijkl} (cas n=4), où i j k et l sont des entiers variant entre n_1,n_2,n_3 et n_4. Cela est utilise dans la définition des polynome_n_iteratif : P = Somme_{ijkl} x_{ijkl} X^i Y^j Z^k W^l ... Les polynomes en récursif contiennent soit un polynome de polynomes récurisfs, soit un scalaire (un nombre de type T). Les polynomes en sparse contiennent juste la liste des monomes ...
 
 Pour utiliser ces objets, il ne faut jamais avoir une liste vide. En effet, si mon polynome à n variables disparait (la liste de polynome à n variables est vide), comment je peux savoir le nombre n ? Ce cas arrive dans polynome<polynome_n> où la liste du polynome est vide ... Idem, si on travaille sur un corps quotient, alors comment connaitre la valeur du nombre premier ? Faites attention à cela ...
+
+si on a un polynome<rationnel<entier>>, on ne peut pas simplifier plus les fractions. Mais si on a un rationnel<polynome<rationnel<entier>>>, on peut considérer l'ensemble des coefficients (les rationnel<entier>), et diviser la partie supérieur par le PGCD parties supérieurs, et multiplier chacun des coefficients par le PPCM des parties inférieurs ... Celà réduit les coefficients, pour éventuellement raccourcir les calculs ultérieurs ...
+
+Enfin, il a été codé des iterateurs intelligents, pour parcourir les différents types de polynome_n ... Pour le polynome_n_iter cela fonctionne comme un n_for, et pour polynome_n_recursif cela est mis à jour au fur et à mesure des montées descentes.
+
+Polynome_n_recursif : Un polynome en (X,Y,Y), peut se décomposer en polynome(Y,Z) + polynome(Y,Z)*X + polynome(Y,Z)*X^2 + ... Donc un polynome<X,Y,Z> = polynome<polynome<Y,Z>>. Cela a été écrit de cette manière exacte pour les polynome_n_fixe (mais il faut connaitre le nombre de variables avant la compilation). Pour l'autre manière, on écrit :
+- soit polynome_n_rec<T> = polynome<polynome_n_rec<T>>
+- soi polynome_n_rec<T> = T
+Dans le premier cas le coefficient T vaut 0, et dans le deuxieme cas la liste (du polynome) est vide ... Pour parcourir un tel polynome_n, on parcourt dans l'ordre les polynomes qui s'imbriquent ...
+

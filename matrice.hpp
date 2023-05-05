@@ -756,11 +756,8 @@ public:
 
 
 			for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
-				T temp = unite(m_matrice.coeffs[0][0], false);
-
-				std::vector<T> vec(taille_c, temp);
-				temp = faux;
-				vec[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
+				std::vector<T> vec(taille_c, faux);
+				vec[parametres_libres[vec_k]] = vrai; //faux partout sauf dans ce parametre libre.
 
 				//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
 				for (int i(0); i < taille_l; ++i) {
@@ -807,6 +804,7 @@ public:
 						continue;
 					T temp = -inv * m_matrice.coeffs[k][j_max];
 					m_matrice.ajouterLigne(i, k, temp);
+					m_matrice[k][j_max] = faux;
 				};
 			};
 

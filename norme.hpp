@@ -229,8 +229,7 @@ public:
 	static decltype(norme_T<T>::norme(T())) norme(anneau_quotient<polynome<T>> const& x) {
 		polynome<T> pgcd = PGCD(x.element, x.quotient); //dans cet ordre ... résultant proportionnel au coeff dominant de x.element.
 		if (pgcd.degre >= 1) {
-			T temp = unite(pgcd.coeffs[0],false);
-			return norme_T<T>::norme(temp);
+			return norme_T<T>::norme(unite(pgcd.coeffs[0], false));
 		}
 		return norme_T<polynome<T>>::norme(pgcd);
 	};

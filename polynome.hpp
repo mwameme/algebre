@@ -442,6 +442,20 @@ public:
         return multiplicite;
     };
 
+    void normaliser() {
+#ifdef ALGEBRA_USE_EXEPTION
+        if (degre < 0)
+            throw std::domain_error("normaliser un polynome : polynome nul");
+#endif
+        T inv = coeffs[coeffs.size() - 1];
+        inv = unite(inv, true) / inv;
+        *this *= inv;
+    };
+
+    T coeff_dominant() {
+        return coeffs[coeffs.size() - 1];
+    }
+
     friend void swap(polynome<T>& gauche, polynome<T>& droit) {
         std::swap(gauche.degre, droit.degre);
         std::swap(gauche.coeffs, droit.coeffs);
