@@ -23,13 +23,14 @@ class float_precision;
 
 template<class T> class type_algebre {
 public:
-	using corps = void; //le corps de base. En supposant que c'est bien défini (sinon ça bug).
+//	using corps =; //le corps de base. vaut void pour les entiers ...
 
-	static constexpr int type=2; //0 : division exacte ; 1 : division avec reste ; 2 : sans divisio,
-	static constexpr int approx=0; //0 : exact ; 1 : approché 
-	static constexpr bool is_ratio = false; //dit si il y a un rationnel, en oubliant le rationnel<int> éventue de la fin
-	static constexpr bool is_objet = true; //dit si il y a au moins un objet ... (polynomes)
-	static constexpr bool is_corps_ratio = false; //dit si le corps de base est un rationnel d'entier. vaut false pour les entiers et les réels ... 
+//	static constexpr int type = ; //0 : division exacte ; 1 : division avec reste ; 2 : sans divisio,
+//	static constexpr int approx = ; //0 : exact ; 1 : approché 
+//	static constexpr bool is_ratio = //dit si il y a un rationnel, en oubliant le rationnel<int> éventue de la fin
+//	static constexpr bool is_objet = //dit si il y a au moins un objet ... (polynomes)
+//	static constexpr bool is_corps_ratio = false; //dit si le corps de base est un rationnel d'entier.
+//	objet : désigne un des types de polynome ...
 };
 
 template<class T> class type_algebre<polynome<T>> {
@@ -129,12 +130,18 @@ template<class T> class type_algebre<corps_quotient<T>> {
 public:
 	using corps = typename std::conditional< std::is_same<typename type_algebre<T>::corps, void>::value, typename  corps_quotient<T>, typename type_algebre<T>::corps>::type;
 
+	static constexpr bool get_is_corps_ratio() {
+		if constexpr (std::is_same< corps_quotient<T>, corps >::value)
+			return false;
+		else
+			return type_algebre<T>::is_corps_ratio;
+	}
 
 	static constexpr int type=0;
 	static constexpr int approx= type_algebre<T>::approx;
 	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
 	static constexpr bool is_objet = type_algebre<T>::is_objet;
-	static constexpr bool is_corps_ratio = (std::is_same< corps_quotient<T>, corps >::value) ? false : type_algebre<T>::is_corps_ratio;
+	static constexpr bool is_corps_ratio = get_is_corps_ratio();
 };
 
 /*
@@ -165,14 +172,32 @@ public:
 			return false;
 		return true;
 	};
-
+	static constexpr bool get_is_corps_ratio() {
+		if constexpr (std::is_same< rationnel<T>, corps >::value)
+			return true;
+		else
+			return type_algebre<T>::is_corps_ratio;
+	}
 
 	static constexpr int type = 0;
 	static constexpr int approx= type_algebre<T>::approx;
 	static constexpr bool is_ratio = get_ratio();
 	static constexpr bool is_objet = type_algebre<T>::is_objet;
-	static constexpr bool is_corps_ratio = (std::is_same< rationnel<T>, corps >::value) ? true : type_algebre<T>::is_corps_ratio;
+	static constexpr bool is_corps_ratio = get_is_corps_ratio();
 };
+
+template<class T> class type_algebre<matrice<T>> {
+public:
+	using corps = typename type_algebre<T>::corps;
+
+
+	static constexpr int type = 1; //faire attention aux inverses
+	static constexpr int approx = type_algebre<T>::approx;
+	static constexpr bool is_ratio = type_algebre<T>::is_ratio;
+	static constexpr bool is_objet = type_algebre<T>::is_objet;
+	static constexpr bool is_corps_ratio = type_algebre<corps>::is_corps_ratio;
+};
+
 
 
 template<class T> class type_algebre<erreur_b<T>> {
@@ -231,7 +256,7 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
-	static constexpr bool is_corps_ratio = false;
+//	static constexpr bool is_corps_ratio = false;
 
 };
 
@@ -243,7 +268,7 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
-	static constexpr bool is_corps_ratio = false;
+//	static constexpr bool is_corps_ratio = false;
 
 };
 
@@ -255,7 +280,7 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
-	static constexpr bool is_corps_ratio = false;
+//	static constexpr bool is_corps_ratio = false;
 
 };
 
@@ -269,7 +294,7 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
-	static constexpr bool is_corps_ratio = false;
+//	static constexpr bool is_corps_ratio = false;
 
 };
 
@@ -281,7 +306,7 @@ public:
 	static constexpr int approx = 0;
 	static constexpr bool is_ratio = false;
 	static constexpr bool is_objet = false;
-	static constexpr bool is_corps_ratio = false;
+//	static constexpr bool is_corps_ratio = false;
 
 };
 
@@ -316,215 +341,3 @@ public:
 	static constexpr bool is_objet = false;
 	static constexpr bool is_corps_ratio = false;
 };
-
-/*
-// ==========================================================
-//redéfinit correctement corps dans ces cas ...
-template<> class type_algebre<rationnel<int>> {
-public:
-	using corps = rationnel<int>;
-
-	static constexpr int type = 0;
-	static constexpr int approx = 0;
-};
-
-
-
-template<> class type_algebre<rationnel<long>> {
-public:
-	using corps = rationnel<long>;
-
-	static constexpr int type = 0;
-	static constexpr int approx = 0;
-};
-
-
-template<> class type_algebre<rationnel<long long>> {
-public:
-	using corps = rationnel<long long>;
-
-	static constexpr int type = 0;
-	static constexpr int approx = 0;
-};
-
-
-template<> class type_algebre<rationnel<int_precision>> {
-public:
-	using corps = rationnel<int_precision>;
-
-	static constexpr int type = 0;
-	static constexpr int approx = 0;
-};
-
-
-template<> class type_algebre<rationnel<InfInt>> {
-public:
-	using corps = rationnel<InfInt>;
-
-	static constexpr int type = 0;
-	static constexpr int approx = 0;
-};
-*/
-
-
-/*
-
-//0 : corps. 1 : anneau avec division et reste. 2 : anneau sans division
-constexpr int type_algebre(int element) {
-	return 1;
-};
-
-constexpr int type_algebre(long element) {
-	return 1;
-};
-
-constexpr int type_algebre(long long element) {
-	return 1;
-};
-
-
-template<class T> constexpr int type_algebre(InfInt& element) {
-	return 1;
-};
-
-template<class T> constexpr int type_algebre(int_precision& element) {
-	return 1;
-};
-
-constexpr int type_algebre(float element) {
-	return 0;
-};
-
-constexpr int type_algebre(double element) {
-	return 0;
-};
-
-constexpr int type_algebre(float_precision& element) {
-	return 0;
-};
-
-
-
-template<class T> constexpr int type_algebre(polynome<T>& element) {
-	if (type_algebre(T()) == 0)
-		return 1;
-	else
-		return 2;
-};
-
-template<class T> constexpr int type_algebre(rationnel<T>& element) {
-	return 0;
-};
-
-
-template<class T> constexpr int type_algebre(anneau_quotient<T>& element) {
-	return (type_algebre(T()));
-};
-
-
-template<class T> constexpr int type_algebre(corps_quotient<T>& element) {
-	if (type_algebre(T()) == 0)
-		return 0;
-	else
-		if (type_alebre(T()) == 1)
-			return 0;
-	return 2; //interdit
-};
-
-
-template<class T> constexpr int type_algebre(matrice<T>& element) {
-	if (type_algebre(T()) == 0)
-		return 0;
-	else
-		return 2;
-};
-
-template<class T> constexpr int type_algebre(polynome_n_rec<T>& element) {
-	return 2;
-};
-
-template<class T> constexpr int type_algebre(complexe<T>& element) {
-	if (type_algebre(T()) == 0)
-		return 0;
-	else
-		return 2;
-};
-
-template<class T> constexpr int type_algebre(erreur_b<T>& element) {
-	return type_algebre(T());
-};
-
-
-
-//0 : exact. 1 : approché
-constexpr int type_approx(int element) {
-	return 0;
-};
-
-constexpr int type_approx(long element) {
-	return 0;
-};
-
-constexpr int type_approx(long long element) {
-	return 0;
-};
-
-constexpr int type_approx(InfInt& element) {
-	return 0;
-};
-
-constexpr int type_approx(int_precision& element) {
-	return 0;
-};
-
-constexpr int type_approx(float element) {
-	return 1;
-};
-
-constexpr int type_approx(double element) {
-	return 1;
-};
-
-template<class T> constexpr int type_approx(float_precision& element) {
-	return 1;
-};
-
-// composés
-template<class T> constexpr int type_approx(erreur_b<T>& element) {
-	return type_approx(T());
-};
-
-template<class T> constexpr int type_approx(polynome<T>& element) {
-	return type_approx(T());
-};
-
-template<class T> constexpr int type_approx(matrice<T>& element) {
-	return type_approx(T());
-};
-
-template<class T> constexpr int type_approx(rationnel<T>& element) {
-	return type_approx(T());
-};
-
-
-template<class T> constexpr int type_approx(anneau_quotient<T>& element) {
-	return type_approx(T());
-};
-
-
-
-template<class T> constexpr int type_approx(corps_quotient<T>& element) {
-	return type_approx(T());
-};
-
-
-template<class T> constexpr int type_approx(polynome_n_rec<T>& element) {
-	return type_approx(T());
-};
-
-template<class T> constexpr int type_approx(complexe<T>& element) {
-	return type_approx(T());
-};
-
-
-*/

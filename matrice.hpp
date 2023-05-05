@@ -7,6 +7,7 @@
 #include "entete objets.hpp"
 #include "fact_for.hpp"
 #include "simplifier polynome_n.hpp"
+#include "reduire_frac.hpp"
 
 #include <algorithm>
 
@@ -576,6 +577,7 @@ public:
 			if (m_matrice.taille_l != Y.size())
 				throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
 			T vrai = unite(m_matrice.coeffs[0][0], true);
+			std::vector<int> colonnes(taille_l, -1);
 
 			// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
 			for (int i(0); i < taille_l; ++i) {
@@ -585,7 +587,7 @@ public:
 						break;
 				if (j == taille_c)
 					continue;
-
+				colonnes[i] = j;
 				T inv = vrai / m_matrice.coeffs[i][j]; //on est dans la ligne i, colonne j. On annule la colonne j (sauf ligne i)
 				for (int k(0); k < taille_l; ++k) { //ligne k != i.
 					if (k == i)
@@ -617,11 +619,8 @@ public:
 			//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
 			//ensuite, pour chaque premier élément non-nul, = Y[k]
 			for (int i(0); i < taille_l; ++i) {
-				int j;
-				for (j = 0; j < taille_c; ++j)
-					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				if (j == taille_c) //ligne nulle. 
+				int j = colonnes[i];
+				if (j == -1)
 					continue;
 				resultat[j] = Y[i] / m_matrice.coeffs[i][j];
 			}
@@ -634,106 +633,38 @@ public:
 				throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
 			T vrai = unite(coeffs[0][0], true);
 			T faux = unite(vrai, false);
-			std::vector<bool> ligne_faite(taille_l, true);
-			std::vector<int> prem_colonne(taille_l, 0);
-			int n_restant = taille_l;
+			std::vector<int> colonnes(taille_l, -1);
 
 			for (int i(0); i < taille_l; ++i) {
-				int j = 0;
-				for (; j < taille_c; ++j)
-					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				prem_colonne[i] = j;
-				if (j == taille_c) {
-					ligne_faite[i] = false;
-					--n_restant;
-				}
-			}
-
-			while (n_restant > 0) {
-				std::vector<decltype(norme(vrai))> normes(taille_c, norme(faux));
-				std::vector<int> lignes(taille_c, -1);
-				std::vector<int> colonnes(0);
-				for (int i(0); i < taille_l; ++i) {
-					if (!ligne_faite[i])
-						continue;
-					colonnes.push_back(prem_colonne[i]);
-					if (lignes[prem_colonne[i]] == -1) {
-						lignes[prem_colonne[i]] = i;
-						normes[prem_colonne[i]] = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-					}
-					else {
-						auto norme_temp = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-						if (norme_temp > normes[prem_colonne[i]]) {
-							normes[prem_colonne[i]] = norme_temp;
-							lignes[prem_colonne[i]] = i;
-						}
-					}
-				}
-
-				std::sort(colonnes.begin(), colonnes.end());
-				auto last = std::unique(colonnes.begin(), colonnes.end());
-				colonnes.erase(last, colonnes.end());
-
-				std::vector<decltype(norme(vrai))> normes_colonnes(taille_c, norme(faux));
-				for (int k(0); k < colonnes.size(); ++k) {
-					for (int i(0); i < taille_l; ++i) {
-						if (i == lignes[colonnes[k]])
-							continue;
-						auto norme_temp = norme(m_matrice.coeffs[i][colonnes[k]]);
-						if (norme_temp > normes_colonnes[colonnes[k]])
-							normes_colonnes[colonnes[k]] = norme_temp;
-					}
-				}
-
-
-				auto norme_min = norme(faux);
-				int j_min = -1;
+				auto norme_max = norme(faux);
+				int j_max = 0;
 				for (int j(0); j < taille_c; ++j) {
-					if (lignes[j] == -1) //VERIFIER
-						continue;
-					if (j_min == -1) {
-						j_min = j;
-						norme_min = normes_colonnes[j] / normes[j];
-					}
-					else {
-						auto norme_temp = normes_colonnes[j] / normes[j];
-						if (norme_temp < norme_min) {
-							j_min = j;
-							norme_min = norme_temp;
-						}
+					auto norme_temp = norme(m_matrice.coeffs[i][j]);
+					if (norme_temp > norme_max) {
+						norme_max = norme_temp;
+						j_max = j;
 					}
 				}
-				int i_min = lignes[j_min];
+				if (!(bool)norme_max)
+					continue;
 
-				T inv = vrai / m_matrice.coeffs[i_min][j_min];
+				colonnes[i] = j_max;
+
+				T inv = vrai / m_matrice.coeffs[i][j_max];
 				for (int k(0); k < taille_l; ++k) {
-					if (k == i_min)
+					if (k == i)
 						continue;
-					if (!(bool)m_matrice.coeffs[k][j_min])
+					if (!(bool)m_matrice.coeffs[k][j_max])
 						continue;
-					Y[k] = Y[k] - inv * m_matrice.coeffs[k][j_min] * Y[i_min]; // VERIFIER
-					m_matrice.ajouterLigne(i_min, k, -inv * m_matrice.coeffs[k][j_min]); //ajoute la ligne i à la ligne k. annnule [k][j_min]
+					T temp = -inv * m_matrice.coeffs[k][j_max];
+					Y[k] += -Y[i] * temp;
+					m_matrice.ajouterLigne(i, k, temp);
+				};
+			};
 
-					//ligne_faite et prem_colonne (taille_l)
-					if (j_min == prem_colonne[k]) {
-						int j = j_min;
-						for (; j < taille_c; ++j)
-							if ((bool)m_matrice.coeffs[k][j])
-								break;
-						prem_colonne[k] = j;
-						if (j == taille_c) {
-							ligne_faite[k] = false;
-							--n_restant;
-						}
-					}
-				}
 
-				ligne_faite[i_min] = false;
-				--n_restant;
-			}
 
-			//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
+			//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur
 			for (int i(0); i < taille_l; ++i) {
 				bool test = false;
 				for (int j(0); j < taille_c; ++j)
@@ -752,11 +683,8 @@ public:
 			//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
 			//ensuite, pour chaque premier élément non-nul, = Y[k] / élément de matrice
 			for (int i(0); i < taille_l; ++i) {
-				int j;
-				for (j = 0; j < taille_c; ++j)
-					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				if (j == taille_c)
+				int j = colonnes[i];
+				if (j == -1)
 					continue;
 				resultat[j] = Y[i] / m_matrice.coeffs[i][j];
 			}
@@ -774,6 +702,7 @@ public:
 
 			T vrai = unite(coeffs[0][0], true);
 			T faux = unite(vrai, false);
+			std::vector<int> colonnes(taille_l, -1);
 
 			// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
 			for (int i(0); i < taille_l; ++i) {
@@ -783,6 +712,7 @@ public:
 						break;
 				if (j == taille_c)
 					continue;
+				colonnes[i] = j;
 
 				T inv = vrai / m_matrice.coeffs[i][j];
 				for (int k(0); k < taille_l; ++k) {
@@ -795,19 +725,16 @@ public:
 
 			//on sépare les parametres libres. les colonnes nulles, et les éléments non-nuls apres un premier élément non-nul.
 			std::vector<int> parametres_libres(0);
-			std::vector<int> parametres_non_libres(0);// on s'en fout !!!
+			parametres_libres.reserve(taille_c);
 			// on commence : premier élément non-nul, et ceux qui suivent qui sont non-nuls sont des parametres libres.
 			for (int i(0); i < taille_l; ++i) {
-				int j;
-				for (j = 0; j < taille_c; ++j)
+				for (int j(0); j < taille_c; ++j) {
+					if (j == colonnes[i])
+						continue;
 					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				if (j == taille_c)
-					continue;
-				parametres_non_libres.push_back(j);
-				for (int k(j + 1); k < taille_c; ++k)
-					if ((bool)m_matrice[i][k])
-						parametres_libres.push_back(k);
+						parametres_libres.push_back(j);
+				}
+
 			}
 
 			//puis, les colonnes nulles : parametres libres.
@@ -825,6 +752,9 @@ public:
 
 			std::sort(parametres_libres.begin(), parametres_libres.end());
 			parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
+
+
+
 			for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
 				T temp = unite(m_matrice.coeffs[0][0], false);
 
@@ -834,11 +764,8 @@ public:
 
 				//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
 				for (int i(0); i < taille_l; ++i) {
-					int j;
-					for (j = 0; j < taille_c; ++j)
-						if ((bool)m_matrice.coeffs[i][j])
-							break;
-					if (j == taille_c)
+					int j = colonnes[i];
+					if (j == -1)
 						continue;
 
 					vec[j] = -m_matrice.coeffs[i][parametres_libres[vec_k]] / m_matrice.coeffs[i][j];
@@ -855,121 +782,47 @@ public:
 
 			T vrai = unite(coeffs[0][0], true);
 			T faux = unite(vrai, false);
-			std::vector<bool> ligne_faite(taille_l, true);
-			std::vector<int> prem_colonne(taille_l, 0);
-			int n_restant = taille_l;
+
+			std::vector<int> colonnes(taille_l, -1);
 
 			for (int i(0); i < taille_l; ++i) {
-				int j = 0;
-				for (; j < taille_c; ++j)
-					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				prem_colonne[i] = j;
-				if (j == taille_c) {
-					ligne_faite[i] = false;
-					--n_restant;
-				}
-			}
-
-			while (n_restant > 0) {
-				std::vector<decltype(norme(vrai))> normes(taille_c, norme(faux));
-				std::vector<int> lignes(taille_c, -1);
-				std::vector<int> colonnes(0);
-				for (int i(0); i < taille_l; ++i) {
-					if (!ligne_faite[i])
-						continue;
-					colonnes.push_back(prem_colonne[i]);
-					if (lignes[prem_colonne[i]] == -1) {
-						lignes[prem_colonne[i]] = i;
-						normes[prem_colonne[i]] = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-					}
-					else {
-						auto norme_temp = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-						if (norme_temp > normes[prem_colonne[i]]) {
-							normes[prem_colonne[i]] = norme_temp;
-							lignes[prem_colonne[i]] = i;
-						}
-					}
-				}
-
-				std::sort(colonnes.begin(), colonnes.end());
-				auto last = std::unique(colonnes.begin(), colonnes.end());
-				colonnes.erase(last, colonnes.end());
-
-				std::vector<decltype(norme(vrai))> normes_colonnes(taille_c, norme(faux));
-				for (int k(0); k < colonnes.size(); ++k) {
-					for (int i(0); i < taille_l; ++i) {
-						if (i == lignes[colonnes[k]])
-							continue;
-						auto norme_temp = norme(m_matrice.coeffs[i][colonnes[k]]);
-						if (norme_temp > normes_colonnes[colonnes[k]])
-							normes_colonnes[colonnes[k]] = norme_temp;
-					}
-				}
-
-
-				auto norme_min = norme(faux);
-				int j_min = -1;
+				auto norme_max = norme(faux);
+				int j_max = 0;
 				for (int j(0); j < taille_c; ++j) {
-					if (lignes[j] == -1) //VERIFIER
-						continue;
-					if (j_min == -1) {
-						j_min = j;
-						norme_min = normes_colonnes[j] / normes[j];
-					}
-					else {
-						auto norme_temp = normes_colonnes[j] / normes[j];
-						if (norme_temp < norme_min) {
-							j_min = j;
-							norme_min = norme_temp;
-						}
+					auto norme_temp = norme(m_matrice.coeffs[i][j]);
+					if (norme_temp > norme_max) {
+						norme_max = norme_temp;
+						j_max = j;
 					}
 				}
-				int i_min = lignes[j_min];
+				if (!(bool)norme_max)
+					continue;
+				colonnes[i] = j_max;
 
-				T inv = vrai / m_matrice.coeffs[i_min][j_min];
+				T inv = vrai / m_matrice.coeffs[i][j_max];
 				for (int k(0); k < taille_l; ++k) {
-					if (k == i_min)
+					if (k == i)
 						continue;
-					if (!(bool)m_matrice.coeffs[k][j_min])
+					if (!(bool)m_matrice.coeffs[k][j_max])
 						continue;
-					m_matrice.ajouterLigne(i_min, k, -inv * m_matrice.coeffs[k][j_min]); //ajoute la ligne i à la ligne k. annnule [k][j_min]
+					T temp = -inv * m_matrice.coeffs[k][j_max];
+					m_matrice.ajouterLigne(i, k, temp);
+				};
+			};
 
-					//ligne_faite et prem_colonne (taille_l)
-					if (j_min == prem_colonne[k]) {
-						int j = j_min;
-						for (; j < taille_c; ++j)
-							if ((bool)m_matrice.coeffs[k][j])
-								break;
-						prem_colonne[k] = j;
-						if (j == taille_c) {
-							ligne_faite[k] = false;
-							--n_restant;
-						}
-					}
-				}
 
-				ligne_faite[i_min] = false;
-				--n_restant;
-			}
-			//MATRICE PREPAREE !!!
 
 			//on sépare les parametres libres. les colonnes nulles, et les éléments non-nuls apres un premier élément non-nul.
 			std::vector<int> parametres_libres(0);
-			std::vector<int> parametres_non_libres(0); //on s'en fiche en fait.
+			parametres_libres.reserve(taille_c);
 			// on commence : premier élément non-nul, et ceux qui suivent qui sont non-nuls
-			for (int i(0); i < taille_l; ++i) {
-				int j;
-				for (j = 0; j < taille_c; ++j)
+			for (int i(0); i < taille_l; ++i)
+				for (int j(0); j < taille_c; ++j) {
+					if (j == colonnes[i])
+						continue;
 					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				if (j == taille_c)
-					continue;
-				parametres_non_libres.push_back(j);
-				for (int k(j + 1); k < taille_c; ++k)
-					if ((bool)m_matrice.coeffs[i][k])
-						parametres_libres.push_back(k);
-			}
+						parametres_libres.push_back(j);
+				}
 
 			//puis, les colonnes nulles : parametres libres.
 			for (int i(0); i < taille_c; ++i) {
@@ -986,19 +839,15 @@ public:
 
 			std::sort(parametres_libres.begin(), parametres_libres.end());
 			parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
+
 			for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
-				T temp = unite(m_matrice.coeffs[0][0], false);
-				std::vector<T> vec(taille_c, temp);
-				temp = unite(temp, true);
-				vec[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
+				std::vector<T> vec(taille_c, faux);
+				vec[parametres_libres[vec_k]] = vrai; //faux partout sauf dans ce parametre libre.
 
 				//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
 				for (int i(0); i < taille_l; ++i) {
-					int j;
-					for (j = 0; j < taille_c; ++j)
-						if ((bool)m_matrice.coeffs[i][j])
-							break;
-					if (j == taille_c)
+					int j = colonnes[i];
+					if (j == -1)
 						continue;
 
 					vec[j] = -m_matrice.coeffs[i][parametres_libres[vec_k]] / m_matrice.coeffs[i][j];
@@ -1045,671 +894,14 @@ matrice<T>& matrice<T>::operator=(const matrice<T>& temp) {
 	return *this;
 };
 
-/*
-
-	//type = 1. OK
-	T determinant() const {
-		matrice<rationnel<T>> m_matrice(taille_l,taille_l);
-		T vrai_ = unite(coeffs[0][0],true);
-
-		if (taille_l != taille_c)
-			throw std::domain_error("determinant matrice : les dimensions ne coïncident pas");
-		int taille = taille_l;
-
-
-		for (int i(0); i < taille; ++i)
-			for (int j(0); j < taille; ++j)
-				m_matrice.coeffs[i][j] = rationnel<T>(coeffs[i][j], vrai_); //passer par les rationnels. vrai_ optionnel
-
-		rationnel<T> det = m_matrice.determinant();
-
-		T result = det.numerateur / det.denominateur; //simplifier : division avec reste 
-		Simplifier_frac_poly(result);
-		return result;
-	};
-
-
-	//type = 0 approx = 0. OK
-	T determinant() const {
-		matrice<T> m_matrice(*this);
-		T det = unite(coeffs[0][0],true);
-		T vrai = det;
-
-		if (taille_l != taille_c)
-			throw std::domain_error("determinant de matrice : les dimensions ne coincident pas");
-		int taille = taille_l;
-
-		for (int i(0); i < taille; ++i) {//colonne i
-			int j;
-			for (j = i; j < taille; ++j) {
-				if ((bool)m_matrice.coeffs[j][i])
-					break;
-			}
-			if (j == taille)
-				return unite(det,false);
-
-			if (i != j) {
-				m_matrice.echangerLigne(i, j);
-				det = -det;
-			}
-
-			T inv = vrai / m_matrice.coeffs[i][i];
-			for (j = i + 1; j < taille; ++j)
-				m_matrice.ajouterLigne(i, j, ((-m_matrice.coeffs[j][i]) * inv));  // ajouter ligne i * coeffs à la ligne j ...
-
-		}
-
-		for (int i(0); i < taille; ++i)
-			det = (det * m_matrice.coeffs[i][i]);
-
-		Simplifier_frac_poly(det);
-		return det;
-	};
-
-	//type = 0, approx = 1. OK
-	T determinant() const {
-		matrice<T> m_matrice(*this);
-		T det = unite(coeffs[0][0], true);
-		T vrai = det;
-
-		if (taille_l != taille_c)
-			throw std::domain_error("determinant de matrice : les dimensions ne coïncident pas");
-		int taille = taille_l;
-
-
-		int taille_max = max(taille - 4, 0); //pour les 4 derniers : on utilise le determinant_anneau
-		int taille_fin = taille - taille_max;
-
-		for (int i(0); i < taille_max; ++i) {
-			int j_max = -1;
-			auto norme_max = norme(vrai);
-			for (int j = i; j < taille; ++j) {
-				if ((bool) m_matrice.coeffs[i][j]) {
-					auto norme_temp = norme(m_matrice.coeffs[j][i]);
-					if (j_max == -1) {
-						norme_max = norme_temp;
-						j_max = j;
-					}
-					else
-						if (norme_temp > norme_max) {
-							norme_max = norme_temp;
-							j_max = j;
-						}
-				}
-			}
-			if (j_max == -1) //0 sur une colonne
-				return unite(det, false);
-
-			if (i != j_max) {
-				m_matrice.echangerLigne(i, j_max);
-				det = -det;
-			}
-			T inv = vrai / m_matrice.coeffs[i][i];
-			for (int j = i + 1; j < taille; ++j) {
-				m_matrice.ajouterLigne(i, j, ((-m_matrice.coeffs[j][i]) * inv)); // ajouter ligne i * coeffs à la ligne j ...
-			}
-
-		}
-
-		for (int i(0); i < taille_max; ++i)
-			det = (det * m_matrice.coeffs[i][i]);
-
-		if (taille_fin > 0) {
-			matrice<T> m_matrice_fin(taille_fin, taille_fin);
-			for (int i(0); i < taille_fin; ++i)
-				for (int j(0); j < taille_fin; ++j)
-					m_matrice_fin.coeffs[i][j] = m_matrice.coeffs[taille_max + i][taille_max + j];
-			det = det * m_matrice_fin.determinant_anneau();
-		}
-		Simplifier_frac_poly(det);
-		return det;
-	};
-
-	
-	//type = 0  approx = 0
-	matrice<T> inverse() const {
-		static_assert(type_algebre<T>::type == 0);
-		T vrai = unite(coeffs[0][0],true);
-
-		if( taille_l != taille_c)
-			throw std::domain_error("inverse de matrice : dimensions ne coincident pas");
-		int taille = taille_l;
-
-		matrice<T> m_matrice(*this);
-		matrice<T> resultat= unite(m_matrice,true);
-
-
-		for (int i(0); i < taille; ++i) {
-			int j;
-			for (j = i; j < taille; ++j)
-				if ((bool)coeffs[j][i])
-					break;
-			if (j == taille)
-				throw std::domain_error("matrice non-inversible");
-
-			if (i != j) {
-				m_matrice.echangerLigne(i, j);
-				resultat.echangerLigne(i, j);
-			}
-			resultat.multiplierLigne(i, vrai / m_matrice.coeffs[i][i]);
-			m_matrice.multiplierLigne(i, vrai / m_matrice.coeffs[i][i]);
-
-			for (j = 0; j < taille; ++j) {
-				if (j == i)
-					continue;
-				resultat.ajouterLigne(i, j, -m_matrice.coeffs[j][i]);  // ajouter ligne i * coeffs à la ligne j ...
-				m_matrice.ajouterLigne(i, j, -m_matrice.coeffs[j][i]);
-			}
-		}
-
-		return resultat;
-	};
-
-	//type_algebre = 0, approx = 1. OK
-	matrice<T> inverse() const {
-		T vrai = unite(coeffs[0][0], true);
-
-		if (taille_l != taille_c)
-			throw std::domain_error("inverse de matrice : les dimensions ne coïncident pas.");
-		int taille = taille_l;
-
-		matrice<T> m_matrice(*this);
-		matrice<T> resultat = unite(*this, true); //identité
-
-		for (int i(0); i < taille; ++i) {
-			int j_max = -1;
-			auto norme_max = norme(vrai_);
-			//			auto norme_max = norme_T<T>::norme(vrai);
-			for (int j = i; j < taille; ++j) {
-				if ((bool)m_matrice.coeffs[i][j]) {
-					auto norme_temp = norme(m_matrice.coeffs[i][j]);
-					if (j_max == -1) {
-						norme_max = norme_temp;
-						j_max = j;
-					}
-					else
-						if (norme_temp > norme_max) {
-							norme_max = norme_temp;
-							j_max = j;
-						}
-				}
-			}
-			if (j_max == -1)
-				throw std::domain_error("matrice non-inversible");
-
-			if (i != j_max) {
-				m_matrice.echangerLigne(i, j_max);
-				resultat.echangerLigne(i, j_max);
-			}
-			resultat.multiplierLigne(i, vrai / m_matrice.coeffs[i][i]);
-			m_matrice.multiplierLigne(i, vrai / m_matrice.coeffs[i][i]);
-
-			for (int j = 0; j < taille; ++j) {
-				if (j == i)
-					continue;
-				resultat.ajouterLigne(i, j, -m_matrice.coeffs[j][i]);
-				m_matrice.ajouterLigne(i, j, -m_matrice.coeffs[j][i]);
-			}
-		}
-
-		return resultat;
-	};
-
-
-	//type_algebre = 0, approx=0
-	std::vector<T> resoudre(std::vector<T> Y) {
-		matrice<T> m_matrice(*this);
-		if (m_matrice.taille_l != Y.size())
-			throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
-		T vrai = unite(m_matrice.coeffs[0][0],true);
-
-		// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
-		for (int i(0); i < taille_l; ++i) {
-			int j;
-			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			if (j == taille_c)
-				continue;
-
-			T inv = vrai / m_matrice.coeffs[i][j]; //on est dans la ligne i, colonne j. On annule la colonne j (sauf ligne i)
-			for (int k(0); k < taille_l; ++k) { //ligne k != i.
-				if (k == i)
-					continue;
-				if ((bool) m_matrice.coeffs[k][j]) {
-					Y[k] = Y[k] - inv * m_matrice.coeffs[k][j] * Y[i];
-					m_matrice.ajouterLigne(i, k, -inv * m_matrice.coeffs[k][j]); //ajoute la ligne i à la ligne k. annnule [k][j]
-				}
-			}
-		}
-
-		//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
-		for (int i(0); i < taille_l; ++i) {
-			bool test = false;
-			for (int j(0); j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j]) {
-					test = true;
-					break;
-				}
-			if (test)
-				continue;
-			if ((bool) Y[i]) //ligne nulle, et Y non-nul. Renvoyer vide.
-				return std::vector<T>(0);
-		}
-
-		T faux = unite(vrai, false);
-		std::vector<T> resultat(taille_c,faux);
-
-		//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
-		//ensuite, pour chaque premier élément non-nul, = Y[k]
-		for (int i(0); i < taille_l; ++i) {
-			int j;
-			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			if (j == taille_c) //ligne nulle. 
-				continue;
-			resultat[j] = Y[i] / m_matrice.coeffs[i][j];
-		}
-
-		return resultat;
-	};
-
-
-	//type_algebre = 0, approx = 1. A MODIFIER
-	std::vector<T> resoudre(std::vector<T> Y) { //dans le cas approx.
-		matrice<T> m_matrice(*this);
-		if (m_matrice.taille_l != Y.size())
-			throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
-		T vrai = unite(coeffs[0][0], true);
-		T faux = unite(vrai, false);
-		std::vector<bool> ligne_faite(taille_l, true);
-		std::vector<int> prem_colonne(taille_l, 0);
-		int n_restant = taille_l;
-
-		for (int i(0); i < taille_l; ++i) {
-			int j = 0;
-			for (; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			prem_colonne[i] = j;
-			if (j == taille_c) {
-				ligne_faite[i] = false;
-				--n_restant;
-			}
-		}
-
-		while (n_restant > 0) {
-			std::vector<decltype(norme(vrai))> normes(taille_c, norme(faux));
-			std::vector<int> lignes(taille_c, -1);
-			std::vector<int> colonnes(0);
-			for (int i(0); i < taille_l; ++i) {
-				if (!ligne_faite[i])
-					continue;
-				colonnes.push_back(prem_colonne[i]);
-				if (lignes[prem_colonne[i]] == -1) {
-					lignes[prem_colonne[i]] = i;
-					normes[prem_colonne[i]] = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-				}
-				else {
-					auto norme_temp = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-					if (norme_temp > normes[prem_colonne[i]]) {
-						normes[prem_colonne[i]] = norme_temp;
-						lignes[prem_colonne[i]] = i;
-					}
-				}
-			}
-
-			std::sort(colonnes.begin(), colonnes.end());
-			auto last = std::unique(colonnes.begin(), colonnes.end());
-			colonnes.erase(last, colonnes.end());
-
-			std::vector<decltype(norme(vrai))> normes_colonnes(taille_c, norme(faux));
-			for (int k(0); k < colonnes.size(); ++k) {
-				for (int i(0); i < taille_l; ++i) {
-					if (i == lignes[colonnes[k])
-						continue;
-					auto norme_temp = norme(m_matrice.coeffs[i][colonnes[k]]);
-					if (norme_temp > normes_colonnes[colonnes[k]])
-						normes_colonnes[colonnes[k]] = norme_temp;
-				}
-			}
-
-
-			auto norme_min = norme(faux);
-			int j_min = -1;
-			for (int j(0); j < taille_c; ++j) {
-				if (lignes[j] == -1) //VERIFIER
-					continue;
-				if (j_min == -1) {
-					j_min = j;
-					norme_min = normes_colonnes[j] / normes[j];
-				}
-				else {
-					auto norme_temp = normes_colonnes[j] / normes[j];
-					if (norme_temp < norme_min) {
-						j_min = j;
-						norme_min = norme_temp;
-					}
-				}
-			}
-			int i_min = lignes[j_min];
-
-			T inv = vrai / m_matrice.coeffs[i_min][j_min];
-			for (int k(0); k < taille_l; ++k) {
-				if (k == i_min)
-					continue;
-				if (! (bool) m_matrice.coeffs[k][j_min])
-					continue;
-				Y[k] = Y[k] - inv * m_matrice.coeffs[k][j_min] * Y[i_min]; // VERIFIER
-				m_matrice.ajouterLigne(i_min, k, -inv * m_matrice.coeffs[k][j_min]); //ajoute la ligne i à la ligne k. annnule [k][j_min]
-
-				//ligne_faite et prem_colonne (taille_l)
-				if (j_min == prem_colonne[k]) {
-					int j = j_min;
-					for (; j < taille_c; ++j)
-						if ((bool)m_matrice.coeffs[k][j])
-							break;
-					prem_colonne[k] = j;
-					if (j == taille_c) {
-						ligne_faite[k] = false;
-						--n_restant;
-					}
-				}
-			}
-
-			ligne_faite[i_min] = false;
-			--n_restant;
-		}
-
-		//on parcourt les lignes. Si elle est nulle, si Y[k] est non-nul, il y a une erreur_b
-		for (int i(0); i < taille_l; ++i) {
-			bool test = false;
-			for (int j(0); j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j]) {
-					test = true;
-					break;
-				}
-			if (test)
-				continue;
-			if ((bool)Y[i])
-				return std::vector<T>(0); //alors on retourne le vide
-		}
-
-		std::vector<T> resultat(taille_c, faux);
-
-		//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
-		//ensuite, pour chaque premier élément non-nul, = Y[k] / élément de matrice
-		for (int i(0); i < taille_l; ++i) {
-			int j;
-			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			if (j == taille_c)
-				continue;
-			resultat[j] = Y[i] / m_matrice.coeffs[i][j];
-		}
-
-		return resultat;
-	}
-
-	//A MODIFIER type_algebre = 0 ; approx = 0
-	sous_ev<T>* noyau() {
-		sous_ev<T>* resultat = new sous_ev<T>();
-		matrice<T> m_matrice(*this);
-
-		T vrai = unite(coeffs[0][0],true);
-		T faux = unite(vrai, false);
-
-		// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
-		for (int i(0); i < taille_l; ++i) {
-			int j;
-			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			if (j == taille_c)
-				continue;
-
-			T inv = vrai / m_matrice.coeffs[i][j];
-			for (int k(0); k < taille_l; ++k) {
-				if (k == i)
-					continue;
-				if((bool) m_matrice.coeffs[k][j])
-					m_matrice.ajouterLigne(i, k, -inv * m_matrice.coeffs[k][j]); //ajoute la ligne i à la ligne k. annnule [k][j]
-			}
-		}
-
-		//on sépare les parametres libres. les colonnes nulles, et les éléments non-nuls apres un premier élément non-nul.
-		std::vector<int> parametres_libres(0);
-		std::vector<int> parametres_non_libres(0);// on s'en fout !!!
-		// on commence : premier élément non-nul, et ceux qui suivent qui sont non-nuls sont des parametres libres.
-		for (int i(0); i < taille_l; ++i) {
-			int j;
-			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			if (j == taille_c)
-				continue;
-			parametres_non_libres.push_back(j);
-			for (int k(j + 1); k < taille_c; ++k)
-				if ((bool)m_matrice[i][k])
-					parametres_libres.push_back(k);
-		}
-		
-		//puis, les colonnes nulles : parametres libres.
-		for (int i(0); i < taille_c; ++i) {
-			bool test = false;
-			for(int j(0);j<taille_l;++j)
-				if ((bool)m_matrice.coeffs[j][i]) {
-					test = true;
-					break;
-				}
-			if (test)
-				continue;
-			parametres_libres.push_back(i); //la colonne i est nulle
-		}
-
-		std::sort(parametres_libres.begin(), parametres_libres.end());
-		parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
-		for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
-			T temp = unite(m_matrice.coeffs[0][0],false);
-
-			std::vector<T> vec(taille_c, temp);
-			temp = faux;
-			vec[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
-
-			//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
-			for (int i(0); i < taille_l; ++i) {
-				int j;
-				for (j = 0; j < taille_c; ++j)
-					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				if (j == taille_c)
-					continue;
-
-				vec[j] = -m_matrice.coeffs[i][parametres_libres[vec_k]] / m_matrice.coeffs[i][j];
-			}
-
-			resultat->ajouter_vecteur(vec);
-		}
-
-		return resultat;
-	}
-
-
-
-	//type_algebre = 0, approx = 1
-	sous_ev<T>* noyau() {
-		sous_ev<T>* resultat = new sous_ev<T>();
-		matrice<T> m_matrice(*this);
-
-		T vrai = unite(coeffs[0][0], true);
-		T faux = unite(vrai, false);
-		std::vector<bool> ligne_faite(taille_l, true);
-		std::vector<int> prem_colonne(taille_l, 0);
-		int n_restant = taille_l;
-
-		for (int i(0); i < taille_l; ++i) {
-			int j = 0;
-			for (; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			prem_colonne[i] = j;
-			if (j == taille_c) {
-				ligne_faite[i] = false;
-				--n_restant;
-			}
-		}
-
-		while (n_restant > 0) {
-			std::vector<decltype(norme(vrai))> normes(taille_c, norme(faux));
-			std::vector<int> lignes(taille_c, -1);
-			std::vector<int> colonnes(0);
-			for (int i(0); i < taille_l; ++i) {
-				if (!ligne_faite[i])
-					continue;
-				colonnes.push_back(prem_colonne[i]);
-				if (lignes[prem_colonne[i]] == -1) {
-					lignes[prem_colonne[i]] = i;
-					normes[prem_colonne[i]] = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-				}
-				else {
-					auto norme_temp = norme(m_matrice.coeffs[i][prem_colonne[i]]);
-					if (norme_temp > normes[prem_colonne[i]]) {
-						normes[prem_colonne[i]] = norme_temp;
-						lignes[prem_colonne[i]] = i;
-					}
-				}
-			}
-
-			std::sort(colonnes.begin(), colonnes.end());
-			auto last = std::unique(colonnes.begin(), colonnes.end());
-			colonnes.erase(last, colonnes.end());
-
-			std::vector<decltype(norme(vrai))> normes_colonnes(taille_c, norme(faux));
-			for (int k(0); k < colonnes.size(); ++k) {
-				for (int i(0); i < taille_l; ++i) {
-					if (i == lignes[colonnes[k])
-						continue;
-					auto norme_temp = norme(m_matrice.coeffs[i][colonnes[k]]);
-					if (norme_temp > normes_colonnes[colonnes[k]])
-						normes_colonnes[colonnes[k]] = norme_temp;
-				}
-			}
-
-
-			auto norme_min = norme(faux);
-			int j_min = -1;
-			for (int j(0); j < taille_c; ++j) {
-				if (lignes[j] == -1) //VERIFIER
-					continue;
-				if (j_min == -1) {
-					j_min = j;
-					norme_min = normes_colonnes[j] / normes[j];
-				}
-				else {
-					auto norme_temp = normes_colonnes[j] / normes[j];
-					if (norme_temp < norme_min) {
-						j_min = j;
-						norme_min = norme_temp;
-					}
-				}
-			}
-			int i_min = lignes[j_min];
-
-			T inv = vrai / m_matrice.coeffs[i_min][j_min];
-			for (int k(0); k < taille_l; ++k) {
-				if (k == i_min)
-					continue;
-				if (!(bool)m_matrice.coeffs[k][j_min])
-					continue;
-				m_matrice.ajouterLigne(i_min, k, -inv * m_matrice.coeffs[k][j_min]); //ajoute la ligne i à la ligne k. annnule [k][j_min]
-
-				//ligne_faite et prem_colonne (taille_l)
-				if (j_min == prem_colonne[k]) {
-					int j = j_min;
-					for (; j < taille_c; ++j)
-						if ((bool)m_matrice.coeffs[k][j])
-							break;
-					prem_colonne[k] = j;
-					if (j == taille_c) {
-						ligne_faite[k] = false;
-						--n_restant;
-					}
-				}
-			}
-
-			ligne_faite[i_min] = false;
-			--n_restant;
-		}
-		//MATRICE PREPAREE !!!
-
-		//on sépare les parametres libres. les colonnes nulles, et les éléments non-nuls apres un premier élément non-nul.
-		std::vector<int> parametres_libres(0);
-		std::vector<int> parametres_non_libres(0); //on s'en fiche en fait.
-		// on commence : premier élément non-nul, et ceux qui suivent qui sont non-nuls
-		for (int i(0); i < taille_l; ++i) {
-			int j;
-			for (j = 0; j < taille_c; ++j)
-				if ((bool)m_matrice.coeffs[i][j])
-					break;
-			if (j == taille_c)
-				continue;
-			parametres_non_libres.push_back(j);
-			for (int k(j + 1); k < taille_c; ++k)
-				if ((bool)m_matrice.coeffs[i][k])
-					parametres_libres.push_back(k);
-		}
-
-		//puis, les colonnes nulles : parametres libres.
-		for (int i(0); i < taille_c; ++i) {
-			bool test = false;
-			for (int j(0); j < taille_l; ++j)
-				if ((bool)m_matrice.coeffs[j][i]) {
-					test = true;
-					break;
-				}
-			if (test)
-				continue;
-			parametres_libres.push_back(i); //la colonne i est nulle
-		}
-
-		std::sort(parametres_libres.begin(), parametres_libres.end());
-		parametres_libres.erase(std::unique(parametres_libres.begin(), parametres_libres.end()), parametres_libres.end()); //supprimer les doublons. A vérifier.
-		for (int vec_k(0); vec_k < parametres_libres.size(); ++vec_k) { //parametres libre : on en prend un à la fois.
-			T temp = unite(m_matrice.coeffs[0][0], false);
-			std::vector<T> vec(taille_c, temp);
-			temp = unite(temp, true);
-			vec[parametres_libres[vec_k]] = temp; //faux partout sauf dans ce parametre libre.
-
-			//on parcourt les premiers-éléments non-nuls. Et on calcule leurs valeurs.
-			for (int i(0); i < taille_l; ++i) {
-				int j;
-				for (j = 0; j < taille_c; ++j)
-					if ((bool)m_matrice.coeffs[i][j])
-						break;
-				if (j == taille_c)
-					continue;
-
-				vec[j] = -m_matrice.coeffs[i][parametres_libres[vec_k]] / m_matrice.coeffs[i][j];
-			}
-
-			resultat->ajouter_vecteur(vec);
-		}
-
-		return resultat;
-	}
-
-
-	*/
-	
 template<class T> class sous_ev {
 public:
 	sous_ev() : liste_vecteurs(0){
 	}
 
-	void ajouter_vecteur(std::vector<T> vecteur) {
+	void ajouter_vecteur(std::vector<T> const& vecteur) {
 		liste_vecteurs.push_back(vecteur);
+		simplifier_frac(liste_vecteurs[liste_vecteurs.size() - 1]);
 	}
 
 	std::vector<std::vector<T>> liste_vecteurs;

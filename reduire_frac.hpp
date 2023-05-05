@@ -178,7 +178,7 @@ template<class T> class descendre_simplification;
 template<class T> class descendre_simplification<rationnel<T>> {
 public:
 	static void simplifier(rationnel<T>& ratio) {
-		if constexpr (type_algebre<T>::is_objet && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_objet && type_algebre<T>::is_corps_ratio) {
 			if constexpr (type_algebre<T>::is_ratio) {
 				descendre_simplification<T>::simplifier(ratio.numerateur);
 				descendre_simplification<T>::simplifer(ratio.denominateur);
@@ -208,7 +208,7 @@ public:
 template<class T> class descendre_simplification<polynome<T>> {
 public:
 	static void simplifier(polynome<T>& poly) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			for (int i(0); i < poly.coeffs.size();++i)
 				if ((bool)poly.coeffs[i])
 					descendre_simplification<T>::simplifier(poly.coeffs[i]);
@@ -221,7 +221,7 @@ public:
 template<class T> class descendre_simplification<polynome_n_iter<T>> {
 public:
 	static void simplifier(polynome_n_iter<T>& poly) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			for (int i(0); i < poly.coeffs.data.size();++i)
 				if ((bool)poly.coeffs.data[i])
 					descendre_simplification<T>::simplifier(poly.coeffs.data[i]);
@@ -234,7 +234,7 @@ public:
 template<class T> class descendre_simplification<polynome_n_rec<T>> {
 public:
 	static void simplifier(polynome_n_rec<T>& poly) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			if (poly.n_var > 0) {
 				for (int i(0); i < poly.poly.coeffs.size(); ++i)
 					if ((bool)poly.poly.coeffs[i])
@@ -251,7 +251,7 @@ public:
 template<class T, int n> class descendre_simplification<polynome_n_fixe<T, n>> {
 public:
 	static void simplifier(polynome_n_fixe<T, n>& poly) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			for (int i(0); i < poly.poly.coeffs.size();++i)
 				if ((bool)poly.poly.coeffs[i])
 					descendre_simplification<polynome_n_fixe<T, n - 1>>::simplifier(poly.poly.coeffs[i]);
@@ -264,7 +264,7 @@ public:
 template<class T> class descendre_simplification<polynome_n_fixe<T, 0>> {
 public:
 	static void simplifier(polynome_n_fixe<T, 0>& poly) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			descendre_simplification<T>::simplifier(poly.element);
 		}
 		else
@@ -275,7 +275,7 @@ public:
 template<class T> class descendre_simplification<matrice<T>> {
 public:
 	static void simplifier(matrice<T>& mat) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			for (int i(0); i < mat.taille_l; ++i)
 				for (int j(0); j < mat.taille_c; ++j)
 					if ((bool) mat.coeffs[i][j])
@@ -290,12 +290,12 @@ public:
 template<class T> class descendre_simplification<std::vector<T>> {
 public:
 	static void simplifier(std::vector<T>& vec) {
-		if constexpr (type_algebre<T>::is_ratio && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		if constexpr (type_algebre<T>::is_ratio && type_algebre<T>::is_corps_ratio) {
 			for (int i(0); i < vec.size(); ++i)
 				if ((bool) vec[i])
 					descendre_simplification<T>::simplifier(vec[i]);
 		}
-		else if constexpr (type_algebre<T>::is_objet && type_algebre<type_algebre<T>::corps>::is_corps_ratio) {
+		else if constexpr (type_algebre<T>::is_objet && type_algebre<T>::is_corps_ratio) {
 			auto ppcm = calcul_objet<std::vector<T>>::PPCM(vec);
 			auto pgcd = calcul_objet<std::vector<T>>::PGCD(vec);
 			auto frac = rationnel<decltype(pgcd)>(ppcm, pgcd);

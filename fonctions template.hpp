@@ -2,6 +2,7 @@
 
 #include "unite.hpp"
 #include "types.hpp"
+#include <tuple>
 
 template<class T> class type_algebre;
 //#include <pair>
@@ -117,7 +118,7 @@ template<class T> T min(T a, T b) {
 };
 
 //vérifier
-template<class T> std::pair<T, T> Bezout(T const& a, T const& b) {
+template<class T> std::tuple<T, T,T> Bezout(T const& a, T const& b) {
     static_assert(type_algebre<T>::type == 1);
 
     T u, v, ua, va, wa,
@@ -146,6 +147,6 @@ template<class T> std::pair<T, T> Bezout(T const& a, T const& b) {
         vb = wb;
     }
     //u = PGCD(a,b) = ua*a + ub*b.
-    return std::make_pair(ua , ub ); // pour les polynomes : u peut être de degré 0, mais différent de 1 ...
+    return std::make_pair(u, ua , ub ); // pour les polynomes : u peut être de degré 0, mais différent de 1 ...
 
 };
