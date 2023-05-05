@@ -299,6 +299,7 @@ public:
 		//		matrice < anneau_quotient<polynome<T>>>& matrices[i] = matrices[i];
 		int taille = matrices[0].taille_l;
 		int i = ligne[iter];
+		polynome<T> poly_faux = unite(matrices[0].coeffs[0][0].element, false);
 
 		for (; i < taille; ++i) {
 			ligne[iter] = i;
@@ -327,8 +328,10 @@ public:
 			for (int k(0); k < taille; ++k) {
 				if (k == i)
 					continue;
-				if ((bool)matrices[iter].coeffs[k][j_max].element)
+				if ((bool)matrices[iter].coeffs[k][j_max].element) {
 					matrices[iter].ajouterLigne(i, k, -inv * matrices[iter].coeffs[k][j_max]); //ajoute la ligne i à la ligne k. annnule [k][j]
+					matrices[iter].coeffs[k][j_max].element = poly_faux;
+				}
 			}
 		}
 
