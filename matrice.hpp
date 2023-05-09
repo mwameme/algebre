@@ -44,7 +44,7 @@ public:
 
 	matrice(matrice<T> const& copie) :taille_l(copie.taille_l),taille_c(copie.taille_c),coeffs(copie.coeffs) {	};
 
-	matrice(matrice<T>&& copie) {
+	matrice(matrice<T>&& copie)  {
 		taille_l = copie.taille_l;
 		taille_c = copie.taille_c;
 		std::swap(coeffs, copie.coeffs);
@@ -52,9 +52,11 @@ public:
 	}
 
 	explicit matrice(const std::vector<std::vector<T>>& vec) :  taille_l(vec.size()),taille_c(vec[0].size()) , coeffs(vec){
+#ifdef ALGEBRA_USE_EXCEPTION
 		for(int i(1);i<taille_l;++i)
 			if (coeffs[i].size() != taille_c)
 				throw std::domain_error("creation de matrice : non-rectangulaire");
+#endif
 	};
 
 	explicit matrice(std::vector<std::vector<T>>&& vec) : taille_l(vec.size()), taille_c(vec[0].size()) {
@@ -95,7 +97,9 @@ public:
 
 	matrice<T>& operator=(const matrice<T>& temp);
 
-	matrice<T>& operator=(matrice<T>&& temp) {
+	matrice<T>& operator=(matrice<T>&& temp)  {
+		if (this == &temp)
+			return *this;
 		swap(*this, temp);
 		return *this;
 	};
@@ -563,6 +567,7 @@ public:
 						continue;
 					resultat.ajouterLigne(i, j, -m_matrice.coeffs[j][i]);
 					m_matrice.ajouterLigne(i, j, -m_matrice.coeffs[j][i]);
+
 				}
 			}
 
@@ -577,6 +582,7 @@ public:
 			if (m_matrice.taille_l != Y.size())
 				throw std::domain_error("resolution equation lineaire : les dimensions ne correspondent pas");
 			T vrai = unite(m_matrice.coeffs[0][0], true);
+			T faux = unite(vrai, false);
 			std::vector<int> colonnes(taille_l, -1);
 
 			// on parcourt les lignes. Le premier élément non-nul : annule toute la colonne
@@ -595,6 +601,7 @@ public:
 					if ((bool)m_matrice.coeffs[k][j]) {
 						Y[k] = Y[k] - inv * m_matrice.coeffs[k][j] * Y[i];
 						m_matrice.ajouterLigne(i, k, -inv * m_matrice.coeffs[k][j]); //ajoute la ligne i à la ligne k. annnule [k][j]
+						m_matrice.coeffs[k][j] = faux;
 					}
 				}
 			}
@@ -613,7 +620,6 @@ public:
 					return std::vector<T>(0);
 			}
 
-			T faux = unite(vrai, false);
 			std::vector<T> resultat(taille_c, faux);
 
 			//une solution est possible. La calculer. Pour ceci, tout d'abord enlever les "parametres libres". (virtuellement)
@@ -659,6 +665,7 @@ public:
 					T temp = -inv * m_matrice.coeffs[k][j_max];
 					Y[k] += -Y[i] * temp;
 					m_matrice.ajouterLigne(i, k, temp);
+					m_matrice.coeffs[k][j_max] = faux;
 				};
 			};
 

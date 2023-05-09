@@ -33,6 +33,11 @@ public:
 		dimensions = temp.dimensions;
 	};
 
+	n_for(n_for&& temp) {
+		swap(*this, temp);
+		return;
+	}
+
 	n_for& operator=(n_for const& temp) {
 		if (this == &temp)
 			return *this;
@@ -41,6 +46,11 @@ public:
 		positions = temp.positions;
 		position = temp.position;
 		dimensions = temp.dimensions;
+		return *this;
+	};
+
+	n_for& operator=(n_for&& temp) {
+		swap(*this, temp);
 		return *this;
 	};
 
@@ -140,6 +150,15 @@ public:
 	explicit inline operator bool() const {// si OK=false, la boucle s'arrête.
 		return OK;
 	};
+
+	friend void swap(n_for& gauche, n_for& droit) {
+		std::swap(gauche.croissant, droit.croissant);
+		std::swap(gauche.OK, droit.OK);
+		std::swap(gauche.position, droit.position);
+		std::swap(gauche.positions, droit.positions);
+		std::swap(gauche.dimensions, droit.dimensions);
+		return;
+	}
 
 	bool croissant;
 	bool OK;

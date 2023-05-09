@@ -154,6 +154,8 @@ public:
 	};
 
 	polynome_n_iter<T>& operator=(polynome_n_iter<T>&& temp) {
+		if (this == &temp)
+			return *this;
 		swap(*this, temp);
 		return *this;
 	};
@@ -317,7 +319,7 @@ public:
 		while (fin) {
 			//on opère la multiplication ... chaque couple (gauche , droite) apparait une et une seule fois.
 			if (((bool)gauche.coeffs.data[position_gauche]) && ((bool)droite.coeffs.data[position_droite])) 
-				result.coeffs.data[position_finale] = result.coeffs.data[position_finale] + (gauche.coeffs.data[position_gauche] * droite.coeffs.data[position_droite]);
+				result.coeffs.data[position_finale] +=  (gauche.coeffs.data[position_gauche] * droite.coeffs.data[position_droite]);
 			++position_gauche;
 			++positions_gauche[n - 1];
 			++position_finale;
@@ -588,7 +590,7 @@ public:
 	};
 
 
-	template<class U> friend polynome_n_iter<T> operator*(U scalaire, polynome_n_iter<T> const& poly) {
+	template<class U> friend polynome_n_iter<T> operator*(U const& scalaire, polynome_n_iter<T> const& poly) {
 		polynome_n_iter<T> result(poly);
 		for (int i(0); i < result.coeffs.data.size(); ++i)
 			result.coeffs.data[i] = scalaire * result.coeffs.data[i];

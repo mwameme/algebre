@@ -25,13 +25,12 @@ template<class T>  T unite(T const& element, bool test);
 
 template<class T> class polynome_n_rec {
 public:
-
-	T element;
 	int n_var;
-	bool nul; //true si non-nul
-
-	std::string* noms_variables;
 	polynome<polynome_n_rec<T>> poly;
+	T element;
+
+	bool nul; //true si non-nul
+	std::string* noms_variables;
 
 
 	polynome_n_rec() : n_var(0),noms_variables(NULL) ,nul(false) {};
@@ -58,9 +57,9 @@ public:
 	};
 
 	polynome_n_rec(polynome_n_rec<T> const& copie) : nul(copie.nul), element(copie.element), noms_variables(copie.noms_variables),n_var(copie.n_var),poly(copie.poly) {	};
-	polynome_n_rec(polynome_n_rec<T>&& copie) : nul(copie.nul), noms_variables(copie.noms_variables), n_var(copie.n_var) {
+	polynome_n_rec(polynome_n_rec<T>&& copie) : nul(copie.nul), noms_variables(copie.noms_variables), n_var(copie.n_var)  {
 		swap_F(element, copie.element);
-		swap_F(poly, copie.poly);
+		swap(poly, copie.poly);
 		return;
 	};
 
@@ -418,7 +417,7 @@ public:
 		std::swap(gauche.noms_variables, droit.noms_variables);
 		std::swap(gauche.nul, droit.nul);
 		swap_F(gauche.element, droit.element);
-		swap_F(gauche.poly, droit.poly);
+		swap(gauche.poly, droit.poly);
 		return;
 	};
 

@@ -27,7 +27,7 @@ public:
 
     anneau_quotient(anneau_quotient<T> const& copie) : element(copie.element), quotient(copie.quotient){    };
 
-    anneau_quotient(anneau_quotient<T>&& copie) {
+    anneau_quotient(anneau_quotient<T>&& copie)  {
         swap(*this, copie);
         return;
     };
@@ -142,7 +142,7 @@ public:
         return os;
     };
 
-    friend void swap(anneau_quotient<T>& gauche, anneau_quotient<T>& droit) {
+    friend void swap(anneau_quotient<T>& gauche, anneau_quotient<T>& droit)   {
         swap_F(gauche.element, droit.element);
         swap_F(gauche.quotient, droit.quotient);
         return;

@@ -23,14 +23,14 @@ public:
 
     corps_quotient(corps_quotient<T> const& copie) : element(copie.element), quotient(copie.quotient) {    };
 
-    corps_quotient(corps_quotient<T>&& copie) {
+    corps_quotient(corps_quotient<T>&& copie)   {
         swap(*this, copie);
         return;
     };
 
     corps_quotient<T>& operator=(corps_quotient<T> const& temp);
 
-    corps_quotient<T>& operator=(corps_quotient<T>&& temp) {
+    corps_quotient<T>& operator=(corps_quotient<T>&& temp)   {
         if (this == &temp)
             return *this;
         swap(*this, temp);

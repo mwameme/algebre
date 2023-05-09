@@ -44,6 +44,8 @@ public:
 	complexe<T>& operator=(complexe<T> const& temp);
 
 	complexe<T>& operator=(complexe<T>&& temp) {
+		if (this == &temp)
+			return *this;
 		swap(*this, temp);
 		return *this;
 	};

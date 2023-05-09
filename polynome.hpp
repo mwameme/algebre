@@ -14,6 +14,7 @@ template<class T> class type_algebre;
 
 template<class T, class enable1 = void, class enable2 = void> class matrice;
 
+
 template<typename T> class polynome {
 public:
 
@@ -54,8 +55,7 @@ public:
 
 
 
-    polynome() : degre(-1){ // : degre(-1), coeffs(1) {
-    }; //problème si utilisé ... est juste là pour les fonctions template.
+    polynome() : degre(-1){ }; //problème si utilisé ... est juste là pour les fonctions template.
 
 
     polynome(const polynome<T>& copie) {
@@ -105,7 +105,7 @@ public:
         return (*this);
     };
 
-    polynome<T>& operator=(polynome<T>&& temp) {
+    polynome<T>& operator=(polynome<T>&& temp)  {
         if (this == &temp)
             return *this;
         
@@ -141,30 +141,41 @@ public:
     }
 
     friend polynome<T> operator*(const polynome<T>& temp1, const polynome<T>& temp2) {
-
         polynome<T> result;
         T faux = unite(temp1.coeffs[0], false);
-
         if ((temp1.degre < 0) || (temp2.degre < 0))
-            return unite(temp1,false);
+            return unite(temp1, false);
 
-        result.coeffs = std::vector<T>(temp1.degre + temp2.degre + 1,faux);
-        /*
-        for (int i(0); i < result.coeffs.size(); ++i) {
-            T temp(faux);
-            for (int j(0); j <= i; ++j) {
-                if ((j < temp1.coeffs.size()) && ((i - j) < temp2.coeffs.size()))
-                    temp = temp + (temp1.coeffs[j] * temp2.coeffs[i - j]);
+        std::vector<bool> nul_1(temp1.coeffs.size(), false); int i1 = 0;
+        std::vector<bool> nul_2(temp2.coeffs.size(), false); int i2 = 0;
+        for (int i(0); i < temp1.coeffs.size(); ++i)
+            if ((bool)temp1.coeffs[i]) {
+                nul_1[i] = true;
+                ++i1;
             }
-            result.coeffs[i] = temp;
-        }*/
-
-        for (int i(0); i <= temp1.degre; ++i)
-            for (int j(0) ; j <= temp2.degre; ++j)
-                result.coeffs[i + j] = result.coeffs[i + j] + (temp1.coeffs[i] * temp2.coeffs[j]);
+        for (int i(0); i < temp2.coeffs.size(); ++i)
+            if ((bool)temp2.coeffs[i]) {
+                nul_2[i] = true;
+                ++i2;
+            }
+        if ((i1 * temp2.coeffs.size() + (temp1.coeffs.size() - i1)) < (i2 * temp1.coeffs.size() + (temp2.coeffs.size() - i2)) ){
+            result.coeffs = std::vector<T>(temp1.degre + temp2.degre + 1, faux);
+            for (int i(0); i <= temp1.degre; ++i)
+                if (nul_1[i])
+                    for (int j(0); j <= temp2.degre; ++j)
+                        if (nul_2[j])
+                            result.coeffs[i + j] += (temp1.coeffs[i] * temp2.coeffs[j]);
+        }
+        else {
+            result.coeffs = std::vector<T>(temp1.degre + temp2.degre + 1, faux);
+            for (int i(0); i <= temp2.degre; ++i)
+                if (nul_2[i])
+                    for (int j(0); j <= temp1.degre; ++j)
+                        if (nul_1[j])
+                            result.coeffs[i + j] += (temp1.coeffs[j] * temp2.coeffs[i]);
+        }
 
         result.getDegre();
-
         return result;
     };
 
@@ -443,6 +454,8 @@ public:
     };
 
     void normaliser() {
+        static_assert(type_algebre<T>::type == 0);
+
 #ifdef ALGEBRA_USE_EXEPTION
         if (degre < 0)
             throw std::domain_error("normaliser un polynome : polynome nul");
@@ -452,7 +465,7 @@ public:
         *this *= inv;
     };
 
-    T coeff_dominant() {
+    T coeff_dominant() const {
         return coeffs[coeffs.size() - 1];
     }
 

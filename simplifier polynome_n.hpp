@@ -8,6 +8,7 @@
 #include "n_for.hpp"
 #include <algorithm>
 
+#include "swap_T.hpp"
 
 template<class T> class scalaire_vecteur {
 public:
@@ -15,12 +16,8 @@ public:
 	T scalaire;
 	std::vector<T> vecteur;
 
-
 	scalaire_vecteur() : vecteur(0) { };
-
-
 	scalaire_vecteur(int n) : vecteur(n) { };
-
 	scalaire_vecteur(scalaire_vecteur<T> const& temp) {
 		scalaire = temp.scalaire;
 		vecteur = temp.vecteur;
@@ -49,6 +46,31 @@ public:
 			return *this;
 		scalaire = temp.scalaire;
 		vecteur = temp.vecteur;
+		return *this;
+	};
+
+	scalaire_vecteur<T>& operator+=(scalaire_vecteur<T> const& temp) {
+		return (*this = (*this + temp));
+	}
+
+	scalaire_vecteur<T>& operator*=(scalaire_vecteur<T> const& temp) {
+		return (*this = (*this * temp));
+	}
+
+	template<class U>
+	friend scalaire_vecteur<T> operator*(U const& scalaire, const scalaire_vecteur<T>& vec) {
+		scalaire_vecteur<T> result(*this);
+		result.scalaire *= scalaire;
+		for (int i(0); i < result.vecteur.size(); ++i)
+			result.vecteur[i] *= scalaire;
+		return result;
+	}
+
+	template<class U>
+	scalaire_vecteur<T>& operator*=(const U& scalaire_) {
+		scalaire *= scalaire_;
+		for (int i(0); i < vecteur.size(); ++i)
+			vecteur[i] *= scalaire_;
 		return *this;
 	};
 
@@ -81,9 +103,17 @@ public:
 	};
 
 	operator bool() const {
-		if ((vecteur.size() == 0) && (!((bool)scalaire)))
-			return false;
-		return true;
+		if ((bool)scalaire)
+			return true;
+		for (int i(0); i < vecteur.size(); ++i)
+			if ((bool)vecteur[i])
+				return true;
+		return false;
+	};
+
+	friend void swap(scalaire_vecteur<T>& gauche, scalaire_vecteur<T>& droit) {
+		std::swap(gauche.vecteur, droit.vecteur);
+		swap_F(gauche.scalaire, droit.scalaire);
 	};
 
 };

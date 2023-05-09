@@ -56,6 +56,12 @@ public :
 		precision = temp.precision;
 	};
 
+	erreur_b(erreur_b<T>&& temp) {
+		swap(*this, temp);
+		return;
+	}
+
+
 	erreur_b<T>& operator=(erreur_b<T> const& temp) {
 		if (this == &temp)
 			return *this;
@@ -64,6 +70,13 @@ public :
 		return *this;
 	};
 
+	erreur_b<T>& operator=(erreur_b<T>&& temp) {
+		if (this == &temp)
+			return *this;
+		swap(*this, temp);
+		return *this;
+	}
+
 	erreur_b<T>& operator+=(erreur_b<T> const& autre) {
 		return (*this = (*this + autre));
 	}
@@ -71,6 +84,13 @@ public :
 	erreur_b<T>& operator*=(erreur_b<T> const& autre) {
 		return (*this = (*this * autre));
 	}
+
+	template<class U>
+	erreur_b<T>& operator*=(U const& scalaire) {
+		valeur *= scalaire;
+		precision *= carre((float)scalaire);
+		return *this;
+	};
 
 
 	explicit inline operator bool() const {
@@ -88,9 +108,9 @@ public :
 		return result;
 	};
 
-	//template<class U> 
-	friend erreur_b<T> operator*(long const& scalaire, erreur_b<T> const& temp) {
-		erreur_b<T> result(scalaire * temp.valeur, ((float)carre(scalaire)) * temp.precision); //((T)scalaire)
+	template<class U> 
+	friend erreur_b<T> operator*(U const& scalaire, erreur_b<T> const& temp) {
+		erreur_b<T> result(scalaire * temp.valeur, (carre((float)scalaire)) * temp.precision); //((T)scalaire)
 		return result;
 	};
 
@@ -251,6 +271,11 @@ public:
 		precision = temp.precision;
 	};
 
+	erreur_l(erreur_l<T>&& temp) {
+		swap(*this, temp);
+		return;
+	}
+
 	explicit inline operator bool() const {
 		if (abs((float) valeur) <= (2. * precision))
 			return false;
@@ -266,6 +291,13 @@ public:
 		return *this;
 	};
 
+	erreur_l<T>& operator=(erreur_l<T>&& temp) {
+		if (this == &temp)
+			return *this;
+		swap(*this, temp);
+		return *this;
+	}
+
 	erreur_l<T>& operator+=(erreur_l<T> const& autre) {
 		return (*this = (*this + autre));
 	};
@@ -274,15 +306,22 @@ public:
 		return (*this = (*this * autre));
 	};
 
+	template<class U>
+	erreur_l<T>& operator*=(U const& scalaire) {
+		valeur *= scalaire;
+		precision *= abs((float)scalaire);
+		return *this;
+	}
+
 	friend erreur_l<T> operator*(erreur_l<T> const& temp1, erreur_l<T> const& temp2) {
 		erreur_l<T> result(temp1.valeur * temp2.valeur, 0.);
 		result.precision = abs((float)temp1.valeur) * temp2.precision + abs((float)temp2.valeur) * temp1.precision; // +(temp1.precision * temp2.precision);
 		return result;
 	};
 
-	//template<class U> 
-	friend erreur_l<T> operator*(long const& scalaire, erreur_l<T> const& temp) {
-		erreur_l<T> result(scalaire * temp.valeur, ((float)abs(scalaire)) * temp.precision); //((T)scalaire)
+	template<class U> 
+	friend erreur_l<T> operator*(U const& scalaire, erreur_l<T> const& temp) {
+		erreur_l<T> result(scalaire * temp.valeur, (abs((float)scalaire)) * temp.precision); //((T)scalaire)
 		return result;
 	};
 

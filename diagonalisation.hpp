@@ -5,6 +5,7 @@
 #include "fonctions template.hpp"
 #include "types.hpp"
 #include "norme.hpp"
+#include "reduire_frac.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -33,25 +34,21 @@ public:
 		if (m_matrice.taille_l != m_matrice.taille_c)
 			throw std::domain_error("diagonalisation : dimensions ne coincident pas");
 #endif
-		polynome<T> chi = m_matrice.polynomeCaracteristique();
+		chi = m_matrice.polynomeCaracteristique();
+		chi.normaliser();
 		polynome<T> chi_ = chi;
-
-		/*
-		polynome<T> R;
-		while ((R = PGCD(chi_, 
-		(chi_))).degre >= 1) {
-			chi_ = chi_ / R;
-		}//chi_ à racines simples */
 		chi_ = chi_ / PGCD(chi_, derivee(chi_));
-
+		chi_.normaliser();
 		int n = 1;
-		polynome<T> chi_n = chi_;
-		while ((bool) chi_n(m_matrice)) {
-			++n;
-			chi_n = chi_n * chi_;
-		}
 		if (vecteurs_propres)
 			n = 1;
+		else {
+			polynome<T> chi_n = chi_;
+			while ((bool)chi_n(m_matrice)) {
+				++n;
+				chi_n = chi_n * chi_;
+			}
+		}
 
 		int taille = m_matrice.taille_l;
 		T e = unite(m_matrice.coeffs[0][0],true);
@@ -88,6 +85,7 @@ public:
 			return false;
 		}
 		else {
+			R.normaliser();
 			matrices.push_back(matrices[i]);
 			conditions.push_back(R);
 			ligne.push_back(ligne[i]);
@@ -107,6 +105,7 @@ public:
 //		matrice < anneau_quotient<polynome<T>>>& matrices[i] = matrices[i];
 		int taille = matrices[0].taille_l;
 		int i = ligne[iter];
+		auto faux = unite(matrices[0].coeffs[0][0],false);
 
 		for (; i < taille; ++i) {
 			ligne[iter] = i;
@@ -122,8 +121,10 @@ public:
 			for (int k(0); k < taille; ++k) {
 				if (k == i)
 					continue;
-				if ((bool)matrices[iter].coeffs[k][j].element)
+				if ((bool)matrices[iter].coeffs[k][j].element) {
 					matrices[iter].ajouterLigne(i, k, -inv * matrices[iter].coeffs[k][j]); //ajoute la ligne i à la ligne k. annnule [k][j]
+					matrices[iter].coeffs[k][j] = faux;
+				}
 			}
 		}
 
@@ -226,7 +227,8 @@ public:
 		if (m_matrice.taille_l != m_matrice.taille_c)
 			throw std::domain_error("diagonalisation : dimensions ne coincident pas");
 #endif
-		polynome<T> chi = m_matrice.polynomeCaracteristique();
+		chi = m_matrice.polynomeCaracteristique();
+		chi.normaliser();
 		polynome<T> chi_ = chi;
 
 		/*
@@ -236,15 +238,18 @@ public:
 			chi_ = chi_ / R;
 		}//chi_ à racines simples */
 		chi_ = chi_ / PGCD(chi_, derivee(chi_));
+		chi_.normaliser();
 
 		int n = 1;
-		polynome<T> chi_n = chi_;
-		while ((bool)chi_n(m_matrice)) {
-			++n;
-			chi_n = chi_n * chi_;
-		}
 		if (vecteurs_propres)
 			n = 1;
+		else {
+			polynome<T> chi_n = chi_;
+			while ((bool)chi_n(m_matrice)) {
+				++n;
+				chi_n = chi_n * chi_;
+			}
+		}
 
 		int taille = m_matrice.taille_l;
 		T e = unite(m_matrice.coeffs[0][0], true);
@@ -275,11 +280,12 @@ public:
 		polynome<T> R = PGCD(Q, conditions[i]);
 
 		if (R.degre <= 0) {
-			return norme(PGCD(inverse(Q,conditions[i]),conditions[i])); // l'élément testé n'est jamais nul ! pas de racine en commun avec la condition
+			return norme(anneau_quotient<polynome<T>>(inverse(Q, conditions[i]), conditions[i])); // l'élément testé n'est jamais nul ! pas de racine en commun avec la condition
 		}
 		else if (R.degre == conditions[i].degre)
 			return 0.;
 		else {
+			R.normaliser();
 			matrices.push_back(matrices[i]);
 			conditions.push_back(R);
 			ligne.push_back(ligne[i]);
@@ -287,10 +293,10 @@ public:
 			mettre_a_jour_quotient(matrices[matrices.size() - 1], R);
 
 			conditions[i] = conditions[i] / R;
-			conditions[i].normaliser();
+//			conditions[i].normaliser();
 			mettre_a_jour_quotient(matrices[i], conditions[i]);
 
-			return norme(PGCD(inverse(Q, conditions[i]), conditions[i])); //l'élément testé n'est jamais nul dans ce cas : la nouvelle condition n'a aucune racine en commun avec l'élément : on a séparé.
+			return norme(anneau_quotient<polynome<T>>(inverse(Q, conditions[i]), conditions[i])); //l'élément testé n'est jamais nul dans ce cas : la nouvelle condition n'a aucune racine en commun avec l'élément : on a séparé.
 			//Mais la condition ajoutée annule l'élément testé :  dans l'espace ajouté, Q sera nul (la condition ajoutée est R, et Q = R*quelquechose)
 		};
 	};
@@ -300,6 +306,7 @@ public:
 		int taille = matrices[0].taille_l;
 		int i = ligne[iter];
 		polynome<T> poly_faux = unite(matrices[0].coeffs[0][0].element, false);
+		auto faux = unite( matrices[0].coeffs[0][0], false);
 
 		for (; i < taille; ++i) {
 			ligne[iter] = i;
@@ -420,6 +427,7 @@ public :
 	
 	void ajouter_vecteur(polynome<T> condition, std::vector<polynome<T>> vecteur) {
 		liste_vecteurs.push_back(vecteur);
+		simplifier_frac(liste_vecteurs[liste_vecteurs.size() - 1]);
 		liste_conditions.push_back(condition);
 	};
 

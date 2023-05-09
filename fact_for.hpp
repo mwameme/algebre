@@ -55,6 +55,11 @@ public:
 		position = temp.position;
 	};
 
+	fact_for(fact_for&& temp) {
+		swap(*this, temp);
+	}
+
+
 	fact_for& operator=(fact_for const& temp) {
 		if (this == &temp)
 			return *this;
@@ -70,6 +75,13 @@ public:
 
 		return *this;
 	};
+
+	fact_for& operator=(fact_for&& temp) {
+		if (this == &temp)
+			return *this;
+		swap(*this, temp);
+		return *this;
+	}
 
 	fact_for& operator++() {
 		int i = positions.size() - 1;
@@ -123,6 +135,21 @@ public:
 	explicit inline operator bool() const {// si OK=false, la boucle s'arrête.
 		return OK;
 	};
+
+	friend void swap(fact_for& gauche, fact_for& droit) {
+		std::swap(gauche.n, droit.n);
+		std::swap(gauche.signature, droit.signature);
+		std::swap(gauche.OK, droit.OK);
+		std::swap(gauche.position, droit.position);
+		std::swap(gauche.positions, droit.positions);
+		std::swap(gauche.dimensions, droit.dimensions);
+		std::swap(gauche.signatures, droit.signatures);
+		std::swap(gauche.places_dispo, droit.places_dispo);
+		std::swap(gauche.permutation, droit.permutation);
+
+		return;
+	}
+
 
 	int position;
 	int signature; //calculer la signature !

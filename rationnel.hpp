@@ -8,11 +8,12 @@
 #include <initializer_list>
 
 #include "entete objets.hpp"
+#include "swap_T.hpp"
 
 
 template<class T> T unite(T const& element, bool test);
 
-template<class T> inline void swap_F(T& x, T& y);
+//template<class T> inline void swap_F(T& x, T& y);
 
 
 template<class T> class rationnel {
@@ -40,7 +41,7 @@ public:
 
     rationnel(const rationnel<T>& copie) : numerateur(copie.numerateur), denominateur(copie.denominateur) {    };
 
-    rationnel(rationnel<T>&& temp) {
+    rationnel(rationnel<T>&& temp) : numerateur(),denominateur()  {
         swap(*this, temp);
         return;
     };
@@ -56,7 +57,9 @@ public:
 
     rationnel<T>& operator=(const rationnel<T>& temp);
 
-    rationnel<T>& operator=(rationnel<T>&& temp) {
+    rationnel<T>& operator=(rationnel<T>&& temp)  {
+        if (this == &temp)
+            return *this;
         swap(*this, temp);
         return *this;
     };
@@ -75,8 +78,11 @@ public:
         return *this;
     };
 
-    rationnel<T>& operator+=(const rationnel<T>& temp) {
-        return (*this = (*this + temp));
+    rationnel<T>& operator+=(rationnel<T> const& temp) {
+        numerateur = ((numerateur * temp.denominateur) + (denominateur * temp.numerateur));
+        denominateur = denominateur * temp.denominateur;
+        simplifier();
+        return *this;
     };
 
 
@@ -120,13 +126,12 @@ public:
         return result;
     };
 
-    friend rationnel<T> operator+ (const rationnel<T>& temp1, const rationnel<T>& temp2) {
+    friend rationnel<T> operator+(const rationnel<T>& temp1, const rationnel<T>& temp2) {
         rationnel<T> result;
         result.numerateur = ((temp1.numerateur * temp2.denominateur) + (temp2.numerateur * temp1.denominateur));
         result.denominateur = (temp1.denominateur * temp2.denominateur);
 
         result.simplifier();
-
         return result;
     };
 
@@ -147,7 +152,10 @@ public:
     };
 
     friend bool operator==(rationnel<T> const& a, rationnel<T> const& b) {
-        return (!((bool)((a.numerateur * b.denominateur) - (b.numerateur * a.denominateur))));
+        if (((bool)((a.numerateur * b.denominateur) - (b.numerateur * a.denominateur))))
+            return false;
+        else
+            return true;
     };
 
 

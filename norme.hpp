@@ -227,11 +227,29 @@ public:
 template<class T> class norme_T < anneau_quotient<polynome<T>>> {
 public:
 	static decltype(norme_T<T>::norme(T())) norme(anneau_quotient<polynome<T>> const& x) {
-		polynome<T> pgcd = PGCD(x.element, x.quotient); //dans cet ordre ... résultant proportionnel au coeff dominant de x.element.
+		//on suppose x normalisé : coeff_dominant =1 
+		polynome<T> poly = x.element;
+		T coeff = poly.coeff_dominant();
+		poly.normaliser();
+		polynome<T> pgcd = PGCD(poly, x.quotient); //dans cet ordre ... résultant proportionnel au coeff dominant de x.element.
 		if (pgcd.degre >= 1) {
 			return norme_T<T>::norme(unite(pgcd.coeffs[0], false));
 		}
-		return norme_T<polynome<T>>::norme(pgcd);
+		return norme_T<polynome<T>>::norme(coeff * pgcd);
+	};
+};
+
+template<class T> class norme_T < corps_quotient<polynome<T>>> {
+public:
+	static decltype(norme_T<T>::norme(T())) norme(corps_quotient<polynome<T>> const& x) {
+		polynome<T> poly = x.element;
+		T coeff = poly.coeff_dominant();
+		poly.normaliser();
+		polynome<T> pgcd = PGCD(poly, x.quotient); //dans cet ordre ... résultant proportionnel au coeff dominant de x.element.
+		if (pgcd.degre >= 1) {
+			return norme_T<T>::norme(unite(pgcd.coeffs[0], false));
+		}
+		return norme_T<polynome<T>>::norme(coeff * pgcd);
 	};
 };
 

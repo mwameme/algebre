@@ -33,6 +33,25 @@ int main()
 //    auto x = 4.5 % 4.1;
 
     if (true) {
+        monome<rationnel<int>> monome_(std::vector<int>({ 1,2,3 }), rationnel<int>(3, 2));
+        polynome_n_fixe<rationnel<int>, 3> poly(monome_);
+        polynome_n_fixe<rationnel<int>, 3> poly2(std::vector<int>({ 1,2,3 }), rationnel<int>(3, 2));
+        polynome_n_fixe<rationnel<int>, 3>::const_iterator it = poly.cbegin();
+        polynome_n_fixe<rationnel<int>, 3>::const_iterator it2 = poly2.cbegin();
+
+        while ((bool)it) {
+            cout << *it << " , " << *it2 << " , " << (*it == *it2) << endl;
+            ++it;
+            ++it2;
+        }
+
+        cout << (poly == poly2) << endl;
+
+        cin >> question;
+
+    }
+
+    if (false) {
         polynome<rationnel<int>> P(std::vector<int>({ 1,2,3,4 }));
         cout << type_algebre< polynome<rationnel<int>>>::type;
 
@@ -59,7 +78,8 @@ int main()
     }
 
     //test simplifier et double conversion.
-    if (true) {
+    if (false) {
+        
         std::string noms[3] = { "X","Y","Z" };
         polynome_n_iter<rationnel<int>> poly1({ 3,1,1 }, rationnel<int> {3, 4}, noms);
 
@@ -83,6 +103,7 @@ int main()
 
         cout << endl << "======FIN======" << endl;
         cin >> question;
+        
     }
 
     //constructeur de liste

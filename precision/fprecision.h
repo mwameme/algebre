@@ -129,6 +129,12 @@ class float_precision_ctrl {
       enum round_mode mode( enum round_mode m ) { return( mRmode = m ); }
       size_t precision() const					{ return mPrec>0 ? mPrec : PRECISION; }
       size_t precision( unsigned int p )        { mPrec = p > 0 ? p : PRECISION; return mPrec; }
+
+	  friend void swap(float_precision_ctrl& gauche, float_precision_ctrl& droit) {
+		  std::swap(gauche.mRmode, droit.mRmode);
+		  std::swap(gauche.mPrec, droit.mPrec);
+		  return;
+	  };
    };
 
 extern class float_precision_ctrl float_precision_ctrl;
@@ -290,6 +296,15 @@ class float_precision {
 								// e.g. R=2^64. Number=mNumber[0]*R^0+mNumber[1]*R^-1+mBInary[2]*R^-2,...mNumber[n-1]*R^-(n-1) etc.
    
    public:
+	   friend void swap(float_precision& gauche, float_precision& droit) {
+		   std::swap(gauche.mRmode, droit.mRmode);
+		   std::swap(gauche.mPrec, droit.mPrec);
+		   std::swap(gauche.mExpo, droit.mExpo);
+		   std::swap(gauche.mSign, droit.mSign);
+		   std::swap(gauche.mNumber, droit.mNumber);
+		   return;
+	   }
+
       // Constructors
 	  float_precision();											// When initialized with no parameters
       float_precision(char, size_t, enum round_mode);				// When initialized through a char
@@ -349,7 +364,7 @@ class float_precision {
 	  //Mes ajouts
 	  explicit inline operator bool() const{
 		  float_precision x(0.,mPrec,mRmode);
-		 return (*this ==  x);
+		 return !(*this ==  x);
 	  };
 	  
 	  friend bool operator<( float_precision const& temp,float const& x){

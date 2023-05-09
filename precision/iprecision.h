@@ -116,6 +116,12 @@ class int_precision
 
 	public:
 
+	friend void swap(int_precision& gauche, int_precision& droit) {
+		std::swap(gauche.mSign, droit.mSign);
+		std::swap(gauche.mLimit, droit.mLimit);
+		std::swap(gauche.mNumber, droit.mNumber);
+		return;
+	};
 
 	// Constructor
 	int_precision();										// No initialization
@@ -205,6 +211,12 @@ class int_precision
 		int_precision temp = gauche;
 		return temp * droit;
 	};
+
+	friend int_precision operator+(long long gauche, int_precision const droit) {
+		int_precision temp = gauche;
+		return temp + droit;
+	};
+
 
 	int_precision& operator*=(long long scalaire) {
 		int_precision temp = scalaire;
