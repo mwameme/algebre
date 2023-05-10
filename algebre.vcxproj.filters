@@ -39,6 +39,9 @@
     <ClCompile Include="vote.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="noms.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interpolation.hpp">
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="polynome_n_sparse.hpp">
       <Filter>Fichiers d%27en-tête\objets algebre</Filter>
+    </ClInclude>
+    <ClInclude Include="noms.hpp">
+      <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

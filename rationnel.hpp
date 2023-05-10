@@ -152,10 +152,7 @@ public:
     };
 
     friend bool operator==(rationnel<T> const& a, rationnel<T> const& b) {
-        if (((bool)((a.numerateur * b.denominateur) - (b.numerateur * a.denominateur))))
-            return false;
-        else
-            return true;
+        return (!((bool)((a.numerateur * b.denominateur) - (b.numerateur * a.denominateur))));
     };
 
 

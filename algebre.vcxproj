@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algebre.cpp" />
+    <ClCompile Include="noms.cpp" />
     <ClCompile Include="precision\precisioncore.cpp" />
     <ClCompile Include="TVD.cpp" />
     <ClCompile Include="vote.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="erreur.hpp" />
     <ClInclude Include="fact_for.hpp" />
     <ClInclude Include="fonctions template.hpp" />
+    <ClInclude Include="noms.hpp" />
     <ClInclude Include="n_for.hpp" />
     <ClInclude Include="InfInt.h" />
     <ClInclude Include="interpolation.hpp" />

@@ -258,6 +258,27 @@ public:
 				poly.coeffs[i].max_degre(p + 1);
 		return;
 	};
+
+	friend std::ostream& operator<<(std::ostream& os, polynome_n_fixe<T, n> const& poly) {
+		auto it = cbegin();
+		if (!nul) {
+			os << " 0 ";
+			return os;
+		}
+		while ((bool)it) {
+			if (!(bool)*it)
+				continue;
+			std::vector<int> positions = it.positions;
+			os << *it << " *";
+			for (int j(0); j < n; ++j)
+				os << "X" <<j<< "^" << std::to_string(positions[j]) << " ";
+			++it;
+			if ((bool)it)
+				os << "+ ";
+		}
+		return os;
+	};
+
 };
 
 template<class T, int n> class pointeur_n;
@@ -366,9 +387,9 @@ public:
 		constexpr_for<1, n - 1>([&](auto j) { //deuxieme fonction : mettre a jour les pointeurs.
 #ifdef ALGEBRA_USE_EXCEPTION
 			if (positions[j - 1] >= pointeurs.get<j - 1>()->poly.coeffs.size())
-				throw std::domain_error("poolynome_n_fixe::iterator, position hors domaine");
+				throw std::domain_error("polynome_n_fixe::iterator, position hors domaine");
 #endif
-			pointeurs.get<j>() = &pointeurs.get<j - 1>()->poly.coeffs[positions[j - 1]];
+			pointeurs.get<(int)j>() = &pointeurs.get<(int)j - 1>()->poly.coeffs[positions[(int)j - 1]];
 			return;
 			});
 		return;
@@ -412,6 +433,7 @@ public:
 	polynome_n_fixe() {};
 	polynome_n_fixe(T element) : poly(polynome_n_fixe<T,0>(element)), nul((bool)element) { };
 	polynome_n_fixe(std::vector<int> vec, T element); //monome
+	polynome_n_fixe(monome<T> monome_) : polynome_n_fixe(monome_.degres, monome_.element) {};
 	polynome_n_fixe(int* vec, T element, T faux); //monome interne
 	polynome_n_fixe(const polynome_n_fixe<T, 1>& copie) : poly(copie.poly), nul(copie.nul) { };
 
@@ -603,6 +625,23 @@ public:
 
 	int lenght() {
 		return poly.coeffs.size() + 1;
+	};
+
+	friend std::ostream& operator<<(std::ostream& os, polynome_n_fixe<T, 1> const& poly) {
+		auto it = cbegin();
+		if (!nul) {
+			os << " 0 ";
+			return os;
+		}
+		while ((bool)it) {
+			if (!(bool)*it)
+				continue;
+			os << *it << " *" << "X0" << "^" << std::to_string(it.p) << " ";
+			++it;
+			if ((bool)it)
+				os << "+ ";
+		}
+		return os;
 	}
 };
 
@@ -759,6 +798,7 @@ public:
 	polynome_n_fixe() {};
 	polynome_n_fixe(T element_) : element(element_), nul((bool)element_) {};
 	polynome_n_fixe(std::vector<int> vec, T element_) : element(element_), nul((bool)element_) {};  //monome
+	polynome_n_fixe(monome<T> monome_) : element(monome_.element), nul((bool)monome_.element) {};
 	polynome_n_fixe(int* vec, T element_, T faux) : element(element_), nul((bool)element_) {};  //monome interne
 	polynome_n_fixe(const polynome_n_fixe<T, 0>& copie) : element(copie.element), nul(copie.nul) {	};
 	polynome_n_fixe(polynome_n_fixe<T, 0>&& temp) {
@@ -871,6 +911,10 @@ public:
 		return result;
 	};
 
+	friend std::ostream& operator<<(std::ostream& os, polynome_n_fixe<T, 0> const& poly) {
+		os << " " << element << " ";
+		return os;
+	}
 
 };
 

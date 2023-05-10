@@ -95,12 +95,12 @@ template<class T>  polynome<T> unite(polynome<T> const& poly, bool test) {
 
 template<class T>  polynome_n_rec<T> unite(polynome_n_rec<T> const& poly_n, bool test) {
 	T temp = unite(poly_n.element,test);
-	polynome_n_rec<T> temp_(poly_n.n_var, temp, poly_n.noms_variables);
+	polynome_n_rec<T> temp_(poly_n.n_var, temp);
 	return temp_;
 }
 
 template<class T>  polynome_n_iter<T> unite(polynome_n_iter<T> const& poly_n, bool test) {
-	polynome_n_iter<T> temp(poly_n.coeffs.puissance, unite(poly_n.coeffs.data[0],test), poly_n.noms);
+	polynome_n_iter<T> temp(poly_n.coeffs.puissance, unite(poly_n.coeffs.data[0],test));
 	return temp;
 }
 

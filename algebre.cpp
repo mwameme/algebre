@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "entete objets.hpp"
-
+#include "noms.hpp"
 
 #include "interpolation.hpp"
 #include "diagonalisation.hpp"
@@ -80,11 +80,10 @@ int main()
     //test simplifier et double conversion.
     if (false) {
         
-        std::string noms[3] = { "X","Y","Z" };
-        polynome_n_iter<rationnel<int>> poly1({ 3,1,1 }, rationnel<int> {3, 4}, noms);
+        polynome_n_iter<rationnel<int>> poly1({ 3,1,1 }, rationnel<int> {3, 4});
 
-        polynome_n_iter<rationnel<int>> poly2({ 1,3,1 }, rationnel<int> {5, 4}, noms);
-        polynome_n_iter<rationnel<int>> poly3({ 1,1,3 }, rationnel<int> {2, 3}, noms);
+        polynome_n_iter<rationnel<int>> poly2({ 1,3,1 }, rationnel<int> {5, 4});
+        polynome_n_iter<rationnel<int>> poly3({ 1,1,3 }, rationnel<int> {2, 3});
 
         polynome_n_iter<rationnel<int>> poly = poly1 + poly2 + poly3;
 
@@ -130,11 +129,10 @@ int main()
 
     //test polynome_n_iter
     if (false) {
-        std::string noms[3] = { "X","Y","Z" };
-        polynome_n_iter<int> poly1({ 3,1,1 }, 1, noms);
+        polynome_n_iter<int> poly1({ 3,1,1 }, 1);
 
-        polynome_n_iter<int> poly2({ 1,3,1 }, 2, noms);
-        polynome_n_iter<int> poly3({ 1,1,3 }, 3, noms);
+        polynome_n_iter<int> poly2({ 1,3,1 }, 2);
+        polynome_n_iter<int> poly3({ 1,1,3 }, 3);
 
         polynome_n_iter<int> poly = poly1 + poly2 + poly3;
 
@@ -197,11 +195,11 @@ int main()
         float x = 4.3;
         string noms[3] = { "X","Y","Z" };
         vector<int> dim = { 1,2,3 };
-        polynome_n_rec<float> poly1(dim,noms,x);
+        polynome_n_rec<float> poly1(dim,x);
         cout << poly1 << endl;
 
         vector<int> dim2 = { 3,4,5 };
-        polynome_n_rec<float> poly2(dim2, noms, 3.54);
+        polynome_n_rec<float> poly2(dim2, 3.54);
         cout << poly2 << endl;
 
         polynome_n_rec<float> poly3 = poly1 + poly2;

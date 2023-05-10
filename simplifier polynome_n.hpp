@@ -129,7 +129,7 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 		throw std::domain_error("simplification de polynome_n_iter : scalaire / polynome");
 #endif
 	if (num.scalaire)
-		return polynome_n_iter<T>(0, num.coeffs.data[0] / denom.coeffs.data[0], NULL);
+		return polynome_n_iter<T>(0, num.coeffs.data[0] / denom.coeffs.data[0]);
 
 
 	T faux = unite(num.coeffs.data[0], false);
@@ -141,7 +141,7 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 		degres[i] = num.coeffs.dimensions[i] - denom.coeffs.dimensions[i];
 	for (int i(0); i < n; ++i)
 		if (degres[i] < 0)
-			return polynome_n_iter<T>(0, faux, NULL);
+			return polynome_n_iter<T>(0, faux);
 
 	int puissance = 1; //nombre d'éléments dans le polynome retourné ... sert à scalaire_vecteur<T>
 	for (int i(0); i < n; ++i)
@@ -154,7 +154,6 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 	vecteur_n<scalaire_vecteur<T>> denom_vec_T(denom.coeffs.dimensions, faux_T); //même dimension que denom. Mais de type différent ...
 	polynome_n_iter<scalaire_vecteur<T>> denom_T;
 	denom_T.coeffs = denom_vec_T;
-	denom_T.noms = denom.noms;
 	denom_T.scalaire = false;
 
 	for (int i(0); i < denom.coeffs.data.size(); ++i)
@@ -210,7 +209,7 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 	//unique a été fait !!! compter, et créer resultat_T
 
 	faux_T.vecteur.resize(positions_R2.size()); //on met à jour la taille du vecteur ... taille(faux_T) = taille(resultat_T)
-	polynome_n_iter<scalaire_vecteur<T>> resultat_T(degres, faux_T, denom.noms); //on connait le degré du résultat à l'avance ...
+	polynome_n_iter<scalaire_vecteur<T>> resultat_T(degres, faux_T); //on connait le degré du résultat à l'avance ...
 	for (int i(0); i < positions_R2.size(); ++i)
 		resultat_T.coeffs.data[resultat_T.coeffs.position(positions_R2[i])] = i; //on génère les vecteurs de la "base"
 
@@ -235,9 +234,9 @@ template<class T> polynome_n_iter<T> simplifier_poly(polynome_n_iter<T> const& n
 
 	std::vector<T> X = m_matrice.resoudre(Y); //taille : positions_R2.size()
 	if (X.size() == 0) //non simplifiable
-		return polynome_n_iter<T>(0, faux, NULL); //exception ?
+		return polynome_n_iter<T>(0, faux); //exception ?
 
-	polynome_n_iter<T> resultat(degres, faux, num.noms);
+	polynome_n_iter<T> resultat(degres, faux);
 	for (int i(0); i < positions_R2.size(); ++i)
 		resultat.coeffs.data[resultat.coeffs.position(positions_R2[i])] = X[i]; //on sait que e_i = X_i ... c'était le but.
 

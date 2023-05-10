@@ -24,13 +24,12 @@ template<class T> class polynome_n_iter {
 public:
 
 	bool scalaire; //true si c'est juste un scalaire
-	std::string* noms;
 	vecteur_n<T> coeffs;
 
 
 	polynome_n_iter() {};
 
-	polynome_n_iter(int n_var, T element,std::string* noms_) {//polynome de degre 0. utilisé pour unite
+	polynome_n_iter(int n_var, T element) {//polynome de degre 0. utilisé pour unite
 #ifdef ALGEBRA_USE_EXCEPTION
 		if (n_var < 0)
 			throw std::domain_error("polynome_n_iter : n_var < 0.");
@@ -39,27 +38,24 @@ public:
 			std::vector<int> dimensions(1, 1);
 			coeffs =vecteur_n<T>(dimensions);
 			coeffs.data[0] = element;
-			noms = NULL;
 			scalaire = true;
 		}
 		else {
 			std::vector<int> dimensions(n_var, 1);
 			coeffs = vecteur_n<T>(dimensions);
 			coeffs.data[0] = element;
-			noms = noms_;
 			scalaire = false;
 		}
 	};
-
-	polynome_n_iter(std::vector<int> degres, T element, std::string* noms_,bool is_degre=true){
+	polynome_n_iter(monome<T> monome_) : polynome_n_iter(monome_.degres, monome_.element, true) {};
+	polynome_n_iter(std::vector<int> degres, T element,bool is_degre=true){
 										//monome. degres >0. Transforme degres en dimensions ...  
-										//si true ATTENTION créé avec degrés
+										//si true ATTENTION créé avec degrés (+1) ... Sinon avec dimensions ...
 		if (degres.size() == 0) {
 			degres = { 1 };
 			coeffs=vecteur_n<T>(degres);
 			coeffs.data[0] = element;
 			scalaire = true;
-			noms = NULL;
 		}
 		else {
 			if (is_degre) {
@@ -86,69 +82,32 @@ public:
 			for (int i(0); i < coeffs.data.size(); ++i)
 				coeffs.data[i] = faux_;
 			coeffs.data[coeffs.data.size() - 1] = element; //monome
-			noms = noms_;
 			scalaire = false;
 		}
 	};
 
-	polynome_n_iter(const vecteur_n<T>& tableau, std::string* noms_) { //au cas où ?
+	polynome_n_iter(const vecteur_n<T>& tableau) { //au cas où ?
 		coeffs = tableau;
-		noms = noms_;
 		scalaire = false;
 	};
 
-	polynome_n_iter(vecteur_n<T>&& tableau, std::string* noms_) { //au cas où ?
+	polynome_n_iter(vecteur_n<T>&& tableau) { //au cas où ?
 		swap(coeffs, tableau);
-		noms = noms_;
 		scalaire = false;
 	};
 
 
-	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs), noms(temp.noms), scalaire(temp.scalaire) {
+	polynome_n_iter(polynome_n_iter const& temp) : coeffs(temp.coeffs), scalaire(temp.scalaire) {
 	};
 
 	polynome_n_iter(polynome_n_iter && temp)  {
 		swap(*this, temp);
 	};
 
-/*
-	polynome_n_iter(std::initializer_list<int> degres_, T element,std::string* noms_) {
-		std::vector<int> degres(degres_);
-
-		if (degres.size() == 0) {
-			degres = { 1 };
-			coeffs = vecteur_n<T>(degres);
-			coeffs.data[0] = element;
-			scalaire = true;
-			noms = NULL;
-		}
-		else {
-			for (int i(0); i < degres.size(); ++i)
-				if (degres[i] < 0) {
-					degres = std::vector<int>(degres.size(), 0);
-					element = unite(element, false);
-					break;
-				}
-
-			for (int i(0); i < degres.size(); ++i)
-				degres[i] += 1; //dimensions
-			coeffs = vecteur_n<T>(degres);
-			T faux_ = unite(element, false);
-
-			for (int i(0); i < coeffs.data.size(); ++i)
-				coeffs.data[i] = faux_;
-			coeffs.data[coeffs.data.size() - 1] = element; //monome
-			noms = noms_;
-			scalaire = false;
-		}
-	};
-	*/
-
 	polynome_n_iter<T>& operator=(polynome_n_iter<T> const& temp) {
 		if (this == &temp)
 			return *this;
 		coeffs = temp.coeffs;
-		noms = temp.noms;
 		scalaire = temp.scalaire;
 		return *this;
 	};
@@ -170,7 +129,7 @@ public:
 			for (int i(0); i < coeffs.data.size(); ++i)
 				coeffs.data[i] *= scalaire_;
 		else
-			*this = polynome_n_iter(coeffs.puissance, unite(coeffs.data[0], false), noms);
+			*this = polynome_n_iter(coeffs.puissance, unite(coeffs.data[0], false));
 
 		return *this;
 	};
@@ -213,7 +172,7 @@ public:
 		gauche.coeffs.modifier_dimension(dim);
 		droite.coeffs.modifier_dimension(dim);
 		for (int i(0); i < gauche.coeffs.data.size(); ++i)
-			gauche.coeffs.data[i] = gauche.coeffs.data[i] + droite.coeffs.data[i];
+			gauche.coeffs.data[i] +=  droite.coeffs.data[i];
 		gauche.scalaire = false;
 		return gauche;
 	};
@@ -238,7 +197,7 @@ public:
 		gauche.coeffs.modifier_dimension(dim);
 		droite.coeffs.modifier_dimension(dim);
 		for (int i(0); i < gauche.coeffs.data.size(); ++i)
-			gauche.coeffs.data[i] = gauche.coeffs.data[i] - droite.coeffs.data[i];
+			gauche.coeffs.data[i] += - droite.coeffs.data[i];
 		gauche.scalaire = false;
 		return gauche;
 	};
@@ -258,12 +217,8 @@ public:
 			throw std::domain_error("multiplication de polynome_n_iter : scalaire * polynome");
 #endif
 		if (gauche.scalaire)
-			return polynome_n_iter(0, gauche.coeffs.data[0] * droite.coeffs.data[0], NULL);
+			return polynome_n_iter(0, gauche.coeffs.data[0] * droite.coeffs.data[0]);
 
-		if (!(bool)gauche)
-			return polynome_n_iter<T>(gauche.coeffs.puissance, unite(gauche.coeffs.data[0], false), gauche.noms);
-		if (!(bool) droite)
-			return polynome_n_iter<T>(droite.coeffs.puissance, unite(droite.coeffs.data[0], false), droite.noms);
 
 		//mettre la plus sparse à droite
 		int n_sparse = 0;
@@ -274,7 +229,13 @@ public:
 		for (int i(0); i < droite.coeffs.data.size(); ++i)
 			m_sparse += (bool) droite.coeffs.data[i];
 
-		if (n_sparse * droite.coeffs.data.size() < m_sparse * gauche.coeffs.data.size())
+		if (n_sparse == 0)
+			return polynome_n_iter<T>(gauche.coeffs.puissance, unite(gauche.coeffs.data[0], false));
+		if (m_sparse == 0)
+			return polynome_n_iter<T>(droite.coeffs.puissance, unite(droite.coeffs.data[0], false));
+
+
+		if ((n_sparse * droite.coeffs.data.size()) < (m_sparse * gauche.coeffs.data.size()))
 			return droite * gauche;
 
 		int n = gauche.coeffs.puissance;
@@ -284,7 +245,7 @@ public:
 
 		T faux_ = unite(gauche.coeffs.data[0],false);
 
-		polynome_n_iter<T> result(degres , faux_ , gauche.noms); //ATTENTION degrés et non dimensions.
+		polynome_n_iter<T> result(degres , faux_ ); //ATTENTION degrés et non dimensions.
 
 		std::vector<int> dimensions_gauche = gauche.coeffs.dimensions;
 		std::vector<int> dimensions_droite = droite.coeffs.dimensions;
@@ -298,16 +259,6 @@ public:
 		std::vector<int> puissances_finale = result.coeffs.puissances;
 		std::vector<int> puissances_gauche = gauche.coeffs.puissances;
 		std::vector<int> puissances_droite = droite.coeffs.puissances;
-
-		/*
-		std::cout << "result " << std::endl << result << std::endl;
-		long question;
-		std::cout << "gauche " << std::endl << gauche << std::endl;
-		std::cout << "droite " << std::endl << droite << std::endl;
-
-		std::cin >> question;
-		*/
-
 
 		bool fin = true;
 		bool fin_gauche = true;
@@ -412,8 +363,8 @@ public:
 
 	operator polynome_n_rec<T>() const {
 		if (scalaire)
-			return polynome_n_rec<T>(0, coeffs.data[0], noms);
-		polynome_n_rec<T> result = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance, noms);
+			return polynome_n_rec<T>(0, coeffs.data[0]);
+		polynome_n_rec<T> result = poly_n_convert_rec(coeffs.data.data(), coeffs.dimensions.data(), coeffs.puissances.data(), coeffs.puissance);
 		return result;
 	};
 
@@ -423,7 +374,7 @@ public:
 			if ((bool)element.coeffs.data[iter.position]) {
 				std::string puissance = "";
 				for (int i(0); i < element.coeffs.puissance; ++i)
-					puissance = puissance + "*" + element.noms[i] + "^" + std::to_string(iter.positions[i]) + " ";
+					puissance = puissance + "* " + "X" + std::to_string(i) + "^" + std::to_string(iter.positions[i]) + " ";
 				if (premier)
 					os << "+" << element.coeffs.data[iter.position] << " " << puissance;
 				else {
@@ -456,7 +407,7 @@ public:
 				puissance = puissance * y;
 			}
 
-			return polynome_n_iter(0, result, NULL);
+			return polynome_n_iter(0, result);
 		}
 
 		int n = coeffs.puissance;
@@ -495,7 +446,7 @@ public:
 
 			std::vector<int> nouvelles_positions = positions;
 			nouvelles_positions.erase(nouvelles_positions.begin() + i); //Pour le polynome à n-1 variables.
-			polynome_n_iter<T> poly_fixe(nouvelles_positions, unite(coeffs.data[0], true), Y.noms); //degrés et nouvelles_positions correspondent ... OK.
+			polynome_n_iter<T> poly_fixe(nouvelles_positions, unite(coeffs.data[0], true)); //degrés et nouvelles_positions correspondent ... OK.
 			
 //			polynome_n_iter<T> pow = unite(Y, true);
 			for (int k(0); k < coeffs.dimensions[i]; ++k) {
@@ -507,7 +458,8 @@ public:
 		return result;
 	};
 
-	template<class U> U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ... 
+	template<class U>
+	U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ... 
 																//Plus précisément polynome de taille n-1
 																// Est utile pour évaluer une fraction de polynome_n_iter ... On évalue le numerateur puis le denominateur ...
 #ifdef ALGEBRA_USE_EXCEPTION
@@ -522,7 +474,7 @@ public:
 #endif
 		if (coeffs.puissance == 1) {
 			U result = unite(Y, false);
-			T puissance = unite(Y, true);
+			U puissance = unite(Y, true);
 
 			for (int i(0); i < coeffs.data.size(); ++i) {
 				result = result + (coeffs.data[i] * puissance);
@@ -580,12 +532,12 @@ public:
 		return result;
 	};
 
-	polynome_n_iter<T> operator() (int i, T element, std::string* noms_) const {
+	polynome_n_iter<T> operator() (int i, T element) const {
 #ifdef ALGEBRA_USE_EXCEPTION
 		if (coeffs.puissance <= 0)
 			throw std::domain_error("evaluation de polynome_n_rec : puissance requise >0");
 #endif
-		polynome_n_iter<T> Y(coeffs.puissance - 1, element, noms_);
+		polynome_n_iter<T> Y(coeffs.puissance - 1, element);
 		return *this(i, Y);
 	};
 
@@ -593,7 +545,7 @@ public:
 	template<class U> friend polynome_n_iter<T> operator*(U const& scalaire, polynome_n_iter<T> const& poly) {
 		polynome_n_iter<T> result(poly);
 		for (int i(0); i < result.coeffs.data.size(); ++i)
-			result.coeffs.data[i] = scalaire * result.coeffs.data[i];
+			result.coeffs.data[i] *= result.coeffs.data[i];
 		return result;
 	};
 
@@ -603,13 +555,12 @@ public:
 		return;
 	};
 
-	void simplifier_2() {
+	void simplifier_2() { //mieux
 		*this = ((polynome_n_iter<T>) ((polynome_n_rec<T>) * this)); //deux conversions ... la premiere simplifie.
 	};
 	
 	friend void swap(polynome_n_iter<T>& gauche, polynome_n_iter<T>& droit) {
 		std::swap(gauche.scalaire, droit.scalaire);
-		std::swap(gauche.noms, droit.noms);
 		swap(gauche.coeffs, droit.coeffs);
 		return;
 	};
@@ -617,7 +568,7 @@ public:
 	friend bool operator==(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droit) {
 		if (gauche.scalaire != droit.scalaire)
 			return false;
-		return ((polynome_n_rec<T>) gauche) == ((polynome_n_rec<T>) droit);
+		return ((polynome_n_rec<T>) gauche) == ((polynome_n_rec<T>) droit); //plus simple ... optimise (en +)
 
 	};
 
@@ -649,7 +600,6 @@ public:
 
 	operator polynome_n_sparse<T>() const {
 		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(coeffs.puissance, 0), unite(coeffs.data[0], false)));
-		poly.noms = noms;
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i])
 				poly.ajouter(monome<T>(coeffs.positions(i), coeffs.data[i]));
@@ -660,10 +610,10 @@ public:
 	template<class U>
 	operator polynome_n_iter<U>() const { //degre element noms false
 		if (scalaire)
-			return polynome_n_iter<U>(std::vector<int>(0), (U)coeffs.data[0], NULL);
-		polynome_n_iter<U> poly(coeffs.dimensions, unite((U)coeffs.data[0], false), noms, false); //false car ce sont les dimensions, et non les degrés ...
+			return polynome_n_iter<U>(std::vector<int>(0), (U)coeffs.data[0]);
+		polynome_n_iter<U> poly(coeffs.dimensions, unite((U)coeffs.data[0], false),  false); //false car ce sont les dimensions, et non les degrés ...
 		for (int i(0); i < poly.coeffs.data.size(); ++i)
-			poly.coeffs.data[i] = (U)coeffs.data[i];
+			poly.coeffs.data[i] = (U) coeffs.data[i];
 		return poly;
 	};
 
@@ -686,25 +636,28 @@ public:
 		for (int i(0); i < coeffs.data.size(); ++i)
 			if ((bool)coeffs.data[i]) {
 				int pos = (i / pow) % dim;
-				if (pos > result)
+				if (pos > result) {
 					result = pos;
+					if (result == (dim - 1))
+						break;
+				}
 			}
 		return result;
 	};
 
 };
 
-template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n, std::string* noms) {
+template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n) {
 	if (n == 0)
 		return polynome_n_rec<T>(*data);
 
 	std::vector<polynome_n_rec<T>> tab(0);
 	tab.reserve(*dimensions);
 	for (int i(0); i < *dimensions; ++i)
-		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1, noms + 1));
+		tab.push_back(poly_n_convert_rec(data + (i * puissances[0]), dimensions + 1, puissances + 1, n - 1));
 
 	T faux = unite(*data,false);
-	return polynome_n_rec<T>(n, noms, faux, tab); //simplifie aussi.
+	return polynome_n_rec<T>(n, faux, tab); //simplifie aussi.
 };
 
 
