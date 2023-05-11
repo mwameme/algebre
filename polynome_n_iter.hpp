@@ -584,7 +584,7 @@ public:
 
 	iterator end() {
 		iterator it(*this);
-		it.position = coeffs.data.size();
+		it.go_position(coeffs.data.size());
 		return it;
 	};
 
@@ -594,7 +594,7 @@ public:
 
 	const_iterator cend() const {
 		const_iterator it(*this);
-		it.position = coeffs.data.size();
+		it.go_position(coeffs.data.size());
 		return it;
 	};
 
@@ -669,9 +669,17 @@ public:
 
 	poly_type* pointeur;
 	int position;
+	std::vector<int> mpositions;
 
 	iterator_polynome_n_iter& operator++() {
 		++position;
+		for (int i(pointeur->coeffs.puissance - 1); i >= 0; --i) {
+			++mpositions[i];
+			if (mpositions[i] >= pointeur->coeffs.dimensions[i])
+				mpositions[i] = 0;
+			else
+				break;
+		}
 		return *this;
 	};
 
@@ -683,20 +691,29 @@ public:
 		return pointeur->coeffs.data[position];
 	};
 
-	std::vector<int> positions() const {
-		return pointeur->coeffs.positions(position);
+	std::vector<int> positions() {
+		return mpositions;
 	};
+
+	/*
+	int position() {
+		return mposition;
+	}
+	*/
 
 	void go_position(int i) {
 		position = i;
+		mpositions = pointeur->coeffs.positions(i);
 	};
 
-	void operator+(int i) {
+	iterator_polynome_n_iter<T>& operator+=(int i) {
 		position += i;
-		return;
+		mpositions = pointeur->coeffs.positions(position);
+		return *this;
 	}
 
 	void go_position(std::vector<int> pos) {
+		mpositions = pos;
 		position = pointeur->coeffs.position(pos);
 	};
 
@@ -711,6 +728,7 @@ public:
 	iterator_polynome_n_iter(poly_type& poly) {
 		pointeur = &poly;
 		position = 0;
+		mpositions = std::vector<int>(poly.coeffs.puissance, 0);
 	};
 };
 // Verifier les dimensions : polynome nul. OK

@@ -1,6 +1,6 @@
 #pragma once
 
-/*
+
 #include <vector>
 #include <string>
 #include <exception>
@@ -105,4 +105,3 @@ polynome_n_rec<T> modifier_nom(std::vector<std::string > ancien_nom, polynome_n_
 	return nouveau_poly;
 }
 
-*/
