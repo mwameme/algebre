@@ -668,11 +668,11 @@ public:
 	using poly_type = std::conditional_t< std::is_const_v<I>, const polynome_n_iter<value_type>, polynome_n_iter<value_type>	>;
 
 	poly_type* pointeur;
-	int position;
+	int mposition;
 	std::vector<int> mpositions;
 
 	iterator_polynome_n_iter& operator++() {
-		++position;
+		++mposition;
 		for (int i(pointeur->coeffs.puissance - 1); i >= 0; --i) {
 			++mpositions[i];
 			if (mpositions[i] >= pointeur->coeffs.dimensions[i])
@@ -684,50 +684,48 @@ public:
 	};
 
 	operator bool() const {
-		return position < pointeur->coeffs.data.size();
+		return mposition < pointeur->coeffs.data.size();
 	};
 
 	I& operator*() {
-		return pointeur->coeffs.data[position];
+		return pointeur->coeffs.data[mposition];
 	};
 
 	std::vector<int> positions() {
 		return mpositions;
 	};
 
-	/*
 	int position() {
 		return mposition;
 	}
-	*/
 
 	void go_position(int i) {
-		position = i;
+		mposition = i;
 		mpositions = pointeur->coeffs.positions(i);
 	};
 
 	iterator_polynome_n_iter<T>& operator+=(int i) {
-		position += i;
-		mpositions = pointeur->coeffs.positions(position);
+		mposition += i;
+		mpositions = pointeur->coeffs.positions(mposition);
 		return *this;
 	}
 
 	void go_position(std::vector<int> pos) {
 		mpositions = pos;
-		position = pointeur->coeffs.position(pos);
+		mposition = pointeur->coeffs.position(pos);
 	};
 
 	friend bool operator==(iterator_polynome_n_iter const& gauche, iterator_polynome_n_iter const& droit) {
-		return ((gauche.pointeur == droit.pointeur) && (gauche.position == droit.position));
+		return ((gauche.pointeur == droit.pointeur) && (gauche.mposition == droit.mposition));
 	};
 
 	friend bool operator!=(iterator_polynome_n_iter const& gauche, iterator_polynome_n_iter const& droit) {
-		return ((gauche.pointeur != droit.pointeur) || (gauche.position != droit.position));
+		return ((gauche.pointeur != droit.pointeur) || (gauche.mposition != droit.mposition));
 	};
 
 	iterator_polynome_n_iter(poly_type& poly) {
 		pointeur = &poly;
-		position = 0;
+		mposition = 0;
 		mpositions = std::vector<int>(poly.coeffs.puissance, 0);
 	};
 };
