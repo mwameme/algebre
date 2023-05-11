@@ -1,6 +1,6 @@
 #include "noms.hpp"
 
-
+/*
 std::vector<std::string> union_nom(std::vector<std::string > const& gauche, std::vector<std::string> const& droit) {
 	std::vector<std::string> result = gauche;
 	for (int i(0); i < droit.size(); ++i) {
@@ -16,3 +16,4 @@ std::vector<std::string> union_nom(std::vector<std::string > const& gauche, std:
 	}
 	return result;
 };
+*/
