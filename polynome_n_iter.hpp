@@ -572,9 +572,29 @@ public:
 
 	};
 
+	using iterator = typename vecteur_n<T>::iterator;
+	using const_iterator = typename vecteur_n<T>::const_iterator;
+
+	iterator begin() {
+		return coeffs.begin();
+	};
+	iterator end() {
+		return coeffs.end();
+	};
+
+	const_iterator cbegin() const {
+		return coeffs.cbegin();
+	};
+	const_iterator cend() const {
+		return coeffs.cend();
+	};
+
+
+
+	/*
 	template<class I>
 	class iterator_polynome_n_iter;
-
+	
 	using iterator = iterator_polynome_n_iter<T>;
 	using const_iterator = iterator_polynome_n_iter<const T>;
 
@@ -597,6 +617,7 @@ public:
 		it.go_position(coeffs.data.size());
 		return it;
 	};
+	*/
 
 	operator polynome_n_sparse<T>() const {
 		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(coeffs.puissance, 0), unite(coeffs.data[0], false)));
@@ -660,7 +681,7 @@ template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int*
 	return polynome_n_rec<T>(n, faux, tab); //simplifie aussi.
 };
 
-
+/*
 template<class T> template<class I>
 class polynome_n_iter<T>::iterator_polynome_n_iter {
 public:
@@ -729,6 +750,7 @@ public:
 		mpositions = std::vector<int>(poly.coeffs.puissance, 0);
 	};
 };
+*/
 // Verifier les dimensions : polynome nul. OK
 // convertir en polynome_n_rec, et réciproquement. OK
 // mettre a jour types et norme.

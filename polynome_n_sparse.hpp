@@ -195,6 +195,11 @@ public:
 		return;
 	};
 
+	inline void force_simplifier() {
+		est_trie = false;
+		simplifier();
+	}
+
 	void simplifier() {
 #ifdef ALGEBRA_USE_EXCEPTION
 		if (monomes.size() == 0)
@@ -384,7 +389,6 @@ public:
 			}
 
 			if (ig == gauche.monomes.size()) { //on ajoute la fin de -droit ...
-				result.monomes.reserve(result.monomes.size() + droit.monomes.size() - id);
 				for (int i(id); i < droit.monomes.size(); ++i)
 					result.monomes.push_back(-droit.monomes[i]);
 //				result.monomes.insert(result.monomes.end(), droit.monomes.begin() + id, droit.monomes.end());

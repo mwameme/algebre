@@ -232,7 +232,104 @@ public:
 		swap(gauche.dimensions, droit.dimensions);
 		return;
 	}
+
+	template<class I>
+	class iterator_vecteur_n;
+
+	using iterator = iterator_vecteur_n<T>;
+	using const_iterator = iterator_vecteur_n<const T>;
+
+	iterator begin() {
+		return iterator(*this);
+	};
+
+	iterator end() {
+		iterator it(*this);
+		it.go_position(data.size());
+		return it;
+	};
+
+	const_iterator cbegin() const {
+		return const_iterator(*this);
+	};
+
+	const_iterator cend() const {
+		const_iterator it(*this);
+		it.go_position(data.size());
+		return it;
+	};
+
 };
 
+
+
+template<class T> template<class I>
+class vecteur_n<T>::iterator_vecteur_n {
+public:
+	using value_type = std::remove_const_t<I>;
+	using vecteur_type = std::conditional_t< std::is_const_v<I>, const vecteur_n<value_type>, vecteur_n<value_type>	>;
+
+	vecteur_type* pointeur;
+	int mPosition;
+	std::vector<int> mPositions;
+
+	iterator_vecteur_n& operator++() {
+		++mPosition;
+		for (int i(pointeur->puissance - 1); i >= 0; --i) {
+			++mPositions[i];
+			if (mPositions[i] >= pointeur->dimensions[i])
+				mPositions[i] = 0;
+			else
+				break;
+		}
+		return *this;
+	};
+
+	operator bool() const {
+		return mPosition < pointeur->data.size();
+	};
+
+	I& operator*() {
+		return pointeur->data[mPosition];
+	};
+
+	std::vector<int> positions() {
+		return mPositions;
+	};
+
+	int position() {
+		return mPosition;
+	}
+
+	void go_position(int i) {
+		mPosition = i;
+		mPositions = pointeur->positions(i);
+	};
+
+	iterator_vecteur_n<T>& operator+=(int i) {
+		mPosition += i;
+		mPositions = pointeur->positions(mPosition);
+		return *this;
+	}
+
+	void go_position(std::vector<int> pos) {
+		mPositions = pos;
+		mPosition = pointeur->position(pos);
+	};
+
+	friend bool operator==(iterator_vecteur_n const& gauche, iterator_vecteur_n const& droit) {
+		return ((gauche.pointeur == droit.pointeur) && (gauche.mPosition == droit.mPosition));
+	};
+
+	friend bool operator!=(iterator_vecteur_n const& gauche, iterator_vecteur_n const& droit) {
+		return ((gauche.pointeur != droit.pointeur) || (gauche.mPosition != droit.mPosition));
+	};
+
+	iterator_vecteur_n(vecteur_type& vec) {
+		pointeur = &vec;
+		mPosition = 0;
+		mPositions = std::vector<int>(puissance, 0);
+	};
+};
 //verifier >= dimension.
 //simplifier ...
