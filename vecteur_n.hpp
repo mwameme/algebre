@@ -196,9 +196,9 @@ public:
 				break;
 		};
 
-		data = data2;
+		swap(data , data2);
 		dimensions = nouvelles_dimensions;
-		puissances = puissances2;
+		swap(puissances , puissances2);
 
 		return;
 	};
@@ -330,6 +330,13 @@ public:
 		mPosition = 0;
 		mPositions = std::vector<int>(puissance, 0);
 	};
+
+	iterator_vecteur_n& operator=(iterator_vecteur_n const& copie) {
+		pointeur = copie.pointeur;
+		mPosition = copie.mPosition;
+		mPositions = copie.mPositions;
+		return *this;
+	}
 };
 //verifier >= dimension.
 //simplifier ...

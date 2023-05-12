@@ -144,63 +144,197 @@ public:
 			dim_finales[i] = max(coeffs.dimensions[i], autre.coeffs.dimensions[i]);
 
 		coeffs.modifier_dimensions(dim_finales);
-		polynome_n_iter<T> copie(autre);
-		copie.modifier_dimensions(dim_finales);
-		for (int i(0); i < coeffs.data.size(); ++i)
-			coeffs.data[i] += copie.data[i];
+
+		int n = coeffs.puissance;
+		int position_finale = 0;
+		std::vector<int> puissances_finale = coeffs.puissances;
+		std::vector<int> puissances = autre.coeffs.puissances;
+		std::vector<int> dimensions = autre.coeffs.dimensions;
+		bool fin = true;
+		int position = 0;
+		std::vector<int> positions(n, 0);
+
+		while (fin) {
+			coeffs.data[position_finale] += autre.coeffs.data[position];
+			++position;
+			++positions[n - 1];
+			++position_finale;
+			int i = n - 1;
+
+			while (positions[i] >= dimensions[i]) { //On réajuste autre, et donc finale aussi.
+				position_finale = position_finale - puissances_finale[i] * positions[i];
+				positions[i] = 0;
+				if (i == 0) {
+					fin = false;
+					break;
+				}
+				++positions[i - 1];
+				position_finale = position_finale + puissances_finale[i - 1];
+				--i;
+			}
+		}
 		return *this;
 	};
 
-	friend polynome_n_iter<T> operator+(polynome_n_iter<T> const& gauche_, polynome_n_iter<T> const& droite_) {
+	friend polynome_n_iter<T> operator+(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) {
 #ifdef ALGEBRA_USE_EXCEPTION
-		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
+		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
-		if (((gauche_.scalaire) && (!droite_.scalaire)) || ((droite_.scalaire) && (!gauche_.scalaire)))
+		if (((gauche.scalaire) && (!droite.scalaire)) || ((droite.scalaire) && (!gauche.scalaire)))
 			throw std::domain_error("addition de polynome_n_iter : scalaire + polynome");
-
-		if (gauche_.scalaire)
-			return polynome_n_iter(0, gauche_.coeffs.data[0] + droite_.coeffs.data[0], NULL);
 #endif
+		if (gauche.scalaire)
+			return polynome_n_iter(0, gauche.coeffs.data[0] + droite.coeffs.data[0]);
 
-		polynome_n_iter<T> gauche = gauche_;
-		polynome_n_iter<T> droite = droite_;
+
 		int n = gauche.coeffs.puissance;
-		std::vector<int> dim(n, 0);
+		std::vector<int> deg(n, 0);
 		for (int i(0); i < n; ++i)
-			dim[i] = max(gauche.coeffs.dimensions[i], droite.coeffs.dimensions[i]);
-		gauche.coeffs.modifier_dimension(dim);
-		droite.coeffs.modifier_dimension(dim);
-		for (int i(0); i < gauche.coeffs.data.size(); ++i)
-			gauche.coeffs.data[i] += droite.coeffs.data[i];
-		gauche.scalaire = false;
-		return gauche;
+			deg[i] = max(gauche.coeffs.dimensions[i], droite.coeffs.dimensions[i]) - 1;
+
+		T faux = unite(gauche.coeffs.data[0], false);
+
+		polynome_n_iter<T> result(deg, faux); //ATTENTION degrés et non dimensions.
+
+		int position_finale = 0;
+		std::vector<int> puissances_finale = result.coeffs.puissances;
+		//gauche
+		std::vector<int> puissances = gauche.coeffs.puissances;
+		std::vector<int> dimensions = gauche.coeffs.dimensions;
+		bool fin = true;
+		int position = 0;
+		std::vector<int> positions(n, 0);
+		while (fin) {
+			result.coeffs.data[position_finale] = gauche.coeffs.data[position];
+			++position;
+			++positions[n - 1];
+			++position_finale;
+			int i = n - 1;
+
+			while (positions[i] >= dimensions[i]) { //On réajuste gauche, et donc finale aussi.
+				position_finale = position_finale - puissances_finale[i] * positions[i];
+				positions[i] = 0;
+				if (i == 0) {
+					fin = false;
+					break;
+				}
+				++positions[i - 1];
+				position_finale = position_finale + puissances_finale[i - 1];
+				--i;
+			}
+		}
+		//droite
+		position = 0;
+		positions = std::vector<int>(n, 0);
+		puissances = droite.coeffs.puissances;
+		fin = true;
+		position_finale = 0;
+		dimensions = droite.coeffs.dimensions;
+
+		while (fin) {
+			result.coeffs.data[position_finale] += droite.coeffs.data[position];
+			++position;
+			++positions[n - 1];
+			++position_finale;
+			int i = n - 1;
+
+			while (positions[i] >= dimensions[i]) { //On réajuste droit, et donc finale aussi.
+				position_finale = position_finale - puissances_finale[i] * positions[i];
+				positions[i] = 0;
+				if (i == 0) {
+					fin = false;
+					break;
+				}
+				++positions[i - 1];
+				position_finale = position_finale + puissances_finale[i - 1];
+				--i;
+			}
+		}
+
+		return result;
 	};
 
-	friend polynome_n_iter<T> operator-(polynome_n_iter<T> const& gauche_, polynome_n_iter<T> const& droite_) {
+	friend polynome_n_iter<T> operator-(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) {
 #ifdef ALGEBRA_USE_EXCEPTION
-		if (gauche_.coeffs.puissance != droite_.coeffs.puissance)
-			throw std::domain_error("polynome_n_iter, soustraction : le nombre de variables ne correspond pas.");
+		if (gauche.coeffs.puissance != droite.coeffs.puissance)
+			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
-		if (((gauche_.scalaire) && (!droite_.scalaire)) || ((droite_.scalaire) && (!gauche_.scalaire)))
-			throw std::domain_error("soustraction de polynome_n_iter : scalaire - polynome");
-
-		if (gauche_.scalaire)
-			return polynome_n_iter(0, gauche_.coeffs.data[0] - droite_.coeffs.data[0], NULL);
+		if (((gauche.scalaire) && (!droite.scalaire)) || ((droite.scalaire) && (!gauche.scalaire)))
+			throw std::domain_error("addition de polynome_n_iter : scalaire + polynome");
 #endif
-		polynome_n_iter<T> gauche = gauche_;
-		polynome_n_iter<T> droite = droite_;
+		if (gauche.scalaire)
+			return polynome_n_iter(0, gauche.coeffs.data[0] - droite.coeffs.data[0]);
+
+
+
 		int n = gauche.coeffs.puissance;
-		std::vector<int> dim(n, 0);
+		std::vector<int> deg(n, 0);
 		for (int i(0); i < n; ++i)
-			dim[i] = max(gauche.coeffs.dimensions[i], droite.coeffs.dimensions[i]);
-		gauche.coeffs.modifier_dimension(dim);
-		droite.coeffs.modifier_dimension(dim);
-		for (int i(0); i < gauche.coeffs.data.size(); ++i)
-			gauche.coeffs.data[i] += -droite.coeffs.data[i];
-		gauche.scalaire = false;
-		return gauche;
-	};
+			deg[i] = max(gauche.coeffs.dimensions[i], droite.coeffs.dimensions[i]) - 1;
+
+		T faux = unite(gauche.coeffs.data[0], false);
+
+		polynome_n_iter<T> result(deg, faux); //ATTENTION degrés et non dimensions.
+
+		int position_finale = 0;
+		std::vector<int> puissances_finale = result.coeffs.puissances;
+		//gauche
+		std::vector<int> puissances = gauche.coeffs.puissances;
+		std::vector<int> dimensions = gauche.coeffs.dimensions;
+		bool fin = true;
+		int position = 0;
+		std::vector<int> positions(n, 0);
+		while (fin) {
+			result.coeffs.data[position_finale] = gauche.coeffs.data[position];
+			++position;
+			++positions[n - 1];
+			++position_finale;
+			int i = n - 1;
+
+			while (positions[i] >= dimensions[i]) { //On réajuste gauche, et donc finale aussi.
+				position_finale = position_finale - puissances_finale[i] * positions[i];
+				positions[i] = 0;
+				if (i == 0) {
+					fin = false;
+					break;
+				}
+				++positions[i - 1];
+				position_finale = position_finale + puissances_finale[i - 1];
+				--i;
+			}
+		}
+		//droite
+		position = 0;
+		positions = std::vector<int>(n, 0);
+		puissances = droite.coeffs.puissances;
+		fin = true;
+		position_finale = 0;
+		dimensions = droite.coeffs.dimensions;
+
+		while (fin) {
+			result.coeffs.data[position_finale] += - droite.coeffs.data[position];
+			++position;
+			++positions[n - 1];
+			++position_finale;
+			int i = n - 1;
+
+			while (positions[i] >= dimensions[i]) { //On réajuste droit, et donc finale aussi.
+				position_finale = position_finale - puissances_finale[i] * positions[i];
+				positions[i] = 0;
+				if (i == 0) {
+					fin = false;
+					break;
+				}
+				++positions[i - 1];
+				position_finale = position_finale + puissances_finale[i - 1];
+				--i;
+			}
+		}
+
+		return result;
+	}
+
 
 	friend polynome_n_iter<T> operator-(polynome_n_iter<T> const& temp) {
 		polynome_n_iter<T> result = temp;

@@ -286,6 +286,7 @@ public:
 				result.monomes.push_back(gauche.monomes[i] * droit.monomes[j]);
 		result.est_trie = false;
 		result.simplifier(); //n^2 log(n^2)
+		result.monomes.reserve(0);
 		return result;
 	};
 
@@ -459,6 +460,7 @@ public:
 		};
 
 		result.simplifier();
+		result.monomes.reserve(0);
 		return result;
 		//marche avec résultat scalaire ? je crois
 	};
