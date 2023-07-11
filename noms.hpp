@@ -14,6 +14,8 @@
 #include "swap_T.hpp"
 #include "entete objets.hpp"
 
+#include "union_nom.hpp"
+
 template<class T>  T unite(T const& element, bool test);
 
 
@@ -24,6 +26,7 @@ template<class T> class monome;
 
 
 //std::vector<std::string> union_nom(std::vector<std::string > const& gauche, std::vector<std::string> const& droit);
+/*
 inline std::vector<std::string> union_nom(std::vector<std::string > const& gauche, std::vector<std::string> const& droit) {
 	std::vector<std::string> result = gauche;
 	for (int i(0); i < droit.size(); ++i) {
@@ -39,7 +42,7 @@ inline std::vector<std::string> union_nom(std::vector<std::string > const& gauch
 	}
 	return result;
 };
-
+*/
 
 
 template<class T>

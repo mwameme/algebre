@@ -140,9 +140,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algebre.cpp" />
-    <ClCompile Include="noms.cpp" />
     <ClCompile Include="precision\precisioncore.cpp" />
     <ClCompile Include="TVD.cpp" />
+    <ClCompile Include="union_nom.cpp" />
     <ClCompile Include="vote.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +178,7 @@
     <ClInclude Include="polynome_n_rec.hpp" />
     <ClInclude Include="rationnel.hpp" />
     <ClInclude Include="TVD.hpp" />
+    <ClInclude Include="union_nom.hpp" />
     <ClInclude Include="vecteur_n.hpp" />
     <ClInclude Include="vote.hpp" />
     <ClInclude Include="unite.hpp" />

@@ -39,7 +39,7 @@
     <ClCompile Include="vote.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="noms.cpp">
+    <ClCompile Include="union_nom.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -148,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="noms.hpp">
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
+    </ClInclude>
+    <ClInclude Include="union_nom.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
