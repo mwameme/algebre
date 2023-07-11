@@ -3,6 +3,9 @@
 #include "fonctions template.hpp"
 #include "entete objets.hpp"
 #include "polynome_n_rec.hpp"
+#include "InfInt.h"
+#include "precision/iprecision.h"
+#include "precision/fprecision.h"
 
 template<class T> class complex;
 
