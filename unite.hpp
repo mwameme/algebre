@@ -11,6 +11,8 @@
 #include "erreur.hpp"
 #include <complex>
 
+#include "noms.hpp"
+
 template<class T> class complex;
 
 template<class T> class erreur_b;

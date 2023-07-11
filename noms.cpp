@@ -1,3 +1,4 @@
+/*
 #include "noms.hpp"
 
 
@@ -16,4 +17,4 @@ std::vector<std::string> union_nom(std::vector<std::string > const& gauche, std:
 	}
 	return result;
 };
-
+*/
