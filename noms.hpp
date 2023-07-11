@@ -1,14 +1,18 @@
 #pragma once
-
 /*
+
 #include <vector>
 #include <string>
-#include <exception>
+
+#include "unite.hpp"
 
 #include "polynome_n_rec.hpp"
 #include "polynome_n_iter.hpp"
 #include "polynome_n_sparse.hpp"
-#include "unite.hpp"
+#include "fonctions template.hpp"
+
+#include "swap_T.hpp"
+#include "entete objets.hpp"
 
 template<class T>  T unite(T const& element, bool test);
 
@@ -104,5 +108,82 @@ polynome_n_rec<T> modifier_nom(std::vector<std::string > ancien_nom, polynome_n_
 	}
 	return nouveau_poly;
 }
+
+template<class T> class polynome_n_noms {
+public:
+	T poly;
+	std::vector<std::string > noms;
+
+	polynome_n_noms(T temp, std::vector<std::string > chaine) : poly(temp), noms(chaine) {};
+
+	template<class U>
+	polynome_n_noms(U element, std::string nom) {
+		noms = { nom };
+		monome<U> temp({ 1 }, element);
+		poly = T(temp);
+		return;
+	};
+
+
+	polynome_n_noms(polynome_n_noms<T> const& temp) {
+		poly = temp.poly;
+		noms = temp.noms;
+	};
+
+	polynome_n_noms(polynome_n_noms<T>&& temp) {
+		swap(noms, temp.noms);
+		swap_F(poly, temp.poly);
+	};
+
+	polynome_n_noms<T>& operator=(polynome_n_noms<T> const& temp) {
+		if (this == &temp)
+			return *this;
+		poly = temp.poly;
+		noms = temp.noms;
+		return *this;
+	};
+
+	polynome_n_noms<T>& operator=(polynome_n_noms<T>&& temp) {
+		if (this == &temp)
+			return *this;
+		swap(noms, temp.noms);
+		swap_F(poly, temp.poly);
+		return *this;
+	};
+
+
+	friend polynome_n_noms<T> operator*(polynome_n_noms<T> const& gauche, polynome_n_noms<T> const& droit) {
+		if (gauche.noms == droit.noms)
+			return polynome_n_noms<T>(gauche.poly * droit.poly, gauche.noms);
+		std::vector<std::string > noms_ = union_nom(gauche.nom, droit.noms);
+		T temp_gauche = modifier_nom(gauche.noms, gauche.poly, noms_);
+		T temp_droit = modifier_nom(droit.noms, droit.poly, noms_);
+		return polynome_n_noms<T>(temp_gauche * temp_droit, noms_);
+	};
+
+	friend polynome_n_noms<T> operator+(polynome_n_noms<T> const& gauche, polynome_n_noms<T> const& droit) {
+		if (gauche.noms == droit.noms)
+			return polynome_n_noms<T>(gauche.poly + droit.poly, gauche.noms);
+		std::vector<std::string > noms_ = union_nom(gauche.nom, droit.noms);
+		T temp_gauche = modifier_nom(gauche.noms, gauche.poly, noms_);
+		T temp_droit = modifier_nom(droit.noms, droit.poly, noms_);
+		return polynome_n_noms<T>(temp_gauche + temp_droit, noms_);
+	};
+
+	friend polynome_n_noms<T> operator-(polynome_n_noms<T> const& gauche, polynome_n_noms<T> const& droit) {
+		if (gauche.noms == droit.noms)
+			return polynome_n_noms<T>(gauche.poly - droit.poly, gauche.noms);
+		std::vector<std::string > noms_ = union_nom(gauche.nom, droit.noms);
+		T temp_gauche = modifier_nom(gauche.noms, gauche.poly, noms_);
+		T temp_droit = modifier_nom(droit.noms, droit.poly, noms_);
+		return polynome_n_noms<T>(temp_gauche - temp_droit, noms_);
+	};
+
+	friend void swap(polynome_n_noms<T>& gauche, polynome_n_noms<T>& droit) {
+		std::swap(gauche.noms, droit.noms);
+		swap_F(gauche.poly, droit.poly);
+		return;
+	};
+};
 
 */
