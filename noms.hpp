@@ -15,6 +15,9 @@
 #include "entete objets.hpp"
 
 #include "union_nom.hpp"
+#include <iostream>
+
+
 
 template<class T>  T unite(T const& element, bool test);
 
@@ -135,13 +138,21 @@ public:
 
 	polynome_n_noms(T temp, std::vector<std::string > chaine) : poly(temp), noms(chaine) {};
 
+	T get_poly() { return poly; };
+	/*
 	template<class U>
 	polynome_n_noms(U element, std::string nom) {
 		noms = { nom };
 		monome<U> temp({ 1 }, element);
 		poly = T(temp);
 		return;
-	};
+	};*/
+
+	polynome_n_noms(typename T::sous_type element, std::string nom) {
+		noms = { nom };
+		poly = T(monome<typename T::sous_type>({ 1 }, element));
+		return;
+	}
 
 
 	polynome_n_noms(polynome_n_noms<T> const& temp) {
@@ -203,5 +214,22 @@ public:
 		swap_F(gauche.poly, droit.poly);
 		return;
 	};
+
+	friend std::ostream& operator<<(std::ostream& os, polynome_n_noms const& poly) {
+		bool premier = false;
+		for (auto it = poly.cbegin(); it != poly.cend(); ++it) {
+			std::vector<int> position = it.get_position();
+			if ((bool)*it) {
+				if (premier)
+					os << " + ";
+				premier = true;
+				os << *it;
+				for (int i(0); i < position.size(); ++i)
+					os << " *" << noms[i] << "^" << position[i];
+			}
+		}
+
+		return os;
+	}
 };
 

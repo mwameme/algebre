@@ -150,6 +150,7 @@
     <ClInclude Include="convertir_liste.hpp" />
     <ClInclude Include="corps quotient.hpp" />
     <ClInclude Include="diagonalisation.hpp" />
+    <ClInclude Include="electronique.hpp" />
     <ClInclude Include="entete objets.hpp" />
     <ClInclude Include="erreur.hpp" />
     <ClInclude Include="fact_for.hpp" />

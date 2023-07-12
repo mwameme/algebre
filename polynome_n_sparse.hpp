@@ -112,8 +112,10 @@ public:
 	std::vector<monome<T>> monomes;
 	bool est_trie; //si true, la liste est triee ...
 
-	using iterator = typename std::vector<monome<T>>::iterator;
-	using const_iterator = typename std::vector<monome<T>>::const_iterator;
+//	using iterator = typename std::vector<monome<T>>::iterator;
+//	using const_iterator = typename std::vector<monome<T>>::const_iterator;
+
+	using sous_type = typename T;
 
 	polynome_n_sparse(int n) : n_var(n), est_trie(true) {};
 	polynome_n_sparse(monome<T> const& temp) : n_var(temp.degres.size()), est_trie(true), monomes({ temp }) {	};
@@ -550,6 +552,7 @@ public:
 		return poly;
 	}
 
+	/*
 	typename iterator begin() {
 		return monomes.begin();
 	};
@@ -565,6 +568,7 @@ public:
 	typename const_iterator cend() const {
 		return monomes.cend();
 	};
+	*/
 
 	friend std::ostream& operator<<(std::ostream& os, polynome_n_sparse<T> const& poly) {
 		if ((bool)poly) {
@@ -580,6 +584,110 @@ public:
 		os << " 0 ";
 		return os;
 	};
+
+	class iterator {
+	public:
+		typename std::vector<monome<T>>::iterator it;
+
+		iterator& operator++() {
+			++it;
+			return *this;
+		};
+
+		iterator operator+(int n) {
+			return iterator(it + n);
+		};
+
+		T& operator*() const {
+			return *it.element;
+		};
+
+		std::vector<int> get_position() const {
+			return *it.degres;
+		};
+
+		bool operator==(iterator const& autre) const {
+			return it == autre.it;
+		};
+
+		bool operator!=(iterator const& autre) const {
+			return it != autre.it;
+		};
+
+		iterator& operator=(iterator const& autre) const {
+			it = autre.it;
+			return *this;
+		};
+
+		iterator(iterator& copie) {
+			it = copie.it;
+		};
+
+		iterator(typename std::vector<monome<T>>::iterator temp) {
+			it = temp;	
+			return;
+		};
+	};
+
+	class const_iterator {
+	public:
+		typename std::vector<monome<T>>::const_iterator it;
+
+		const_iterator& operator++() {
+			++it;
+			return *this;
+		};
+
+		const_iterator operator+(int n) {
+			return const_iterator(it +n);
+		};
+
+		T const& operator*() const {
+			return *it.element;
+		};
+
+		std::vector<int> get_position() const {
+			return *it.degres;
+		};
+
+		bool operator==(const_iterator const& autre) const {
+			return it == autre.it;
+		};
+
+		bool operator!=(const_iterator autre) const {
+			return it != autre.it;
+		};
+
+		const_iterator& operator=(const_iterator const& autre) {
+			it = autre.it;
+			return *this;
+		};
+
+		const_iterator(const_iterator& copie) {
+			it = copie.it;
+		};
+
+		const_iterator(typename  std::vector<monome<T>>::const_iterator temp) {
+			it = temp;
+			return;
+		};
+	};
+
+	iterator begin() {
+		return iterator(monomes.begin());
+	}
+
+	iterator end() {
+		return iterator(monomes.end());
+	}
+
+	const_iterator cbegin() const {
+		return const_iterator(monomes.begin());
+	}
+
+	const_iterator cend() const {
+		return const_iterator(monomes.end());
+	}
 
 };
 

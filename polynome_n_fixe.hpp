@@ -70,6 +70,8 @@ public:
 	polynome<polynome_n_fixe<T, n - 1>> poly;
 	bool nul;
 
+	using sous_type = typename T;
+
 	polynome_n_fixe() {};
 	polynome_n_fixe(T element) : poly(polynome_n_fixe<T, n - 1>(element)) ,nul((bool) element) {};
 	polynome_n_fixe(monome<T> monome_) : polynome_n_fixe(monome_.degres, monome_.element) {};
@@ -359,6 +361,10 @@ public:
 	std::vector<int> positions;
 	bool termine;
 
+	std::vector<int> get_position() {
+		return positions;
+	}
+
 	iterator_polynome_n_fixe& operator++() {
 		constexpr_for_2<n - 1, 0, n - 1>([&](auto i) { //premiere fonction : mettre a jour les positions.
 			++positions[i];
@@ -429,6 +435,8 @@ template<class T> class polynome_n_fixe<T, 1> {
 public:
 	polynome<polynome_n_fixe<T, 0>> poly;
 	bool nul;
+
+	using sous_type = typename T;
 
 	polynome_n_fixe() {};
 	polynome_n_fixe(T element) : poly(polynome_n_fixe<T,0>(element)), nul((bool)element) { };
@@ -742,6 +750,10 @@ public:
 		termine = copie.termine;
 	}
 
+	std::vector<int> get_position() {
+		return { p };
+	}
+
 	iterator_polynome_n_fixe& operator=(iterator_polynome_n_fixe const& copie) {
 		p=copie.p;
 		termine = copie.termine;
@@ -794,6 +806,8 @@ template<class T> class polynome_n_fixe<T, 0> {
 public:
 	T element;
 	bool nul;
+
+	using sous_type = typename T;
 
 	polynome_n_fixe() {};
 	polynome_n_fixe(T element_) : element(element_), nul((bool)element_) {};

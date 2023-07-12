@@ -30,6 +30,8 @@ public:
 	T element;
 	bool nul; //true si non-nul
 
+	using sous_type = typename T;
+
 	polynome_n_rec() : n_var(0) ,nul(false) {};
 
 	polynome_n_rec(int n, T temp) { //constructeur de base. polynome vide.
@@ -557,6 +559,10 @@ public:
 	std::vector<int> positions;
 	std::vector<poly_type *> pointeurs;
 	bool termine;
+
+	std::vector<int> get_position() {
+		return positions;
+	};
 
 
 	iterator_polynome_n_rec& operator++() {

@@ -285,6 +285,11 @@ public:
 		return *this;
 	};
 
+	std::vector<int> get_position() {
+		return mPositions;
+	}
+
+
 	operator bool() const {
 		return mPosition < pointeur->data.size();
 	};

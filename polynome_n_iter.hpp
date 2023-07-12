@@ -26,6 +26,7 @@ public:
 	bool scalaire; //true si c'est juste un scalaire
 	vecteur_n<T> coeffs;
 
+	using sous_type = typename T;
 
 	polynome_n_iter() {};
 

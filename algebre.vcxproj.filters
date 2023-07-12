@@ -25,6 +25,9 @@
     <Filter Include="Fichiers d%27en-tête\objet_n">
       <UniqueIdentifier>{a49515c4-cdbd-4ec6-b8dd-678140d9368c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\electronique">
+      <UniqueIdentifier>{2946a584-2bd4-42a6-89a5-a9a07f71d312}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="algebre.cpp">
@@ -146,11 +149,14 @@
     <ClInclude Include="polynome_n_sparse.hpp">
       <Filter>Fichiers d%27en-tête\objets algebre</Filter>
     </ClInclude>
-    <ClInclude Include="noms.hpp">
-      <Filter>Fichiers d%27en-tête\ensemble</Filter>
-    </ClInclude>
     <ClInclude Include="union_nom.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="electronique.hpp">
+      <Filter>Fichiers d%27en-tête\electronique</Filter>
+    </ClInclude>
+    <ClInclude Include="noms.hpp">
+      <Filter>Fichiers d%27en-tête\objets algebre</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
