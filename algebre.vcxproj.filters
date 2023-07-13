@@ -39,9 +39,6 @@
     <ClCompile Include="precision\precisioncore.cpp">
       <Filter>Fichiers d%27en-tête\precision</Filter>
     </ClCompile>
-    <ClCompile Include="vote.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="union_nom.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -129,9 +126,6 @@
       <Filter>Fichiers d%27en-tête\ensemble</Filter>
     </ClInclude>
     <ClInclude Include="TVD.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="vote.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="polynome_n_fixe.hpp">

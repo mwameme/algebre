@@ -143,7 +143,6 @@
     <ClCompile Include="precision\precisioncore.cpp" />
     <ClCompile Include="TVD.cpp" />
     <ClCompile Include="union_nom.cpp" />
-    <ClCompile Include="vote.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="complexe.hpp" />
@@ -181,7 +180,6 @@
     <ClInclude Include="TVD.hpp" />
     <ClInclude Include="union_nom.hpp" />
     <ClInclude Include="vecteur_n.hpp" />
-    <ClInclude Include="vote.hpp" />
     <ClInclude Include="unite.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
