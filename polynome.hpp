@@ -17,7 +17,7 @@ template<class T, class enable1 = void, class enable2 = void> class matrice;
 
 template<typename T> class polynome {
 public:
-
+    //test
     int degre;
     std::vector<T> coeffs;
 
