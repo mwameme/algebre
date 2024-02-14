@@ -42,7 +42,7 @@ constexpr inline void constexpr_for(F&& f) //utilisé pour g, croissant
 {
 	if constexpr (start <= end)
 	{
-		(f(std::integral_constant<int, start>()));
+		f(std::integral_constant<int, start>());
 		constexpr_for<start + 1, end>(f);
 	}
 	else return;

@@ -3,8 +3,11 @@
 #include "polynome.hpp"
 #include "rationnel.hpp"
 #include "matrice.hpp"
+#include "unite.hpp"
+
 #include <vector>
 #include <set>
+#include <exception>
 
 template<class T> class noeud;
 template<class T> class AO;
@@ -29,6 +32,64 @@ public:
 	std::vector<int> entrees; //numero des entrees
 	noeud<T>* masse;
 	std::set<schema_diode<T>>;
+
+	void ajouter_impedance(rationnel<polynome<T>> valeur, int i, int j) {
+		if (i == j)
+			throw std::domain_error("ajouter impedance : i==j");
+		if (max(i, j) >= noeuds.size()) {
+			for (int k(noeuds.size()); k <= max(i, j); ++k)
+				noeuds.push_back(noeud<T>(k));
+			impedances.push_back(impedance<T>(&noeuds[i], &noeuds[j], valeur));
+			impedances[impedances.size() - 1].numero = impedances.size() - 1;
+			noeuds[i].impedances.push_back(&impedances[impedances.size() - 1]);
+			noeuds[j].impedances.push_back(&impedances[impedances.size() - 1]);
+			return;
+		}
+
+		noeud<T>* local_a = &noeuds[i];
+		noeud<T>* local_b = &noeuds[j];
+
+		bool trouve = false;
+		for (int k(0); k < local_a->impedances.size(); ++k) {
+			if ((local_a->impedances[k]->a == local_b) || (local_a->impedances[k]->b == local_b)){
+				rationnel<polynome<T>> vrai = unite(local->impedances[k]->valeur, true);
+				local_a->impedances[k]->valeur = vrai / ((vrai / local->impedances[k]->valeur) + (vrai / valeur));
+				trouve = true;
+				break;
+			}
+		}
+		if (!trouve) {
+			impedances.push_back(impedance<T>(local_a, local_b, valeur));
+			impedances[impedances.size() - 1].numero = impedances.size() - 1;
+			local_a->impedances.push_back(&impedances[impedances.size() - 1]);
+			local_b->impedances.push_back(&impedances[impedances.size() - 1]);
+		}
+		return;
+	}
+
+	void ajouter_resistance(T valeur, int i, int j) {
+		polynome<T> poly(valeur);
+		rationnel<polynome<T>> temp( poly, unite(poly, true));
+		ajouter_impedance(temp, i, j);
+	}
+
+	void ajouter_condensateur(T valeur, int i, int j) {
+		polynome<T> poly(unite(valeur,false),valeur);
+		rationnel<polynome<T>> temp(unite(poly, true), poly);
+		ajouter_impedance(temp, i, j);
+	}
+
+	void ajouter_bobine(T valeur, int i, int j) {
+		polynome<T> poly(unite(valeur, false), valeur);
+		rationnel<polynome<T>> temp( poly , unite(poly, true));
+		ajouter_impedance(temp, i, j);
+	}
+
+	void ajouter_diode(int i, int j) { // parfaite
+		
+	}
+
+
 };
 
 template<class T> class schema_diode {
@@ -76,7 +137,7 @@ public:
 	bool fuite;
 	int numero;
 
-	std::vector<impedance<T>*> fils;
+	std::vector<impedance<T>*> impedances;
 	std::vector<diode<T>*> diodes;
 	std::vector<AO<T>*> AOs;
 
@@ -87,6 +148,13 @@ public:
 	std::vector<double> racines;
 	std::vector<double> coeffs;
 	std::vector<double> derivees;
+
+	noeud(int num) {
+		masse = false;
+		fuite = false;
+		numero = num;
+	}
+
 };
 
 template<class T> class impedance {
@@ -96,6 +164,13 @@ public:
 	noeud<T>* b;
 
 	int numero;
+
+	impedance(noeud<T>* a_, noeud<T>* b_, rationnel<polynome<T>> val) {
+		valeur = val;
+		a = a_;
+		b = b_;
+		return;
+	}
 };
 
 template<class T> class diode {

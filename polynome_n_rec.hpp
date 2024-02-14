@@ -89,7 +89,7 @@ public:
 #endif
 		if (!(bool)element_) {
 			nul = false;
-			poly = { poly_faux };
+			poly = polynome<polynome_n_rec<T>>{ poly_faux };
 			return;
 		}
 
