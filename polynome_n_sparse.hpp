@@ -18,6 +18,7 @@ template<class T> class monome {
 public:
 	std::vector<int> degres;
 	T element;
+	using sous_type = typename T;
 
 	monome() {};
 
@@ -53,8 +54,10 @@ public:
 	};
 
 	friend void swap(monome<T>& gauche, monome<T>& droit) {
-		swap(gauche.degres, droit.degres);
-		swap_F(gauche.element, droit.element);
+		if (&droit != &gauche) {
+			swap(gauche.degres, droit.degres);
+			swap_F(gauche.element, droit.element);
+		}
 		return;
 	};
 
@@ -71,22 +74,24 @@ public:
 
 
 	friend monome<T> operator*(monome<T> const& gauche, monome<T> const& droit) {
+#ifdef _DEBUG
+		if (gauche.degres.size() != droit.degres.size())
+			thorw std::domain_error("multiplication de monomes de dimensions différentes");
+#endif
 		T temp = gauche.element * droit.element;
-		if ((bool)temp) {
-			std::vector<int> degres_temp = gauche.degres;
-			for (int i(0); i < degres_temp.size(); ++i)
-				degres_temp[i] += droit.degres[i];
+		std::vector<int> degres_temp = gauche.degres;
+		for (int i(0); i < degres_temp.size(); ++i)
+			degres_temp[i] += droit.degres[i];
 
-			return monome<T>(degres_temp, temp);
-		}
-		std::vector<int> degres_temp(gauche.degres.size(), 0);
 		return monome<T>(degres_temp, temp);
 	};
 
 	monome<T> operator-() const {
 		return monome<T>(degres, -element);
 	};
+	
 
+	// bien defini
 	friend bool operator<(monome<T> const& gauche, monome<T> const& droit) {
 		return gauche.degres < droit.degres;
 	};
@@ -103,6 +108,10 @@ public:
 	operator monome<U>() const {
 		return monome<U>(degres, (U)element);
 	};
+
+	inline operator bool() const {
+		return (bool)element;
+	}
 };
 
 template<class T> class polynome_n_sparse {
@@ -117,7 +126,7 @@ public:
 
 	using sous_type = typename T;
 
-	polynome_n_sparse(int n) : n_var(n), est_trie(true) {};
+	polynome_n_sparse(int n) : n_var(n), est_trie(true) {}; //ne pas utiliser : il n'y a pas de T.
 	polynome_n_sparse(monome<T> const& temp) : n_var(temp.degres.size()), est_trie(true), monomes({ temp }) {	};
 	polynome_n_sparse(int n, T const& element) : n_var(n), est_trie(true), monomes({ monome<T>(std::vector<int>(n,0),element) }) {	};
 	polynome_n_sparse(polynome_n_sparse<T> const& copie) : monomes(copie.monomes), n_var(copie.n_var), est_trie(copie.est_trie) {	};
@@ -153,9 +162,11 @@ public:
 
 	template<class U>
 	polynome_n_sparse<T>& operator*=(U const& scalaire) {
-		if((bool) scalaire)
+		if ((bool)scalaire) {
 			for (int i(0); i < monomes.size(); ++i)
 				monomes[i].element *= scalaire;
+//			verifier();
+		}
 		else {
 			monome<T> faux = unite(monomes[0], false);
 			monomes = { faux };
@@ -164,11 +175,32 @@ public:
 		return *this;
 	}
 
+	void verifier() { //check les monomes nuls (bool T).
+		int i = 0;
+		int j = 0;
+		while (i < monomes.size()) {
+			if (!(bool)monomes[j]) {
+				++i;
+				if (i >= monomes.size()){
+					break;
+				}
+			}
+			swap(monomes[i], monomes[j]);//monome j est non nul
+			++i;
+			++j;
+		}
+		if (j > 0)
+			monomes.resize(j);
+		else
+			monomes.resize(1);
+	}
 
 	friend void swap(polynome_n_sparse<T>& gauche, polynome_n_sparse<T>& droit) {
-		std::swap(gauche.monomes, droit.monomes);
-		std::swap(gauche.n_var, droit.n_var);
-		std::swap(gauche.est_trie, droit.est_trie);
+		if (&gauche != &droit) {
+			std::swap(gauche.monomes, droit.monomes);
+			std::swap(gauche.n_var, droit.n_var);
+			std::swap(gauche.est_trie, droit.est_trie);
+		}
 		return;
 	};
 
@@ -256,24 +288,26 @@ public:
 	};
 	
 	friend polynome_n_sparse<T> operator*(monome<T> const& monome_, polynome_n_sparse<T> const& poly) {
+#ifdef _DEBUG
+		if (monome_.degres.size() != poly.n_var)
+			throw std::domain_error("multiplication poly_n_sparse par monome : les degrés ne correspondent pas");
+#endif
 		if (!(bool)monome_.element)
 			return polynome_n_sparse<T>(n_var, monome_.element);
-		if ((bool)monome_.element) {
-			polynome_n_sparse<T> result(poly);
-			for (int i(0); i < result.monomes.size(); ++i) {
-				for (int j(0); j < result.n_var; ++j)
-					result.monomes[i].degres[j] += monome_.degres[j];
-				result.monomes[i].element *= monome_.element;
-			}
-			return result;
+		polynome_n_sparse<T> result(poly);
+		for (int i(0); i < result.monomes.size(); ++i) {
+			for (int j(0); j < result.n_var; ++j)
+				result.monomes[i].degres[j] += monome_.degres[j];
+			result.monomes[i].element *= monome_.element;
 		}
-		else
-			return polynome_n_sparse(n_var, unite(monomes[0], false));
+		return result;
 	};
 
+	/*
 	friend inline polynome_n_sparse<T> operator*(polynome_n_sparse<T> const& poly, monome<T> const& monome_) {
 		return monome_* poly;
 	};
+	*/
 
 
 	friend polynome_n_sparse<T> operator*(polynome_n_sparse<T> const& gauche, polynome_n_sparse<T> const& droit) {
@@ -281,6 +315,9 @@ public:
 		if ( (gauche.monomes.size() == 0) || (droit.monomes.size() == 0)
 			throw std::domain_error("polynome_n_sparse vide");
 #endif
+		if (gauche.n_var == 0) {
+			return polynome_n_sparse<T>(monome<T>(std::vector<int>(0), gauche.monomes[0].element * droit.monomes[0].element));
+		}
 		polynome_n_sparse<T> result(gauche.n_var,gauche.noms);
 		result.monomes.reserve(gauche.monomes.size() * droit.monomes.size());
 		for (int i(0); i < gauche.monomes.size(); ++i)
@@ -288,7 +325,7 @@ public:
 				result.monomes.push_back(gauche.monomes[i] * droit.monomes[j]);
 		result.est_trie = false;
 		result.simplifier(); //n^2 log(n^2)
-		result.monomes.reserve(0);
+//		result.monomes.reserve(0);
 		return result;
 	};
 
@@ -348,7 +385,6 @@ public:
 		result.est_trie = true;
 		if (result.monomes.size() == 0)
 			result.monomes.push_back(faux);
-		result.noms = gauche.noms;
 		return result;
 	};
 
@@ -406,7 +442,6 @@ public:
 		if (result.monomes.size() == 0)
 			result.monomes.push_back(faux);
 
-		result.noms = gauche.noms;
 		return result;
 	};
 
@@ -441,11 +476,11 @@ public:
 		if (poly.n_var != (n_var - 1))
 			throw std::domain_error("evaluation de polynome n_sparse : les degrés ne correspondent pas");
 #endif
-		std::vector< polynome_n_sparse<T>> vec_pow;
+		std::vector< polynome_n_sparse<T>> vec_pow(0);
 		vec_pow.reserve(m_pow + 1);
 		vec_pow.push_back(unite(poly, true));
-		for (int j(1); j < vec_pow.size(); ++j)
-			vec_pow[j] = vec_pow[j - 1] * poly;
+		for (int j(1); j <= m_pow; ++j)
+			vec_pow.push_back( vec_pow[j - 1] * poly);
 
 		result.monomes.reserve(poly.monomes.size() * vec_pow[vec_pow.size() - 1].monomes.size());
 
@@ -454,15 +489,12 @@ public:
 			int pow = temp_degres[i];
 			temp_degres.erase(temp_degres.begin() + i);
 
-			//			polynome_n_sparse<T> temp_poly(monome<T>(temp_degres, monomes[j].element));
-
-//			polynome_n_sparse<T> temp_poly(vec_pow[pow]); //On fait à la main et on simplifie seulement à la fin : + rapide
 			polynome_n_sparse<T> temp_poly = monome<T>(temp_degres, monomes[j].element) * vec_pow[pow];
 			result.ajouter(temp_poly);  //result += monome<T>(temp_degres,monomes.element) * vec_pow[pow] 
 		};
 
 		result.simplifier();
-		result.monomes.reserve(0);
+		result.monomes.reserve(0); //semble nécessaire
 		return result;
 		//marche avec résultat scalaire ? je crois
 	};
@@ -471,38 +503,36 @@ public:
 	U operator()(std::vector<U> eval) const {
 		//n_var, monomes
 		//monomes : degres, element
-		T neutre = unite(get_T(),true);
+		U neutre = unite(eval[0], true);
 
-		T somme = unite(neutre, false);
+		U somme = unite(neutre, false);
 		std::vector<std::vector< U >> puissances(n_var, std::vector<U>(1,neutre));
 		for (int i(0); i < monomes.size(); ++i) {
 			if (!(bool)monomes[i].element)
 				continue;
 
-			for (int j(0); j < n_var; ++j) {
+			for (int j(0); j < n_var; ++j)
 				while (monomes[i].degres[j] >= puissances[j].size())
 					puissances[j].push_back(puissances[j][puissances[j].size() - 1] * eval[j]);
-			}
+			
 			
 			U temp = neutre;
-
 			for (int j(0); j < n_var; ++j)
 				temp = temp * puissances[j][monomes[i].degres[j]];
 			somme = somme + (monomes[i].element * temp);
 		}
 		return somme;
-
 	}
 	
 	template<class U>
-	U operator()(int i, U const& poly) const {
+	U operator()(int i, U const& poly) const { //généralisation pour (int i, polynome_n_sparse<T> poly)
 		U result = unite(poly, false);
 		int m_pow = max_degre(i);
 		std::vector< U> vec_pow;
 		vec_pow.reserve(m_pow + 1);
 		vec_pow.push_back(unite(poly, true));
 		for (int j(1); j < vec_pow.size(); ++j)
-			vec_pow[j] = vec_pow[j - 1] * poly;
+			vec_pow.push_back( vec_pow[j - 1] * poly);
 
 //		result.monomes.reserve(poly.monomes.size() * vec_pow[vec_pow.size() - 1].monomes.size());
 
@@ -535,13 +565,19 @@ public:
 		return poly;
 	};
 
-	operator polynome_n_iter<T>() {
+	operator polynome_n_iter<T>() const {
 		polynome_n_iter<T> result(max_degre(), unite(get_T(), false));
-		if (!est_trie)
-			simplifier();
-		for (int i(0); i < monomes.size(); ++i) {
-			result.coeffs.data[result.coeffs.position(monomes[i].degres)] = monomes[i].element;
-		};
+	//	if (!est_trie)
+	//		simplifier();
+	
+		if (est_trie) { //sans redondance
+			for (int i(0); i < monomes.size(); ++i)
+				result.coeffs.data[result.coeffs.position(monomes[i].degres)] = monomes[i].element;
+		}
+		else {
+			for (int i(0); i < monomes.size(); ++i)
+				result.coeffs.data[result.coeffs.position(monomes[i].degres)] += monomes[i].element;
+		}
 		return result;
 	};
 
@@ -565,7 +601,10 @@ public:
 		if (monomes.size() == 0)
 			throw std::domain_error("polynome_n_sparse, (bool) : vide");
 #endif
-		return (bool) monomes[0].element;
+		if(est_trie)
+			return (bool) monomes[0].element;
+		simplifier(); //rigueur
+		return (bool)monomes[0].element;
 	};
 
 	template<class U>
@@ -597,6 +636,7 @@ public:
 	class iterator {
 	public:
 		typename std::vector<monome<T>>::iterator it;
+		std::vector<monome<T>>* pointeur;
 
 		iterator& operator++() {
 			++it;
@@ -630,17 +670,27 @@ public:
 
 		iterator(iterator& copie) {
 			it = copie.it;
+			pointeur = copie.pointeur;
+
 		};
 
+		/*
 		iterator(typename std::vector<monome<T>>::iterator temp) {
 			it = temp;	
 			return;
 		};
+		*/
+
+		operator bool() {
+			return it != pointeur->end();
+		}
 	};
 
 	class const_iterator {
 	public:
 		typename std::vector<monome<T>>::const_iterator it;
+		const std::vector<monome<T>>* pointeur;
+
 
 		const_iterator& operator++() {
 			++it;
@@ -674,12 +724,21 @@ public:
 
 		const_iterator(const_iterator& copie) {
 			it = copie.it;
+			pointeur = copie.pointeur;
 		};
 
+		/*
 		const_iterator(typename  std::vector<monome<T>>::const_iterator temp) {
 			it = temp;
 			return;
 		};
+		*/
+
+		operator bool() {
+			return it != pointeur->cend();
+		}
+
+
 	};
 
 	iterator begin() {

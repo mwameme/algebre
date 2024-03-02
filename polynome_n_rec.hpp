@@ -16,6 +16,7 @@ template<class T> class polynome_n_sparse;
 template<class T> class monome;
 
 template<class T, int n> class polynome_n_fixe;
+template<class T> class polynome_n_iter;
 
 template<class T>  T unite(T const& element, bool test);
 
@@ -32,7 +33,7 @@ public:
 
 	using sous_type = typename T;
 
-	polynome_n_rec() : n_var(0) ,nul(false) {};
+	polynome_n_rec() : n_var(0) ,nul(false) {}; //a ne pas utiliser dans le programme.
 
 	polynome_n_rec(int n, T temp) { //constructeur de base. polynome vide.
 		n_var = n;
@@ -43,6 +44,7 @@ public:
 		}
 		else {
 			element = temp;
+			//poly est vide
 		}
 	};
 
@@ -50,16 +52,20 @@ public:
 		element = element_;
 		n_var = 0;
 		nul = (bool)element;
+		// poly est vide
 	};
 
 	polynome_n_rec(polynome_n_rec<T> const& copie) : nul(copie.nul), element(copie.element),n_var(copie.n_var),poly(copie.poly) {	};
 	polynome_n_rec(polynome_n_rec<T>&& copie) : nul(copie.nul), n_var(copie.n_var) {
-		swap_F(element, copie.element);
-		swap(poly, copie.poly);
+		if (this != &copie) {
+			swap_F(element, copie.element);
+			swap(poly, copie.poly);
+		}
 		return;
 	};
 
 	polynome_n_rec(int n_var_, T element_, std::vector<polynome_n_rec<T>> const& vec) : n_var(n_var_), poly(vec), element(element_) { //à partir d'un vecteur de pointeurs. Utilisé pour construire (* et +)
+		// poly.getDegre(); //automatique.
 		nul = (bool)poly;
 		return;
 	};
@@ -328,7 +334,7 @@ public:
 				return polynome_n_rec<T>(scalaire * temp.element);
 		} 
 		else  //retourne le polynome nul.
-			return polynome_n_rec<T>(temp.n_var, unite(temp.element, false), temp.noms_variables);
+			return polynome_n_rec<T>(temp.n_var, unite(temp.element, false));
 	};
 
 	explicit inline operator bool() const {
@@ -351,11 +357,15 @@ public:
 	};
 
 	int max_degre(int i) const {
+#ifdef _DEBUG
+		if (n_var == 0)
+			throw std::domain_error("polynome_n_rec : max_degre d'un polynome constant");
+#endif
 		if (i == 0)
 			return poly.degre;
 		int result = -1;
 		for (int j(0); j < poly.coeffs.size(); ++j)
-			result = max(result, poly.coeffs[i].max_degre(i - 1));
+			result = max(result, poly.coeffs[j].max_degre(i - 1));
 		return result;
 	}
 
@@ -367,8 +377,6 @@ public:
 	};
 
 	void max_degre(int* degres) const {
-		int i = 0;
-
 		if (*degres < poly.degre)
 			*degres = poly.degre;
 		if (n_var == 1)
@@ -452,22 +460,25 @@ public:
 		if (n_var == 0)
 			return 1;
 		if (n_var == 1)
-			return poly.coeffs.size()+1;
+			return (1 + poly.coeffs.size()) ;
 		else {
 			int somme = 0;
 			for (int i(0); i < poly.coeffs.size(); ++i)
 				somme += poly.coeffs[i].length();
-			return somme+1; //+ cet espace local
+			return somme+1; // + cet espace local
 		};
+
+		//multiplier par sizeof()
 	};
 
 	operator polynome_n_sparse<T>() const {
 		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(n_var, 0), unite(element, false)));
-
+		
+		poly.monomes.reserve(length);
 		for (iterator it = cbegin(); (bool)it; ++it)
 			if ((bool)*it)
 				poly.ajouter(monome<T>(it.positions, *it));
-		poly.simplifier();//non nécessaire ...
+		poly.simplifier(); //non nécessaire ...
 	}
 
 	
@@ -482,7 +493,7 @@ public:
 		vec_pow.reserve(m_pow + 1);
 		vec_pow.push_back(unite(poly, true));
 		for (int j(1); j < vec_pow.size(); ++j)
-			vec_pow[j] = vec_pow[j - 1] * poly;
+			vec_pow.push_back( vec_pow[j - 1] * poly);
 
 		for (iterator it = cbegin(); (bool) it; ++it) {
 			if (!(bool)*it)
@@ -493,9 +504,9 @@ public:
 
 			//			polynome_n_sparse<T> temp_poly(monome<T>(temp_degres, monomes[j].element));
 
-			polynome_n_rec<T> temp_poly(vec_pow[pow]); //On fait à la main et on simplifie seulement à la fin : + rapide
+//			polynome_n_rec<T> temp_poly(vec_pow[pow]); //On fait à la main et on simplifie seulement à la fin : + rapide
 			polynome_n_rec<T> monome_(n_var - 1, temp_degres, *it);
-			result += monome_ * temp_poly;
+			result += monome_ * vec_pow[pow];
 		};
 
 
@@ -516,7 +527,7 @@ public:
 		vec_pow.reserve(m_pow + 1);
 		vec_pow.push_back(unite(poly, true));
 		for (int j(1); j < vec_pow.size(); ++j)
-			vec_pow[j] = vec_pow[j - 1] * poly;
+			vec_pow.push_back(vec_pow[j - 1] * poly);
 
 		for (iterator it = cbegin(); (bool)it; ++it) {
 			if (!(bool)*it)
@@ -558,17 +569,18 @@ public:
 		//bool nul; //true si non-nul
 
 		if (n_var == 0)
-			return element;
-		if (!(bool)*this)
-			return unite(element, false);
+			return (U) element;
+		if (!(bool) *this)
+			return unite((U) element, false);
 
 		while (poly.degre >= puissances[0].size()) {
 			puissances[0].push_back(puissances[0][puissances->size() - 1] * evaluation[0]);
 		}
 
-		U somme = unite(element, false);
+		U somme = unite((U) element, false);
 		for (int i(0); i < poly.coeffs.size(); ++i) 
-			somme += puissances[0][i] * poly.coeffs[i].evaluation_interne(puissances + 1, evaluation + 1);
+			if((bool) poly.coeffs[i])
+				somme += puissances[0][i] * poly.coeffs[i].evaluation_interne(puissances + 1, evaluation + 1);
 		
 
 		return somme;
@@ -593,19 +605,7 @@ public:
 #endif
 		for (int j(0); j < poly.coeffs.size() - 1; ++j) 
 			poly.coeffs[j] = (j + 1) * poly.coeffs[j + 1];
-		int j = poly.coeffs.size() - 1;
-		poly.coeffs[j].nul = false;
-
-		/*
-		for (; j > 0; --j)
-			if (poly.coeffs[j].nul)
-				break;
-		if ((j + 1) != poly.coeffs.size())
-			poly.coeffs.resize(j + 1);
-		poly.degre
-		if (j == 0)
-			if (! poly.coeffs[j].nul)
-				nul = false;*/
+		poly.coeffs[poly.coeffs.size() - 1].nul = false ; //se fera bien simplifier par l'algorithme
 
 		poly.getDegre();
 		nul = (bool)poly;
@@ -662,7 +662,7 @@ public:
 			--i;
 		}
 		for (int j = i + 1; j < n_var; ++j)
-			pointeurs[j] = &pointeurs[j - 1]->poly.coeffs[positions[j - 1]];
+			pointeurs[j] = & (pointeurs[j - 1]->poly.coeffs[positions[j - 1]] ); //faire un test ? 
 		return *this;
 	};
 

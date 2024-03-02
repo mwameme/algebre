@@ -20,10 +20,10 @@ public:
 
     int degre;
     std::vector<T> coeffs;
-
+    using sous_type = typename T;
     
-    friend polynome<T> derivee(polynome<T> const& element) { // T = rationnel<InfInt>
-        polynome<T> result(element);
+    polynome<T> derivee() const { // T = rationnel<InfInt>
+        polynome<T> result(*this);
 
         for (long i(0); i < result.coeffs.size() - 1; ++i) {
             result.coeffs[i] = ((i + 1)) * result.coeffs[i + 1];
@@ -89,13 +89,14 @@ public:
         getDegre();
     };
 
-
+    
     template<class U> explicit polynome(std::vector<U> const& vec) {
         coeffs.resize(vec.size());
         for (int i(0); i < vec.size(); ++i)
-            coeffs[i] = T(vec[i]);
+            coeffs[i] = (T) vec[i];
         getDegre();
     };
+
 
     polynome<T>& operator=(const polynome<T>& temp) {
         if (this == &temp)
@@ -117,6 +118,7 @@ public:
         if (coeffs.size() >= autre.coeffs.size()) {
             for (int i(0); i < coeffs.size(); ++i)
                 coeffs[i] += autre.coeffs[i];
+            getDegre();
             return *this;
         }
         coeffs.reserve(autre.coeffs.size());
@@ -295,7 +297,6 @@ public:
             for (int i(temp1.degre + 1); i <= temp2.degre; ++i) {
                 result.coeffs[i] = temp2.coeffs[i];
             }
-
         }
 
         result.getDegre();
@@ -339,10 +340,11 @@ public:
 
 
     friend polynome<T> operator-(const polynome<T>& temp) {
-        polynome<T> result(temp);
+        polynome<T> result;
+        result.coeffs.resize(temp.coeffs.size());
 
         for (int i(0); i < result.coeffs.size(); ++i)
-            result.coeffs[i] = - result.coeffs[i];
+            result.coeffs[i] = - temp.coeffs[i];
 
         result.getDegre(); // enlever ?
         return result;
@@ -350,7 +352,7 @@ public:
 
     template<class U> U operator()(const U& element) const{
         U result = unite(element,false);
-        U puissance = unite(result,true);
+        U puissance = unite(element,true);
 
         if (degre == -1)
             return result;
@@ -391,7 +393,7 @@ public:
         return result;
     };
 
-    void majListe();
+//    void majListe();
 
     inline void getDegre();
 
@@ -428,7 +430,7 @@ public:
         return m_matrice.determinant();
     };
 
-    int multiplicite_max() {
+    int multiplicite_max() const {
         if (degre < 0)
             return -1;
         if (degre == 0)
@@ -442,7 +444,7 @@ public:
         }//P à racines simples
         */
 
-        polynome<T> P = *this / PGCD(*this, derivee(*this));
+        polynome<T> P = *this / PGCD(*this,this->derivee());
 
         polynome<T> P_n(P);
         int multiplicite = 1;
@@ -475,8 +477,13 @@ public:
         return;
     };
 
+    T get_T() {
+        return coeffs[0];
+    }
+
 };
 
+/*
 template<class T>
 void polynome<T>::majListe() {
     int i(coeffs.size() - 1);
@@ -490,7 +497,7 @@ void polynome<T>::majListe() {
         coeffs.erase(coeffs.begin() + i + 1, coeffs.end());
     return;
 };
-
+*/
 
 template<class T>
 void polynome<T>::getDegre() {
@@ -504,8 +511,8 @@ void polynome<T>::getDegre() {
         if (i == 0)
             break;
     };
-    if (i < coeffs.size() - 1)
-        coeffs.erase(coeffs.begin() + i + 1, coeffs.end());
+    if(i+1 != coeffs.size())
+        coeffs.resize(i + 1);
 
     if (i > 0)
         degre = i;
