@@ -22,7 +22,7 @@
 
 using namespace std;
 
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 
 #endif
 

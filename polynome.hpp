@@ -17,7 +17,7 @@ template<class T, class enable1 = void, class enable2 = void> class matrice;
 
 template<typename T> class polynome {
 public:
-    //test
+
     int degre;
     std::vector<T> coeffs;
 
@@ -36,7 +36,7 @@ public:
 
     polynome(std::vector<T> const& tab) {
         coeffs = tab;
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
         if (coeffs.size() == 0) 
             throw std::domain_error("polynome : la taille du vecteur des coeffs doit être > 0");
 #endif        
@@ -46,7 +46,7 @@ public:
 
     polynome(std::vector<T>&& tab) {
         std::swap(coeffs, tab);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
         if (coeffs.size() == 0) 
             throw std::domain_error("polynome : la taille du vecteur des coeffs doit être > 0");
 #endif
@@ -495,7 +495,7 @@ void polynome<T>::majListe() {
 template<class T>
 void polynome<T>::getDegre() {
     int i(coeffs.size() - 1);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
     if (i < 0)
         throw std::domain_error("polynome vide");
 #endif

@@ -109,7 +109,7 @@ public:
 
     template<class U> U operator()(const U& element) const {
         U result = denominateur(element);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
         if (!(bool)result)
             throw std::domain_error("division par zero lors d'une évaluation de fraction polynome");
 #endif

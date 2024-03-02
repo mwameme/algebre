@@ -8,6 +8,8 @@
 
 template<class T>  T unite(T const& element, bool test);
 
+
+
 template<class T> class vecteur_n {
 public:
 
@@ -19,33 +21,37 @@ public:
 	vecteur_n() {};
 
 	vecteur_n(std::vector<int> const& liste_dim) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (liste_dim.size() == 0)
 			throw std::domain_error("vecteur_n : liste vide");
 #endif
+
 		dimensions = liste_dim;
 		puissance = dimensions.size();
-#ifdef ALGEBRA_USE_EXCEPTION
+
+#ifdef _DEBUG
 		for (int i(0); i < puissance; ++i)
 			if (dimensions[i] < 0)
 				throw std::domain_error("vecteur_n : une dimension < 0");
 #endif
+
 		puissances= std::vector<int>(puissance);
 		puissances[puissance - 1] = 1;
 		for (int i(puissance-2); i >= 0; --i)
 			puissances[i]= puissances[i+1]* dimensions[i+1];
 		int taille = puissances[0] * dimensions[0];
 		data = std::vector<T>(taille);
+
 	};
 
 	vecteur_n(std::vector<int> const& liste_dim,T const& element) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (liste_dim.size() == 0)
 			throw std::domain_error("vecteur_n : liste vide");
 #endif
 		dimensions = liste_dim;
 		puissance = dimensions.size();
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		for (int i(0); i < puissance; ++i)
 			if (dimensions[i] < 0)
 				throw std::domain_error("vecteur_n : une dimension < 0");

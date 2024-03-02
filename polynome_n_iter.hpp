@@ -31,7 +31,7 @@ public:
 	polynome_n_iter() {};
 
 	polynome_n_iter(int n_var, T element) {//polynome de degre 0. utilisé pour unite
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (n_var < 0)
 			throw std::domain_error("polynome_n_iter : n_var < 0.");
 #endif
@@ -60,7 +60,7 @@ public:
 		}
 		else {
 			if (is_degre) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 				for (int i(0); i < degres.size(); ++i)
 					if (degres[i] < 0) {
 						//						degres = std::vector<int>(degres.size(), 0);
@@ -72,7 +72,7 @@ public:
 				for (int i(0); i < degres.size(); ++i)
 					degres[i] += 1; //dimensions
 			}
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 			for (int i(0); i < degres.size(); ++i)
 				if (degres[i] <= 0)
 					throw std::domain_error("declaration de polynome_n_iter avec un vecteur de dimensions : une dimension <= 0");
@@ -136,7 +136,7 @@ public:
 	};
 
 	polynome_n_iter<T>& operator+=(polynome_n_iter<T> const& autre) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (coeffs.puissance != autre.puissance)
 			throw std::domain_error("addition de polynomes : puissances ne correspondent pas");
 #endif
@@ -178,7 +178,7 @@ public:
 	};
 
 	friend polynome_n_iter<T> operator+(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
@@ -257,7 +257,7 @@ public:
 	};
 
 	friend polynome_n_iter<T> operator-(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, addition : le nombre de variables ne correspond pas.");
 
@@ -345,7 +345,7 @@ public:
 	};
 
 	friend polynome_n_iter<T> operator*(polynome_n_iter<T> const& gauche, polynome_n_iter<T> const& droite) { // mettre le polynome le plus sparse à droite ! optimisé.
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (gauche.coeffs.puissance != droite.coeffs.puissance)
 			throw std::domain_error("polynome_n_iter, multiplication : le nombre de variables ne correspond pas.");
 		if (((gauche.scalaire) && (!droite.scalaire)) || ((droite.scalaire) && (!gauche.scalaire)))
@@ -522,9 +522,9 @@ public:
 	};
 
 	polynome_n_iter<T> operator() (int i, polynome_n_iter<T> const& Y) const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((i >= coeffs.puissance) || (i < 0))
-			throw std::domain_error("evaluation de polynome_n_rec : i non-conforme");
+			throw std::domain_error("evaluation de polynome_n_iter : i non-conforme");
 
 		if (Y.coeffs.puissance != coeffs.puissance - 1)
 			throw std::domain_error("evaluation de polynome : objet évalué non-conforme");
@@ -597,9 +597,9 @@ public:
 	U operator() (int i, U const& Y) const { //Y doit être de type matrice de polynome_n_iter, ou rationnel de polynome_n_iter, pour que ça ait du sens ... 
 		//Plus précisément polynome de taille n-1
 		// Est utile pour évaluer une fraction de polynome_n_iter ... On évalue le numerateur puis le denominateur ...
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((i >= coeffs.puissance) || (i < 0))
-			throw std::domain_error("evaluation de polynome_n_rec : i non-conforme");
+			throw std::domain_error("evaluation de polynome_n_iter : i non-conforme");
 
 		if (Y.coeffs.puissance != coeffs.puissance - 1)
 			throw std::domain_error("evaluation de polynome : objet évalué non-conforme");
@@ -668,14 +668,42 @@ public:
 	};
 
 	polynome_n_iter<T> operator() (int i, T element) const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (coeffs.puissance <= 0)
-			throw std::domain_error("evaluation de polynome_n_rec : puissance requise >0");
+			throw std::domain_error("evaluation de polynome_n_iter : puissance requise >0");
 #endif
 		polynome_n_iter<T> Y(coeffs.puissance - 1, element);
 		return *this(i, Y);
 	};
 
+	template<class U>
+	U operator() (std::vector<U> eval) const {
+#ifdef _DEBUG
+		if (eval.size() != coeffs.puissance)
+			throw std::domain_error("evaluation de polynome_n_iter : les dimensions ne coincident pas");
+#endif
+		U neutre = unite(eval[0], true);
+		std::vector<std::vector<U>> puissances(eval.size(), std::vector<U>(0));
+		for (int i(0); i < eval.size(); ++i) {
+			puissances[i] = std::vector<U>(coeffs.dimensions[i], neutre);
+			for (int j(1); j < coeffs.dimensions[i]; ++j)
+				puissances[i][j] = puissances[i][j - 1] * eval[i];
+		}
+
+		U resultat = unite(neutre, false);
+
+		for (typename vecteur_n<T>::const_iterator it = coeffs.cbegin(); (bool) it; ++it) {
+			if ((bool) *it)
+			{
+				U temp = neutre;
+				for (int i(0); i < eval.size(); ++i) {
+					temp *= puissances[i][it.mPositions[i]];
+				}
+				resultat += (*it) * temp;
+			}
+		}
+		return resultat;
+	}
 
 	template<class U> friend polynome_n_iter<T> operator*(U const& scalaire, polynome_n_iter<T> const& poly) {
 		polynome_n_iter<T> result(poly);
@@ -725,35 +753,6 @@ public:
 	};
 
 
-
-	/*
-	template<class I>
-	class iterator_polynome_n_iter;
-	
-	using iterator = iterator_polynome_n_iter<T>;
-	using const_iterator = iterator_polynome_n_iter<const T>;
-
-	iterator begin() {
-		return iterator(*this);
-	};
-
-	iterator end() {
-		iterator it(*this);
-		it.go_position(coeffs.data.size());
-		return it;
-	};
-
-	const_iterator cbegin() const {
-		return const_iterator(*this);
-	};
-
-	const_iterator cend() const {
-		const_iterator it(*this);
-		it.go_position(coeffs.data.size());
-		return it;
-	};
-	*/
-
 	operator polynome_n_sparse<T>() const {
 		polynome_n_sparse<T> poly(monome<T>(std::vector<int>(coeffs.puissance, 0), unite(coeffs.data[0], false)));
 		for (int i(0); i < coeffs.data.size(); ++i)
@@ -801,6 +800,33 @@ public:
 		return result;
 	};
 
+	polynome_n_iter<T> derivee(int i) const {
+		T nul = unite(get_T(), false);
+
+		std::vector<int> nouvelles_dimensions = coeffs.dimensions;
+		nouvelles_dimensions[i] -= 1;
+		if (nouvelles_dimensions[i] <= 0)
+			return polynome_n_iter<T>(coeffs.n_var, nul);
+
+		polynome_n_iter<T> resultat = *this;
+
+		for (const_iterator it = resultat.cbegin(); (bool)it; ++it) {
+			int pos = it.mPosition;
+			int pos2 = pos + coeffs.puissances[i];
+			if (pos2 < coeffs.data.size())
+				resultat.coeffs.data[pos] = (it.mPositions[i] +1) * coeffs.data[pos2];
+			else
+				resultat.coeffs.data[pos] = nul;
+		}
+
+		resultat.coeffs.modifier_dimension(nouvelles_dimensions);
+		return resultat;
+	}
+
+	T get_T() {
+		return coeffs.data[0];
+	}
+
 };
 
 template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int* dimensions, const int* puissances, int n) {
@@ -815,81 +841,3 @@ template<class T> polynome_n_rec<T> poly_n_convert_rec(const T* data, const int*
 	T faux = unite(*data, false);
 	return polynome_n_rec<T>(n, faux, tab); //simplifie aussi.
 };
-
-/*
-template<class T> template<class I>
-class polynome_n_iter<T>::iterator_polynome_n_iter {
-public:
-	using value_type = std::remove_const_t<I>;
-	using poly_type = std::conditional_t< std::is_const_v<I>, const polynome_n_iter<value_type>, polynome_n_iter<value_type>	>;
-
-	poly_type* pointeur;
-	int mposition;
-	std::vector<int> mpositions;
-
-	iterator_polynome_n_iter& operator++() {
-		++mposition;
-		for (int i(pointeur->coeffs.puissance - 1); i >= 0; --i) {
-			++mpositions[i];
-			if (mpositions[i] >= pointeur->coeffs.dimensions[i])
-				mpositions[i] = 0;
-			else
-				break;
-		}
-		return *this;
-	};
-
-	operator bool() const {
-		return mposition < pointeur->coeffs.data.size();
-	};
-
-	I& operator*() {
-		return pointeur->coeffs.data[mposition];
-	};
-
-	std::vector<int> positions() {
-		return mpositions;
-	};
-
-	int position() {
-		return mposition;
-	}
-
-	void go_position(int i) {
-		mposition = i;
-		mpositions = pointeur->coeffs.positions(i);
-	};
-
-	iterator_polynome_n_iter<T>& operator+=(int i) {
-		mposition += i;
-		mpositions = pointeur->coeffs.positions(mposition);
-		return *this;
-	}
-
-	void go_position(std::vector<int> pos) {
-		mpositions = pos;
-		mposition = pointeur->coeffs.position(pos);
-	};
-
-	friend bool operator==(iterator_polynome_n_iter const& gauche, iterator_polynome_n_iter const& droit) {
-		return ((gauche.pointeur == droit.pointeur) && (gauche.mposition == droit.mposition));
-	};
-
-	friend bool operator!=(iterator_polynome_n_iter const& gauche, iterator_polynome_n_iter const& droit) {
-		return ((gauche.pointeur != droit.pointeur) || (gauche.mposition != droit.mposition));
-	};
-
-	iterator_polynome_n_iter(poly_type& poly) {
-		pointeur = &poly;
-		mposition = 0;
-		mpositions = std::vector<int>(poly.coeffs.puissance, 0);
-	};
-};
-*/
-// Verifier les dimensions : polynome nul. OK
-// convertir en polynome_n_rec, et réciproquement. OK
-// mettre a jour types et norme.
-// simplifier le vecteur_n OK
-// vérifier puissances OK
-// const OK
-// ostream

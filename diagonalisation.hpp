@@ -30,7 +30,7 @@ public:
 	static_assert(type_algebre<T>::type == 0);
 
 	calcul_condition(matrice<T> m_matrice,bool vecteurs_propres = false) { //vecteurs propre : choisit de résoudre A.X=0 ou A^n.X=0
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (m_matrice.taille_l != m_matrice.taille_c)
 			throw std::domain_error("diagonalisation : dimensions ne coincident pas");
 #endif
@@ -223,7 +223,7 @@ public:
 	static_assert(type_algebre<T>::type == 0);
 
 	calcul_condition(matrice<T> m_matrice, bool vecteurs_propres = false) { //vecteurs propre : choisit de résoudre A.X=0 ou A^n.X=0
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (m_matrice.taille_l != m_matrice.taille_c)
 			throw std::domain_error("diagonalisation : dimensions ne coincident pas");
 #endif

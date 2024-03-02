@@ -217,7 +217,7 @@ public:
 					return;
 				ratio.numerateur *= frac;
 				ratio.denominateur *= frac;
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 				if (!(bool)denominateur)
 					throw std::domain_error("un 0 au denominateur d'une fraction");
 #endif
@@ -318,7 +318,7 @@ public:
 			auto ppcm = calcul_objet<std::vector<T>>::PPCM_objet(vec);
 			auto pgcd = calcul_objet<std::vector<T>>::PGCD_objet(vec);
 			auto frac = rationnel<decltype(pgcd)>(ppcm, pgcd);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 			if (!(bool)frac.denominateur)
 				throw std::domain_error("un 0 au denominateur d'une fraction");
 #endif

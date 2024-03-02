@@ -391,7 +391,7 @@ public:
 		positions = new_positions;
 
 		constexpr_for<1, n - 1>([&](auto j) { //deuxieme fonction : mettre a jour les pointeurs.
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 			if (positions[j - 1] >= pointeurs.get<j - 1>()->poly.coeffs.size())
 				throw std::domain_error("polynome_n_fixe::iterator, position hors domaine");
 #endif
@@ -613,7 +613,7 @@ public:
 	};
 
 	int max_degre(int i) const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (i != 0)
 			throw std::domain_error("polynome_n_fixe : get_degre : i >= n");
 #endif
@@ -655,7 +655,7 @@ public:
 
 
 template<class T, int n> polynome_n_fixe<T, n>::polynome_n_fixe(std::vector<int> vec, T element) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 	if (vec.size() != n)
 		throw std::domain_error("constructeur de polynome_n_fixe : n ne correspond pas");
 	for (int i(0); i < vec.size(); ++i)
@@ -693,7 +693,7 @@ template<class T, int n> polynome_n_fixe<T, n>::polynome_n_fixe(int* vec, T elem
 };
 
 template<class T> polynome_n_fixe<T, 1>::polynome_n_fixe(std::vector<int> vec, T element) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 	if (vec.size() != 1)
 		throw std::domain_error("constructeur de polynome_n_fixe : n ne correspond pas");
 	if (vec[0] < 0) {

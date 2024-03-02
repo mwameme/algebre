@@ -52,7 +52,7 @@ public:
 	}
 
 	explicit matrice(const std::vector<std::vector<T>>& vec) :  taille_l(vec.size()),taille_c(vec[0].size()) , coeffs(vec){
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		for(int i(1);i<taille_l;++i)
 			if (coeffs[i].size() != taille_c)
 				throw std::domain_error("creation de matrice : non-rectangulaire");
@@ -61,7 +61,7 @@ public:
 
 	explicit matrice(std::vector<std::vector<T>>&& vec) : taille_l(vec.size()), taille_c(vec[0].size()) {
 		std::swap(coeffs, vec);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		for (int i(1); i < taille_l; ++i)
 			if (coeffs[i].size() != taille_c)
 				throw std::domain_error("creation de matrice : non-rectangulaire");
@@ -76,7 +76,7 @@ public:
 	template<class U> explicit matrice(std::vector< std::vector<U>> liste) {
 		taille_l = liste.size();
 		taille_c = liste[0].size();
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (taille_l == 0)
 			throw std::domain_error("initialisation de matrice : liste vide");
 		if (taille_c == 0)
@@ -151,7 +151,7 @@ public:
 	};
 
 	friend matrice<T> operator*(const matrice<T>& gauche,const matrice<T>& droit) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (gauche.taille_c != droit.taille_l)
 			throw std::domain_error("multiplication de matrices : les dimensions ne coïncident pas");
 #endif
@@ -168,7 +168,7 @@ public:
 	};
 
 	friend matrice<T> operator+(const matrice<T>& gauche, const matrice<T>& droit) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((gauche.taille_l != droit.taille_l) || (gauche.taille_c != droit.taille_c))
 			throw std::domain_error("addition de matrices : les dimensions ne coïncident pas");
 #endif
@@ -180,7 +180,7 @@ public:
 	};
 
 	friend matrice<T> operator-(const matrice<T>& gauche, const matrice<T>& droit) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((gauche.taille_l != droit.taille_l) || (gauche.taille_c != droit.taille_c))
 			throw std::domain_error("addition de matrices : les dimensions ne coïncident pas");
 #endif
@@ -192,7 +192,7 @@ public:
 	};
 
 	friend matrice<T> operator-(matrice<T> const& element) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((gauche.taille_l != droit.taille_l) || (gauche.taille_c != droit.taille_c))
 			throw std::domain_error("addition de matrices : les dimensions ne coïncident pas");
 #endif
@@ -209,7 +209,7 @@ public:
 	};
 
 	void echangerLigne(int i, int j) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((i < 0) || (i >= taille_l) || (j < 0) || (j >= taille_l))
 			throw std::domain_error("echange de lignes : hors domaine");
 #endif
@@ -224,7 +224,7 @@ public:
 	};
 
 	void ajouterLigne(int i, int j, T coefficient) { // ajouter ligne i * coeffs à la ligne j ...
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((i < 0) || (i >= taille_l) || (j < 0) || (j >= taille_l))
 			throw std::domain_error("ajout de lignes : hors domaine");
 		if (i == j)
@@ -263,7 +263,7 @@ public:
 
 
 	friend std::vector<T> operator*(std::vector<T> const& vec_ligne, matrice<T> const& m_matrice) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ( vec_ligne.size() != m_matrice.taille_l)
 			throw std::domain_error("multiplication vecteur*matrice : les dimensions ne correspondent pas");
 #endif
@@ -281,7 +281,7 @@ public:
 	};
 
 	friend std::vector<T> operator*(matrice<T> const& m_matrice, std::vector<T> const& vec_colonne) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (vec_colonne.size() != m_matrice.taille_c)
 			throw std::domain_error("multiplication matrice*vecteur : les dimensions ne correspondent pas");
 #endif
@@ -320,7 +320,7 @@ public:
 	T determinant_anneau() const {
 		T resultat = unite(coeffs[0][0], false);
 		T vrai_ = unite(resultat, true);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (taille_l != taille_c)
 			throw std::domain_error("determinant : les dimensions ne coïncident pas");
 #endif
@@ -342,7 +342,7 @@ public:
 		else if constexpr (type_algebre<T>::type == 1) {
 			matrice<rationnel<T>> m_matrice(taille_l, taille_l);
 			T vrai = unite(coeffs[0][0], true);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 			if (taille_l != taille_c)
 				throw std::domain_error("determinant matrice : les dimensions ne coïncident pas");
 #endif
@@ -364,7 +364,7 @@ public:
 				matrice<T> m_matrice(*this);
 				T det = unite(coeffs[0][0], true);
 				T vrai = det;
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 				if (taille_l != taille_c)
 					throw std::domain_error("determinant de matrice : les dimensions ne coincident pas");
 #endif
@@ -400,7 +400,7 @@ public:
 				matrice<T> m_matrice(*this);
 				T det = unite(coeffs[0][0], true);
 				T vrai = det;
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 				if (taille_l != taille_c)
 					throw std::domain_error("determinant de matrice : les dimensions ne coïncident pas");
 #endif
@@ -461,7 +461,7 @@ public:
 	// type_algebre (2)
 	polynome<T> polynomeCaracteristique() const {
 		T mvrai = - unite(coeffs[0][0], true);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (taille_l != taille_c)
 			throw std::domain_error("polynome caracteristique : les dimensions ne correspondent pas");
 #endif

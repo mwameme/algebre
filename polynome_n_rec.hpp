@@ -82,7 +82,7 @@ public:
 		element = unite(element_, false);
 
 		polynome_n_rec<T> poly_faux(polynome_n_rec<T>(n_var - 1, element));
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		for (int i(0); i < liste.size(); ++i)
 			if (liste[i] < 0)
 				throw std::domain_error("creation de polynome_n_rec : un degre est negatif");
@@ -94,7 +94,7 @@ public:
 		}
 
 		std::vector<polynome_n_rec<T>> m_vec(liste[0] + 1, poly_faux);
-		m_vec[liste[0] + 1] = polynome_n_rec<T>(liste.data() + 1, n_var - 1, element_, element);
+		m_vec[liste[0] ] = polynome_n_rec<T>(liste.data() + 1, n_var - 1, element_, element);//ou liste[0] +1 ?
 
 		poly = polynome<polynome_n_rec<T>>(m_vec);
 		nul = (bool) poly;
@@ -111,7 +111,7 @@ public:
 			polynome_n_rec<T> poly_faux(polynome_n_rec<T>(n_var - 1, faux));
 
 			std::vector<polynome_n_rec<T>> m_vec(liste[0] + 1, poly_faux);
-			m_vec[liste[0] + 1] = polynome_n_rec<T>(liste + 1, n_var - 1, element_, faux);
+			m_vec[liste[0] ] = polynome_n_rec<T>(liste + 1, n_var - 1, element_, faux);
 
 			poly = polynome<polynome_n_rec<T>>(m_vec);
 		}
@@ -202,13 +202,14 @@ public:
 		}
 		else {
 			poly *= scalaire;
+			poly.getDegre();
 			nul = (bool)poly;
 		}
 		return *this;
 	};
 
 	polynome_n_rec<T>& operator+=(polynome_n_rec<T> const& autre) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (n_var != autre.n_var)
 			throw std::domain_error("addition de polynome_n_rec : n_var ne correspondent pas");
 #endif
@@ -217,13 +218,14 @@ public:
 			return *this;
 		}
 		poly += autre.poly;
+		poly.getDegre();
 		nul = (bool)poly;
 		return *this;
 	};
 
 
 	friend polynome_n_rec<T> operator*(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
 #endif
@@ -235,13 +237,14 @@ public:
 		result.element = temp1.element;
 		result.n_var = temp1.n_var;
 
+		result.poly.getDegre();
 		result.nul = (bool)result.poly;
 
 		return result;
 	}
 
 	friend polynome_n_rec<T> operator+(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
 #endif
@@ -253,6 +256,7 @@ public:
 		result.element = temp1.element;
 		result.n_var = temp1.n_var;
 
+		result.poly.getDegre();
 		result.nul = (bool)result.poly;
 
 		return result;
@@ -261,7 +265,7 @@ public:
 
 
 	friend polynome_n_rec<T> operator-(polynome_n_rec<T> const& temp1, polynome_n_rec<T> const& temp2) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (temp1.n_var != temp2.n_var)
 			throw std::domain_error("polynomes à n variables de tailles différentes");
 #endif
@@ -272,6 +276,7 @@ public:
 		result.element = temp1.element;
 		result.n_var = temp1.n_var;
 
+		result.poly.getDegre();
 		result.nul = (bool)result.poly;
 
 		return result;
@@ -287,6 +292,7 @@ public:
 		result.element = temp.element;
 		result.n_var = temp.n_var;
 
+		result.poly.getDegre();
 		result.nul = temp.nul;
 
 		return result;
@@ -313,6 +319,7 @@ public:
 				result.element = temp.element;
 				result.n_var = temp.n_var;
 
+				result.getDegre();
 				result.nul = (bool) result.poly;
 
 				return result;
@@ -337,6 +344,7 @@ public:
 		result.poly = (polynome<polynome_n_rec<U>>) poly;
 		result.n_var = n_var;
 
+		result.poly.getDegre();
 		result.nul = (bool)result.poly;
 
 		return result;
@@ -394,14 +402,14 @@ public:
 	void simplifier() { //reparcourt tout, met à jour nul, réduit les polynomes.
 		if (n_var == 0) {
 			nul = (bool)element;
-			return nul;
+			return ;
 		}
 		for (int i(0); i < poly.coeffs.size(); ++i)
 			poly.coeffs[i].simplifier();
 
 		poly.getDegre();
-
 		nul = (bool) poly;
+		return;
 	};
 
 	friend void swap(polynome_n_rec<T>& gauche, polynome_n_rec<T>& droit) {
@@ -466,7 +474,7 @@ public:
 	polynome_n_rec<T> operator()(int i, polynome_n_rec<T> const& poly) const {
 		polynome_n_rec<T> result = unite(poly, false);
 		int m_pow = max_degre(i);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (poly.n_var != (n_var - 1))
 			throw std::domain_error("evaluation de polynome n_sparse : les degrés ne correspondent pas");
 #endif
@@ -490,7 +498,7 @@ public:
 			result += monome_ * temp_poly;
 		};
 
-		result.noms_variables = poly.noms_variables;
+
 		return result;
 		//marche avec résultat scalaire ? je crois
 	};
@@ -500,7 +508,7 @@ public:
 	U operator()(int i, U const& poly) const {
 		U result = unite(poly, false);
 		int m_pow = max_degre(i);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (poly.n_var != (n_var - 1))
 			throw std::domain_error("evaluation de polynome n_sparse : les degrés ne correspondent pas");
 #endif
@@ -533,18 +541,89 @@ public:
 		return *this(i, poly);
 	};
 
+	template<class U>
+	U operator() (std::vector<U> eval) const {
+		if (n_var == 0)
+			return (U) element;
+		U neutre = unite(eval[0], true);
+		std::vector<std::vector<U>> puissances(n_var, std::vector<U>(1, neutre));
+		return evaluation_interne(puissances.data(), eval.data());
+	}
+
+	template<class U>
+	U evaluation_interne(std::vector<U>* puissances, U* evaluation) const {
+		//int n_var;
+		//polynome<polynome_n_rec<T>> poly;
+		//T element;
+		//bool nul; //true si non-nul
+
+		if (n_var == 0)
+			return element;
+		if (!(bool)*this)
+			return unite(element, false);
+
+		while (poly.degre >= puissances[0].size()) {
+			puissances[0].push_back(puissances[0][puissances->size() - 1] * evaluation[0]);
+		}
+
+		U somme = unite(element, false);
+		for (int i(0); i < poly.coeffs.size(); ++i) 
+			somme += puissances[0][i] * poly.coeffs[i].evaluation_interne(puissances + 1, evaluation + 1);
+		
+
+		return somme;
+	}
+
+	polynome_n_rec<T> derivee(int i) const {
+		polynome_n_rec<T> resultat = *this ;
+		resultat.deriver(i);
+		return resultat;
+	}
+
+	void deriver(int i) {
+		if (i > 0) {
+			for (int j(0); j < poly.coeffs.size(); ++j)
+				if ((bool)poly.coeffs[j])
+					poly.coeffs[j].deriver(i - 1);
+			return;
+		}
+#ifdef _DEBUG
+		if (n_var == 0)  //ne doit pas arriver
+			throw std::domain_error("derivee de polynome : s'applique sur le polynome constant");
+#endif
+		for (int j(0); j < poly.coeffs.size() - 1; ++j) 
+			poly.coeffs[j] = (j + 1) * poly.coeffs[j + 1];
+		int j = poly.coeffs.size() - 1;
+		poly.coeffs[j].nul = false;
+
+		/*
+		for (; j > 0; --j)
+			if (poly.coeffs[j].nul)
+				break;
+		if ((j + 1) != poly.coeffs.size())
+			poly.coeffs.resize(j + 1);
+		poly.degre
+		if (j == 0)
+			if (! poly.coeffs[j].nul)
+				nul = false;*/
+
+		poly.getDegre();
+		nul = (bool)poly;
+
+		return;
+	}
 };
 
 //vérifier nul=true/false
 
-template<class T> void parcourir_convert(polynome_n_rec<T> const* objet, T* data, int* puissances) {
+template<class T> void parcourir_convert(polynome_n_rec<T> const* objet, T* data, int* puissances) { //ordre : 
 	if (objet->n_var == 0) {
 		data[0] = objet->element;
 		return;
 	}
 	for (int i(objet->poly.coeffs.size() - 1); i >= 0; --i) {
 		if (objet->poly.coeffs[i].nul)
-			parcourir_convert(&objet->poly.coeffs[i], data + (i * (puissances[0])), puissances + 1);
+			parcourir_convert(& (objet->poly.coeffs[i]), data + (i * (puissances[0])), puissances + 1);
 	}
 	return;
 };

@@ -22,7 +22,7 @@ public:
 	monome() {};
 
 	monome(std::vector<int> const& degres_, T const& element_) : degres(degres_), element(element_) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		for (int i(0); i < degres.size(); ++i)
 			if (degres[i] < 0)
 				throw std::domain_error("constructeur de monome : un degre est negatif");
@@ -173,7 +173,7 @@ public:
 	};
 
 	void ajouter(monome<T> const& temp) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (temp.degres.size() != n_var)
 			throw std::domain_error("polynome_n_sparse : ajout de monome : n_var ne correspond pas");
 #endif
@@ -187,7 +187,7 @@ public:
 	};
 
 	void ajouter(std::vector<monome<T>> const& temp) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		for(int i(0);i<temp.size();++i)
 			if (temp[i].degres.size() != n_var)
 				throw std::domain_error("polynome_n_sparse : ajout de monome : n_var ne correspond pas");
@@ -203,7 +203,7 @@ public:
 	}
 
 	void simplifier() {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (monomes.size() == 0)
 			throw std::domain_error("polynome_n_sparse vide");
 #endif
@@ -277,7 +277,7 @@ public:
 
 
 	friend polynome_n_sparse<T> operator*(polynome_n_sparse<T> const& gauche, polynome_n_sparse<T> const& droit) {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ( (gauche.monomes.size() == 0) || (droit.monomes.size() == 0)
 			throw std::domain_error("polynome_n_sparse vide");
 #endif
@@ -411,7 +411,7 @@ public:
 	};
 
 	int max_degre(int i) const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if ((i < 0) || (i >= n_var))
 			throw std::domain_error("polynome_n_sparse : i > n_var");
 #endif
@@ -437,7 +437,7 @@ public:
 	polynome_n_sparse<T> operator()(int i, polynome_n_sparse<T> const& poly) const {
 		polynome_n_sparse<T> result = unite(poly, false);
 		int m_pow = max_degre(i);
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (poly.n_var != (n_var - 1))
 			throw std::domain_error("evaluation de polynome n_sparse : les degrés ne correspondent pas");
 #endif
@@ -467,6 +467,32 @@ public:
 		//marche avec résultat scalaire ? je crois
 	};
 
+	template<class U>
+	U operator()(std::vector<U> eval) const {
+		//n_var, monomes
+		//monomes : degres, element
+		T neutre = unite(get_T(),true);
+
+		T somme = unite(neutre, false);
+		std::vector<std::vector< U >> puissances(n_var, std::vector<U>(1,neutre));
+		for (int i(0); i < monomes.size(); ++i) {
+			if (!(bool)monomes[i].element)
+				continue;
+
+			for (int j(0); j < n_var; ++j) {
+				while (monomes[i].degres[j] >= puissances[j].size())
+					puissances[j].push_back(puissances[j][puissances[j].size() - 1] * eval[j]);
+			}
+			
+			U temp = neutre;
+
+			for (int j(0); j < n_var; ++j)
+				temp = temp * puissances[j][monomes[i].degres[j]];
+			somme = somme + (monomes[i].element * temp);
+		}
+		return somme;
+
+	}
 	
 	template<class U>
 	U operator()(int i, U const& poly) const {
@@ -521,7 +547,7 @@ public:
 
 	template<int n>
 	operator polynome_n_fixe<T,n>() const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (n != n_var)
 			throw std::domain_error("convertisseur de polynome_n_fixe : n ne correspond pas");
 #endif
@@ -533,7 +559,7 @@ public:
 	};
 
 	operator bool() const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
 		if (!est_trie)
 			throw std::domain_error("polynome_n_sparse, (bool) : n'est pas trie");
 		if (monomes.size() == 0)
@@ -552,23 +578,6 @@ public:
 		return poly;
 	}
 
-	/*
-	typename iterator begin() {
-		return monomes.begin();
-	};
-
-	typename iterator end() {
-		return monomes.end();
-	}
-
-	typename const_iterator cbegin()  const {
-		return monomes.cbegin();
-	};
-
-	typename const_iterator cend() const {
-		return monomes.cend();
-	};
-	*/
 
 	friend std::ostream& operator<<(std::ostream& os, polynome_n_sparse<T> const& poly) {
 		if ((bool)poly) {

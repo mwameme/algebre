@@ -106,7 +106,7 @@ public:
     };
 
     template<class U> U operator()(const U& temp) const {
-#ifdef ALGEBRA_USE_EXCEPTION
+#ifdef _DEBUG
         if ((bool) quotient(temp))
             std::cerr << "ATTENTION : évaluation de polynome : quotient(element) != 0" << std::endl;
 #endif
