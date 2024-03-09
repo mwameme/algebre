@@ -77,14 +77,14 @@ template<class T>  T unite(T const& element,bool test) {
 
 template<class T>  erreur_b<T> unite(erreur_b<T> const& temp, bool test) {
 	if (test)
-		return erreur_b<T>(unite(temp.valeur, test), precision_relative(temp.valeur));
+		return erreur_b<T>(unite(temp.valeur, test));
 	else
 		return erreur_b<T>(unite(temp.valeur, test), 0.);
 }
 
 template<class T>  erreur_l<T> unite(erreur_l<T> const& temp, bool test) {
 	if (test)
-		return erreur_l<T>(unite(temp.valeur, test), precision_relative_l(temp.valeur));
+		return erreur_l<T>(unite(temp.valeur, test));
 	else
 		return erreur_l<T>(unite(temp.valeur, test), 0.);
 }

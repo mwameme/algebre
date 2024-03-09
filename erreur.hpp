@@ -10,18 +10,33 @@
 
 #include "swap_T.hpp"
 
-inline float precision_relative(double x) {
+inline float precision_relative_b(double x) {
 	return carre(1.0e-15);
 };
 
-inline float precision_relative(float x) {
+inline float precision_relative_b(float x) {
 	return carre(1.0e-6);
 };
 
 
 //test de précision ... Essayer avec 1. et 10 000. (par exemple)
-inline float precision_relative(float_precision const& x) {
+inline float precision_relative_b(float_precision const& x) {
 	return carre((float) x.epsilon());
+};
+
+
+inline float precision_relative_l(double x) {
+	return 1.0e-15;
+};
+
+inline float precision_relative_l(float x) {
+	return 1.0e-6;
+};
+
+
+//test de précision ... Essayer avec 1. et 10 000. (par exemple)
+inline float precision_relative_l(float_precision const& x) {
+	return (float)x.epsilon();
 };
 
 
@@ -41,7 +56,7 @@ public :
 
 	explicit erreur_b(T const& valeur_) {
 		valeur = valeur_;
-		precision = carre((float)valeur) * precision_relative(valeur);
+		precision = carre((float)valeur) * precision_relative_b(valeur);
 	};
 
 
@@ -129,17 +144,17 @@ public :
 	//A MODIFIER
 	friend erreur_b<T> operator+(erreur_b<T> const& temp1, erreur_b<T> const& temp2) {
 		erreur_b<T> result(temp1.valeur + temp2.valeur, 0.);
-		if (carre((float)temp2.valeur) < carre((float)temp1.valeur) * precision_relative(temp1.valeur)) {
+		if (carre((float)temp2.valeur) < carre((float)temp1.valeur) * precision_relative_l(temp1.valeur)) {
 			result.precision = temp1.precision + carre((float)temp2.valeur);
 			return result;
 		}
-		if (carre((float)temp1.valeur) < carre((float)temp2.valeur) * precision_relative(temp2.valeur)) {
+		if (carre((float)temp1.valeur) < carre((float)temp2.valeur) * precision_relative_l(temp2.valeur)) {
 			result.precision = temp2.precision + carre((float)temp1.valeur);
 			return result;
 		}
 
-		float erreur_b1 = carre((float)temp1.valeur) * precision_relative(temp1.valeur); //erreur_b sur le calcul de x+y liée à x. registre
-		float erreur_b2 = carre((float)temp2.valeur) * precision_relative(temp2.valeur); //erreur_b sur le calcul de x+y liée à y. registre
+		float erreur_b1 = carre((float)temp1.valeur) * precision_relative_l(temp1.valeur); //erreur_b sur le calcul de x+y liée à x. registre
+		float erreur_b2 = carre((float)temp2.valeur) * precision_relative_l(temp2.valeur); //erreur_b sur le calcul de x+y liée à y. registre
 		if (erreur_b1 > erreur_b2) {
 			if ((float)temp2.precision < erreur_b1) {
 				result.precision = temp1.precision + erreur_b1;
@@ -160,17 +175,17 @@ public :
 	friend erreur_b<T> operator-(erreur_b<T> const& temp1, erreur_b<T> const& temp2) {
 		erreur_b<T> result(temp1.valeur - temp2.valeur,0.);
 		//copié de operator+
-		if (carre((float)temp2.valeur) < carre((float)temp1.valeur) * precision_relative(temp1.valeur)) {
+		if (carre((float)temp2.valeur) < carre((float)temp1.valeur) * precision_relative_l(temp1.valeur)) {
 			result.precision = temp1.precision + carre((float)temp2.valeur);
 			return result;
 		}
-		if (carre((float)temp1.valeur) < carre((float)temp2.valeur) * precision_relative(temp2.valeur)) {
+		if (carre((float)temp1.valeur) < carre((float)temp2.valeur) * precision_relative_l(temp2.valeur)) {
 			result.precision = temp2.precision + carre((float)temp1.valeur);
 			return result;
 		}
 
-		float erreur_b1 = carre((float)temp1.valeur) * precision_relative(temp1.valeur); //erreur_b sur le calcul de x+y liée à x
-		float erreur_b2 = carre((float)temp2.valeur) * precision_relative(temp2.valeur); //erreur_b sur le calcul de x+y liée à y
+		float erreur_b1 = carre((float)temp1.valeur) * precision_relative_l(temp1.valeur); //erreur_b sur le calcul de x+y liée à x
+		float erreur_b2 = carre((float)temp2.valeur) * precision_relative_l(temp2.valeur); //erreur_b sur le calcul de x+y liée à y
 		if (erreur_b1 > erreur_b2) {
 			//		float x = carre((float)temp1.valeur) * precision_relative(temp1.valeur);
 			if ((float)temp2.precision < erreur_b1) {
@@ -229,20 +244,6 @@ public :
 
 //LA MEME EN LINEAIRE
 
-inline float precision_relative_l(double x) {
-	return 1.0e-15;
-};
-
-inline float precision_relative_l(float x) {
-	return 1.0e-6;
-};
-
-
-//test de précision ... Essayer avec 1. et 10 000. (par exemple)
-inline float precision_relative_l(float_precision const& x) {
-	return (float)x.epsilon();
-};
-
 
 template<class T> class erreur_l {
 public:
@@ -256,7 +257,7 @@ public:
 
 	explicit erreur_l(T const& valeur_) {
 		valeur = valeur_;
-		precision = ((float)valeur) * precision_relative_l(valeur);
+		precision = abs((float)valeur) * precision_relative_l(valeur);
 	};
 
 

@@ -256,9 +256,8 @@ public:
 			if (vec[i]->degres == vec_2[j].degres)
 				vec_2[j].element += vec[i]->element;
 			else {
-				if (!(bool)vec_2[j].element) {
+				if (!(bool)vec_2[j].element)
 					vec_2[j] = * (vec[i]);
-				}
 				else {
 					++j;
 					vec_2.push_back(*(vec[i]));

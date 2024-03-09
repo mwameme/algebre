@@ -671,9 +671,7 @@ public:
 	};
 
 	bool operator!=(iterator const& autre) const {
-		if (termine != autre.termine)
-			return true;
-		if (pointeurs[0] != autre.pointeurs[0])
+		if ((termine != autre.termine) || (pointeurs[0] != autre.pointeurs[0]))
 			return true;
 		if (n_var != 0)
 			return (positions != autre.positions);
