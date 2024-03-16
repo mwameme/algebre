@@ -134,6 +134,42 @@ public:
 		swap(monomes, copie.monomes);
 	};
 
+	void deriver(int i) {
+#ifdef _DEBUG
+		if (i >= n_var)
+			throw std::domain_error("derivee de polynome_n_sparse : int i trop grand");
+#endif
+		T faux = unite(get_T(), false);
+		for (int j(0); j < monomes.size(); ++j) {
+			monomes[j].element *= monomes[j].degres[i];
+			monomes[j].degres[i] -= 1;
+			if (monomes[j].degres[i] < 0) {
+				monomes[j].elemnent == faux;
+				est_trie = false;
+			}
+		}
+
+		simplifier();
+		return;
+	}
+
+	polynome_n_sparse<T> derivee(int i) const {
+
+		polynome_n_sparse<T> resultat(n_var);
+		resultat.monomes.reserve(monomes.size());
+		for (int j(0); j < monomes.size(); ++j)
+			if (monomes[j].degres[i] > 0) {
+				std::vector<int> degres = monomes[j].degres;
+				degres[i] -= 1;
+				monome<T> temp(degres, monomes[j].degres * monomes[j].element);
+				resultat.monomes.push_back(temp);
+			}
+
+		resultat.est_trie = est_trie;
+		return resultat;
+	}
+
+
 	polynome_n_sparse<T>& operator=(polynome_n_sparse<T> const& copie) {
 		if (this == &copie)
 			return *this;

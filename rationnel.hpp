@@ -21,6 +21,22 @@ public:
     T numerateur;
     T denominateur;
 
+    rationnel<T> derivee(int i) const {
+        rationnel<T> result;
+        T x = denominateur.derivee(i);
+        if ((bool)denominateur.derivee(i)) {
+            result.numerateur = (numerateur.derivee(i) * denominateur) - (numerateur * x);
+            result.denominateur = denominateur * denominateur;
+            result.simplifier();
+            return result;
+        }
+        else {
+            result.numerateur = numerateur.derivee(i);
+            result.denominateur = denominateur;
+            return result;
+        }
+    }
+
 
     friend rationnel<T> derivee(rationnel<T> const& element) {
         rationnel<T> result;

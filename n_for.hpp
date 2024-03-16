@@ -4,6 +4,13 @@
 
 class n_for {
 public:
+
+	bool croissant;
+	bool OK;
+	int position;
+	std::vector<int> positions;
+	std::vector<int> dimensions;
+
 	n_for() {};
 
 	n_for(std::vector<int> dim,bool croissant_=false) {
@@ -158,12 +165,7 @@ public:
 		std::swap(gauche.positions, droit.positions);
 		std::swap(gauche.dimensions, droit.dimensions);
 		return;
-	}
+	};
 
-	bool croissant;
-	bool OK;
-	int position;
-	std::vector<int> positions;
-	std::vector<int> dimensions;
 
 };

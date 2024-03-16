@@ -33,6 +33,11 @@ public:
 
 	using sous_type = typename T;
 
+
+	T get_T() const {
+		return element;
+	}
+
 	polynome_n_rec() : n_var(0) ,nul(false) {}; //a ne pas utiliser dans le programme.
 
 	polynome_n_rec(int n, T temp) { //constructeur de base. polynome vide.
@@ -638,6 +643,7 @@ public:
 	std::vector<int> positions;
 	std::vector<poly_type *> pointeurs;
 	bool termine;
+
 
 	std::vector<int> get_position() {
 		return positions;

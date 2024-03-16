@@ -52,6 +52,7 @@ public:
 	polynome_n_iter(std::vector<int> degres, T element, bool is_degre = true) {
 		//monome. degres >0. Transforme degres en dimensions ...  
 		//si true ATTENTION créé avec degrés (+1) ... Sinon avec dimensions ...
+
 		if (degres.size() == 0) {
 			degres = { 1 };
 			coeffs = vecteur_n<T>(degres);
@@ -558,6 +559,7 @@ public:
 
 		polynome_n_iter<T> result(n - 1, unite(coeffs.data[0], false), Y.noms); //polynome nul.
 		while (fin) {
+
 			int j = n - 1;
 			if (j == i)
 				--j;
@@ -642,7 +644,7 @@ public:
 				position += coeffs.puissances[j];
 				if (positions[j] < coeffs.dimensions[j])
 					break;
-				positions -= positions[j] * coeffs.puissances[j];
+				position -= positions[j] * coeffs.puissances[j];
 				--j;
 				if (j == i)
 					--j;
@@ -821,6 +823,51 @@ public:
 
 		resultat.coeffs.modifier_dimension(nouvelles_dimensions);
 		return resultat;
+	}
+
+	void deriver(int i) {
+		int n = coeffs.puissance;
+		int position = 0;
+		bool fin = true;
+		std::vector<int> positions = std::vector<int>(n, 0);
+		T faux = unite(get_T(), false);
+
+		while (fin) {
+			int j = n - 1;
+			if (j == i)
+				--j;
+			if (j < 0) //non-essentiel. Pour être sûr.
+				break;
+			do {
+				++positions[j];
+				position += coeffs.puissances[j];
+				if (positions[j] < coeffs.dimensions[j])
+					break;
+				position -= positions[j] * coeffs.puissances[j];
+				--j;
+				if (j == i)
+					--j;
+				if (j < 0)
+					break;
+			} while (true);
+
+			if (j < 0)
+				break;
+			//on a la nouvelle position ... correcte avec 0 sur positions[i].
+			for (int k(1); k < coeffs.dimensions[i]; ++k) {
+				int pos2 = position + coeffs.puissances[i] * k;
+				if (pos2 >= coeffs.data.size()) {
+					coeffs.data[position + (k - 1) * coeffs.puissances[i]] = faux;
+					break;
+				}
+				else
+					coeffs.data[position + (k - 1) * coeffs.puissances[i]] = k * coeffs.data[position + k * coeffs.puissances[i]];
+			}
+		}
+
+		simplifier();
+		return;
+
 	}
 
 	T get_T() {

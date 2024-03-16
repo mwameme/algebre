@@ -5,6 +5,7 @@
 #include <exception>
 
 #include "unite.hpp"
+#include "swap_T.hpp"
 
 template<class T>  T unite(T const& element, bool test);
 
@@ -13,9 +14,9 @@ template<class T>  T unite(T const& element, bool test);
 template<class T> class vecteur_n {
 public:
 
-	std::vector<int> puissances;
+	std::vector<int> puissances; //pour se retrouver dans le vecteur data
 	int puissance; //nombre de variables ... data[1][2]...[puissance]
-	std::vector<int> dimensions;
+	std::vector<int> dimensions; //.size() du n-ème vecteur
 	std::vector<T> data;
 
 	vecteur_n() {};
@@ -38,7 +39,7 @@ public:
 		puissances= std::vector<int>(puissance);
 		puissances[puissance - 1] = 1;
 		for (int i(puissance-2); i >= 0; --i)
-			puissances[i]= puissances[i+1]* dimensions[i+1];
+			puissances[i]= puissances[i+1] * dimensions[i+1];
 		int taille = puissances[0] * dimensions[0];
 		data = std::vector<T>(taille);
 
@@ -56,6 +57,7 @@ public:
 			if (dimensions[i] < 0)
 				throw std::domain_error("vecteur_n : une dimension < 0");
 #endif
+
 		puissances = std::vector<int>(puissance);
 		puissances[puissance - 1] = 1;
 		for (int i(puissance - 2); i >= 0; --i)
@@ -179,7 +181,7 @@ public:
 
 
 		while (true) {
-			data2[pos_int2] = data[pos_int];
+			swap_F(data2[pos_int2] , data[pos_int]); //plus rapide. On détruit "data" à la fin
 			++pos_int;
 			++pos_int2;
 			++pos[puissance - 1];
@@ -215,7 +217,7 @@ public:
 		std::vector<int> dimensions_max(puissance, 0);
 
 		for (n_for iter(dimensions); (bool) iter; ++iter)
-			if ((bool)data[iter.position])
+			if ((bool)data[iter.position]) //c'est ceci qu'on regarde
 				for (int i(0); i < puissance; ++i)
 					if (iter.positions[i] > dimensions_max[i])
 						dimensions_max[i] = iter.positions[i];
