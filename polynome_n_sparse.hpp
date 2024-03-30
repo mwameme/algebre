@@ -86,10 +86,6 @@ public:
 		return monome<T>(degres_temp, temp);
 	};
 
-	monome<T> operator-() const {
-		return monome<T>(degres, -element);
-	};
-	
 
 	// bien defini
 	friend bool operator<(monome<T> const& gauche, monome<T> const& droit) {
@@ -161,7 +157,7 @@ public:
 			if (monomes[j].degres[i] > 0) {
 				std::vector<int> degres = monomes[j].degres;
 				degres[i] -= 1;
-				monome<T> temp(degres, monomes[j].degres * monomes[j].element);
+				monome<T> temp(degres, monomes[j].degres[i] * monomes[j].element);
 				resultat.monomes.push_back(temp);
 			}
 
@@ -353,7 +349,7 @@ public:
 		if (gauche.n_var == 0) {
 			return polynome_n_sparse<T>(monome<T>(std::vector<int>(0), gauche.monomes[0].element * droit.monomes[0].element));
 		}
-		polynome_n_sparse<T> result(gauche.n_var,gauche.noms);
+		polynome_n_sparse<T> result(gauche.n_var);
 		result.monomes.reserve(gauche.monomes.size() * droit.monomes.size());
 		for (int i(0); i < gauche.monomes.size(); ++i)
 			for (int j(0); j < droit.monomes.size(); ++j)
@@ -381,15 +377,14 @@ public:
 		}
 		if (gauche.n_var == 0) {
 			polynome_n_sparse<T> result(monome<T>(std::vector<int>(0), gauche.monomes[0].element + droit.monomes[0].element));
-			result.noms = gauche.noms;
 			return result;
 		}
 
 		int ig = 0; //gauche droit et final
 		int id = 0;
-		polynome_n_sparse<T> result(gauche.n_var, gauche.noms);
+		polynome_n_sparse<T> result(gauche.n_var);
 		result.monomes.reserve(gauche.monomes.size() + droit.monomes.size());
-		monome<T> faux = unite(monomes[0], false);
+		monome<T> faux = unite(gauche.monomes[0], false);
 
 		while (true) {
 			if (gauche.monomes[ig].degres == droit.monomes[id].degres) {
@@ -435,15 +430,14 @@ public:
 		}
 		if (gauche.n_var == 0) {
 			polynome_n_sparse<T> result(monome<T>(std::vector<int>(0), gauche.monomes[0].element - droit.monomes[0].element));
-			result.noms = gauche.noms;
 			return result;
 		}
 
 		int ig = 0; //gauche droit et final
 		int id = 0;
-		polynome_n_sparse<T> result(gauche.n_var, gauche.noms);
+		polynome_n_sparse<T> result(gauche.n_var);
 		result.monomes.reserve(gauche.monomes.size() + droit.monomes.size());
-		monome<T> faux = unite(monomes[0], false);
+		monome<T> faux = unite(gauche.monomes[0], false);
 
 		while (true) {
 			if (gauche.monomes[ig].degres == droit.monomes[id].degres) {
@@ -629,7 +623,7 @@ public:
 		return poly;
 	};
 
-	operator bool() const {
+	operator bool() {
 #ifdef _DEBUG
 		if (!est_trie)
 			throw std::domain_error("polynome_n_sparse, (bool) : n'est pas trie");
